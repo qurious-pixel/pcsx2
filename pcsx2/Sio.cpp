@@ -20,11 +20,14 @@
 #include "ConsoleLogger.h"
 #include "Sio.h"
 #include "sio_internal.h"
+#ifdef _WIN32
+#include "PAD/Windows/PAD.h"
+#else
+#include "PAD/Linux/PAD.h"
+#endif
 
 #ifndef DISABLE_RECORDING
 #	include "Recording/InputRecording.h"
-#	include "Recording/PadData.h"
-#	include "Recording/RecordingInputManager.h"
 #endif
 
 _sio sio;
@@ -214,17 +217,14 @@ SIO_WRITE sioWriteController(u8 data)
 
 	default:
 		sio.buf[sio.bufCount] = PADpoll(data);
-
 #ifndef DISABLE_RECORDING
 		if (g_Conf->EmuOptions.EnableRecordingTools)
 		{
-			g_InputRecording.ControllerInterrupt(data, sio.port, sio.bufCount, sio.buf);
-			if (g_InputRecording.IsInterruptFrame())
+			// Only examine controllers 1 / 2
+			if (sio.slot[sio.port] == 0)
 			{
-				g_RecordingInput.ControllerInterrupt(data, sio.port, sio.bufCount, sio.buf);
+				g_InputRecording.ControllerInterrupt(data, sio.port, sio.bufCount, sio.buf);
 			}
-
-			PadData::LogPadData(sio.port, sio.bufCount, sio.buf);
 		}
 #endif
 		break;
@@ -445,6 +445,7 @@ SIO_WRITE memcardWrite(u8 data)
 					once = false;
 					break;
 				}
+				[[fallthrough]];
 
 			default:
 				DevCon.Warning("%s cmd: %02X??", __FUNCTION__, data);
@@ -535,6 +536,7 @@ SIO_WRITE memcardRead(u8 data)
 					once = false;
 					break;
 				}
+				[[fallthrough]];
 
 			default:
 				DevCon.Warning("%s cmd: %02X??", __FUNCTION__, data);
@@ -718,7 +720,7 @@ SIO_WRITE sioWriteMemcard(u8 data)
 		case 0x11: // On Boot/Probe
 		case 0x12: // On Write/Delete/Recheck?
 			sio2.packet.recvVal3 = 0x8C;
-			// Fall through
+			[[fallthrough]];
 
 		case 0x81: // Checked right after copy/delete
 		case 0xBF: // Wtf?? On game booting?

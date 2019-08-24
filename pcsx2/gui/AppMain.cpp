@@ -21,6 +21,11 @@
 #include "AppSaveStates.h"
 #include "AppGameDatabase.h"
 #include "AppAccelerators.h"
+#ifdef _WIN32
+#include "PAD/Windows/PAD.h"
+#else
+#include "PAD/Linux/PAD.h"
+#endif
 
 #include "Plugins.h"
 #include "ps2/BiosTools.h"
@@ -32,7 +37,7 @@
 #include "Debugger/DisassemblyDialog.h"
 
 #ifndef DISABLE_RECORDING
-#	include "Recording/RecordingControls.h"
+#	include "Recording/InputRecordingControls.h"
 #	include "Recording/InputRecording.h"
 #endif
 
@@ -534,12 +539,6 @@ void DoFmvSwitch(bool on)
 			if (GSPanel* viewport = gsFrame->GetViewport())
 				viewport->DoResize();
 	}
-
-	if (EmuConfig.Gamefixes.FMVinSoftwareHack) {
-		ScopedCoreThreadPause paused_core(new SysExecEvent_SaveSinglePlugin(PluginId_GS));
-		renderswitch = !renderswitch;
-		paused_core.AllowResume();
-	}
 }
 
 void Pcsx2App::LogicalVsync()
@@ -552,7 +551,7 @@ void Pcsx2App::LogicalVsync()
 
 	FpsManager.DoFrame();
 
-	if (EmuConfig.Gamefixes.FMVinSoftwareHack || g_Conf->GSWindow.FMVAspectRatioSwitch != FMV_AspectRatio_Switch_Off) {
+	if (g_Conf->GSWindow.FMVAspectRatioSwitch != FMV_AspectRatio_Switch_Off) {
 		if (EnableFMV) {
 			DevCon.Warning("FMV on");
 			DoFmvSwitch(true);
@@ -573,7 +572,7 @@ void Pcsx2App::LogicalVsync()
 
 	// Only call PADupdate here if we're using GSopen2.  Legacy GSopen plugins have the
 	// GS window belonging to the MTGS thread.
-	if( (PADupdate != NULL) && (GSopen2 != NULL) && (wxGetApp().GetGsFramePtr() != NULL) )
+	if( (GSopen2 != NULL) && (wxGetApp().GetGsFramePtr() != NULL) )
 		PADupdate(0);
 
 	while( const keyEvent* ev = PADkeyEvent() )
@@ -620,21 +619,20 @@ void Pcsx2App::HandleEvent(wxEvtHandler* handler, wxEventFunction func, wxEvent&
 #ifndef DISABLE_RECORDING
 		if (g_Conf->EmuOptions.EnableRecordingTools)
 		{
-			if (g_RecordingControls.HasRecordingStopped())
+			if (g_InputRecordingControls.IsPaused())
 			{
-				// While stopping, GSFrame key event also stops, so get key input from here
-				// Along with that, you can not use the shortcut keys set in GSFrame
-				if (PADkeyEvent != NULL)
+				// When the GSFrame CoreThread is paused, so is the logical VSync
+				// Meaning that we have to grab the user-input through here to potentially
+				// resume emulation.
+				if (const keyEvent* ev = PADkeyEvent() )
 				{
-					// Acquire key information, possibly calling it only once per frame
-					const keyEvent* ev = PADkeyEvent();
-					if (ev != NULL)
+					if( ev->key != 0 )
 					{
-						sApp.Recording_PadKeyDispatch(*ev);
+						PadKeyDispatch( *ev );
 					}
 				}
 			}
-			g_RecordingControls.ResumeCoreThreadIfStarted();
+			g_InputRecordingControls.ResumeCoreThreadIfStarted();
 		}
 #endif
 		(handler->*func)(event);
@@ -664,6 +662,11 @@ void Pcsx2App::HandleEvent(wxEvtHandler* handler, wxEventFunction func, wxEvent&
 		// Saved state load failed prior to the system getting corrupted (ie, file not found
 		// or some zipfile error) -- so log it and resume emulation.
 		Console.Warning( ex.FormatDiagnosticMessage() );
+#ifndef DISABLE_RECORDING
+		if (g_InputRecording.IsInitialLoad())
+			g_InputRecording.FailedSavestate();
+#endif
+
 		CoreThread.Resume();
 	}
 	// ----------------------------------------------------------------------------
@@ -1020,32 +1023,51 @@ void Pcsx2App::OpenGsPanel()
 #endif
 
 	gsFrame->ShowFullScreen( g_Conf->GSWindow.IsFullscreen );
+
+#ifndef DISABLE_RECORDING
+	// Enable New & Play after the first game load of the session
+	sMainFrame.enableRecordingMenuItem(MenuId_Recording_New, !g_InputRecording.IsActive());
+	sMainFrame.enableRecordingMenuItem(MenuId_Recording_Play, true);
+
+	// Enable recording menu options as the game is now running
+	sMainFrame.enableRecordingMenuItem(MenuId_Recording_FrameAdvance, true);
+	sMainFrame.enableRecordingMenuItem(MenuId_Recording_TogglePause, true);
+	sMainFrame.enableRecordingMenuItem(MenuId_Recording_ToggleRecordingMode, g_InputRecording.IsActive());
+#endif
 }
 
 void Pcsx2App::CloseGsPanel()
 {
-	if( AppRpc_TryInvoke( &Pcsx2App::CloseGsPanel ) ) return;
+	if (AppRpc_TryInvoke(&Pcsx2App::CloseGsPanel))
+		return;
 
 	if (CloseViewportWithPlugins)
 	{
 		if (GSFrame* gsFrame = GetGsFramePtr())
-		if (GSPanel* woot = gsFrame->GetViewport())
-			woot->Destroy();
+			if (GSPanel* woot = gsFrame->GetViewport())
+				woot->Destroy();
 	}
 }
 
-void Pcsx2App::OnGsFrameClosed( wxWindowID id )
+void Pcsx2App::OnGsFrameClosed(wxWindowID id)
 {
-	if( (m_id_GsFrame == wxID_ANY) || (m_id_GsFrame != id) ) return;
+	if ((m_id_GsFrame == wxID_ANY) || (m_id_GsFrame != id))
+		return;
 
 	CoreThread.Suspend();
 
-	if( !m_UseGUI )
+	if (!m_UseGUI)
 	{
 		// The user is prompted before suspending (at Sys_Suspend() ), because
 		// right now there's no way to resume from suspend without GUI.
 		PrepForExit();
 	}
+#ifndef DISABLE_RECORDING
+	// Disable recording controls that only make sense if the game is running
+	sMainFrame.enableRecordingMenuItem(MenuId_Recording_FrameAdvance, false);
+	sMainFrame.enableRecordingMenuItem(MenuId_Recording_TogglePause, false);
+	sMainFrame.enableRecordingMenuItem(MenuId_Recording_ToggleRecordingMode, false);
+#endif
 }
 
 void Pcsx2App::OnProgramLogClosed( wxWindowID id )
@@ -1060,7 +1082,7 @@ void Pcsx2App::OnProgramLogClosed( wxWindowID id )
 void Pcsx2App::OnMainFrameClosed( wxWindowID id )
 {
 #ifndef DISABLE_RECORDING
-	if (g_Conf->EmuOptions.EnableRecordingTools)
+	if (g_InputRecording.IsActive())
 	{
 		g_InputRecording.Stop();
 	}
@@ -1153,6 +1175,9 @@ void Pcsx2App::SysExecute()
 void Pcsx2App::SysExecute( CDVD_SourceType cdvdsrc, const wxString& elf_override )
 {
 	SysExecutorThread.PostEvent( new SysExecEvent_Execute(cdvdsrc, elf_override) );
+#ifndef DISABLE_RECORDING
+	g_InputRecording.RecordingReset();
+#endif
 }
 
 // Returns true if there is a "valid" virtual machine state from the user's perspective.  This
@@ -1178,7 +1203,19 @@ void SysStatus( const wxString& text )
 void SysUpdateIsoSrcFile( const wxString& newIsoFile )
 {
 	g_Conf->CurrentIso = newIsoFile;
-	sMainFrame.UpdateIsoSrcSelection();
+	sMainFrame.UpdateStatusBar();
+	sMainFrame.UpdateCdvdSrcSelection();
+}
+
+void SysUpdateDiscSrcDrive( const wxString& newDiscDrive )
+{
+#if defined(_WIN32)
+	g_Conf->Folders.RunDisc = wxFileName::DirName(newDiscDrive);
+#else
+	g_Conf->Folders.RunDisc = wxFileName(newDiscDrive);
+#endif
+	AppSaveSettings();
+	sMainFrame.UpdateCdvdSrcSelection();
 }
 
 bool HasMainFrame()

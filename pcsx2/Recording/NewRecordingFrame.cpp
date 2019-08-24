@@ -1,5 +1,5 @@
 /*  PCSX2 - PS2 Emulator for PCs
- *  Copyright (C) 2002-2019  PCSX2 Dev Team
+ *  Copyright (C) 2002-2020  PCSX2 Dev Team
  *
  *  PCSX2 is free software: you can redistribute it and/or modify it under the terms
  *  of the GNU Lesser General Public License as published by the Free Software Found-
@@ -18,13 +18,14 @@
 #include "NewRecordingFrame.h"
 
 
-NewRecordingFrame::NewRecordingFrame(wxWindow *parent)
+#ifndef DISABLE_RECORDING
+NewRecordingFrame::NewRecordingFrame(wxWindow* parent)
 	: wxDialog(parent, wxID_ANY, "New Input Recording", wxDefaultPosition, wxDefaultSize, wxSTAY_ON_TOP | wxCAPTION)
 {
-	wxPanel *panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _("panel"));
+	wxPanel* panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _("panel"));
 
-	wxFlexGridSizer *fgs = new wxFlexGridSizer(4, 2, 20, 20);
-	wxBoxSizer *container = new wxBoxSizer(wxVERTICAL);
+	wxFlexGridSizer* fgs = new wxFlexGridSizer(4, 2, 20, 20);
+	wxBoxSizer* container = new wxBoxSizer(wxVERTICAL);
 
 	m_fileLabel = new wxStaticText(panel, wxID_ANY, _("File Path"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
 	m_authorLabel = new wxStaticText(panel, wxID_ANY, _("Author"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
@@ -32,13 +33,10 @@ NewRecordingFrame::NewRecordingFrame(wxWindow *parent)
 
 	m_filePicker = new wxFilePickerCtrl(panel, MenuIds_New_Recording_Frame_File, wxEmptyString, "File", L"p2m2 file(*.p2m2)|*.p2m2", wxDefaultPosition, wxDefaultSize, wxFLP_SAVE | wxFLP_OVERWRITE_PROMPT | wxFLP_USE_TEXTCTRL);
 	m_authorInput = new wxTextCtrl(panel, MenuIds_New_Recording_Frame_Author, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-	wxArrayString choices;
-	choices.Add("Current Frame");
-	choices.Add("Power-On");
-	m_fromChoice = new wxChoice(panel, MenuIds_New_Recording_Frame_From, wxDefaultPosition, wxDefaultSize, choices);
-	m_fromChoice->SetSelection(0);
+	m_fromChoice = new wxChoice(panel, MenuIds_New_Recording_Frame_From, wxDefaultPosition, wxDefaultSize, NULL);
 
-	m_startRecording = new wxButton(panel, wxID_OK, _("Ok"), wxDefaultPosition, wxDefaultSize);
+	m_startRecording = new wxButton(panel, wxID_OK, _("Browse Required"), wxDefaultPosition, wxDefaultSize);
+	m_startRecording->Enable(false);
 	m_cancelRecording = new wxButton(panel, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxDefaultSize);
 
 	fgs->Add(m_fileLabel, 1);
@@ -57,11 +55,57 @@ NewRecordingFrame::NewRecordingFrame(wxWindow *parent)
 	panel->SetSizer(container);
 	panel->GetSizer()->Fit(this);
 	Centre();
+
+	m_fileBrowsed = false;
+	m_filePicker->GetPickerCtrl()->Bind(wxEVT_FILEPICKER_CHANGED, &NewRecordingFrame::OnFileDirChange, this);
+	m_filePicker->Bind(wxEVT_FILEPICKER_CHANGED, &NewRecordingFrame::OnFileChanged, this);
+}
+
+int NewRecordingFrame::ShowModal(const bool isCoreThreadOpen)
+{
+	static const char* choices[2] = {"Boot", "Current Frame"};
+	m_fromChoice->Set(wxArrayString(1 + isCoreThreadOpen, &choices[0]));
+	m_fromChoice->SetSelection(isCoreThreadOpen);
+	return wxDialog::ShowModal();
+}
+
+void NewRecordingFrame::OnFileDirChange(wxFileDirPickerEvent& event)
+{
+	m_filePicker->wxFileDirPickerCtrlBase::OnFileDirChange(event);
+	m_fileBrowsed = true;
+	EnableOkBox();
+}
+
+void NewRecordingFrame::OnFileChanged(wxFileDirPickerEvent& event)
+{
+	EnableOkBox();
+}
+
+void NewRecordingFrame::EnableOkBox()
+{
+	if (m_filePicker->GetPath().length() == 0)
+	{
+		m_fileBrowsed = false;
+		m_startRecording->SetLabel(_("Browse Required"));
+		m_startRecording->Enable(false);
+	}
+	else if (m_fileBrowsed)
+	{
+		m_startRecording->SetLabel(_("Start"));
+		m_startRecording->Enable(true);
+	}
 }
 
 wxString NewRecordingFrame::GetFile() const
 {
-	return m_filePicker->GetPath();
+	wxString path = m_filePicker->GetPath();
+	// wxWidget's removes the extension if it contains wildcards
+	// on wxGTK https://trac.wxwidgets.org/ticket/15285
+	if (!path.EndsWith(".p2m2"))
+	{
+		return wxString::Format("%s.p2m2", path);
+	}
+	return path;
 }
 
 wxString NewRecordingFrame::GetAuthor() const
@@ -73,3 +117,4 @@ int NewRecordingFrame::GetFrom() const
 {
 	return m_fromChoice->GetSelection();
 }
+#endif

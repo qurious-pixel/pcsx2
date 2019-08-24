@@ -19,10 +19,6 @@
 *.dump
 
 *.asm
-!/plugins/zerogs/dx/x86-32.asm
-!/plugins/zerogs/dx/x86-64.asm
-!/plugins/zerogs/opengl/x86-32.asm
-!/plugins/zzogl-pg/opengl/x86-32.asm
 
 *.VC.db
 *.VC.VC.opendb
@@ -34,11 +30,15 @@
 **/x64/Debug*
 **/x64/Devel*
 
+**/bin/PCSX2-linux.sh
+
 _ReSharper.*
 pcsx2.snapshot_*
 svnrev.h
 
 /build
+/build_dev
+/build_dbg
 /obj-*
 
 .DS_Store
@@ -47,6 +47,8 @@ Thumbs.db
 Debug.txt
 install_log.txt
 padLog.txt
+GSdx_opengl_debug_hw.txt
+GSdx_opengl_debug_sw.txt
 
 Debug
 Release
@@ -63,6 +65,7 @@ oprofile_data/
 # Visual Studio upgrades
 /Backup*
 /UpgradeLog*.htm
+/.vscode*
 
 /bin/**/*.dll
 /bin/**/*.exp
@@ -70,7 +73,10 @@ oprofile_data/
 /bin/**/*.lib
 /bin/**/*.pdb
 /bin/PCSX2
+/bin/PCSX2-linux.sh
 /bin/*ReplayLoader
+/bin/PCSX2-linux.sh
+/bin/GSdx*.txt
 /bin/bios
 /bin/dumps
 /bin/help
@@ -103,12 +109,9 @@ oprofile_data/
 /pcsx2/gui/Resources/*.h
 !/pcsx2/gui/Resources/EmbeddedImage.h
 /plugins/GSdx/Template
-/plugins/USBqemu/Win32/bin
-/plugins/zerospu2/Windows/dsound51.cpp
 /tools/bin
-/tools/GSDumpGUI/bin
-/tools/GSDumpGUI/obj
 .vs
 
 /pcsx2/windows/VCprojects/GSdx_opengl_debug_hw.txt
 /pcsx2/windows/VCprojects/GSdx_opengl_debug_sw.txt
+/out/build/x64-Debug (default)

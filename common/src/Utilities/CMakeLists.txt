@@ -5,7 +5,6 @@ if(NOT TOP_CMAKE_WAS_SOURCED)
     It is advice to delete all wrongly generated cmake stuff => CMakeFiles & CMakeCache.txt")
 endif(NOT TOP_CMAKE_WAS_SOURCED)
 
-
 set(Output Utilities)
 
 set(CommonFlags
@@ -56,7 +55,6 @@ set(UtilitiesHeaders
 	../../include/Utilities/EventSource.h
 	../../include/Utilities/Exceptions.h
 	../../include/Utilities/FixedPointTypes.h
-	../../include/Utilities/gtkGuiTools.h
 	../../include/Utilities/General.h
 	../../include/Utilities/MakeUnique.h
 	../../include/Utilities/MemcpyFast.h
@@ -113,7 +111,18 @@ set(UtilitiesFinalSources
 set(UtilitiesFinalLibs
     ${LIBC_LIBRARIES} # Gold (new linux linker) does not get automatically dependency of dependency
 	${wxWidgets_LIBRARIES}
+	yaml-cpp
 )
 
 add_pcsx2_lib(${Output} "${UtilitiesFinalSources}" "${UtilitiesFinalLibs}" "${UtilitiesFinalFlags}")
 add_pcsx2_lib(${Output}_NO_TLS "${UtilitiesFinalSources}" "${UtilitiesFinalLibs}" "${UtilitiesFinalFlags} -DPCSX2_THREAD_LOCAL=0")
+
+target_compile_features(${Output} PUBLIC cxx_std_17)
+target_compile_features(${Output}_NO_TLS PUBLIC cxx_std_17)
+target_include_directories(${Output} PUBLIC ../../../3rdparty/include)
+target_include_directories(${Output}_NO_TLS PUBLIC ../../../3rdparty/include)
+
+if(COMMAND target_precompile_headers)
+	target_precompile_headers(${Output} PRIVATE PrecompiledHeader.h)
+	target_precompile_headers(${Output}_NO_TLS PRIVATE PrecompiledHeader.h)
+endif()

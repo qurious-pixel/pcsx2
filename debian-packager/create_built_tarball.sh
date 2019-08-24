@@ -83,26 +83,13 @@ remove_3rdparty()
 {
     echo "Remove 3rdparty code"
     rm -fr $LOCAL_REPO/3rdparty
-    rm -fr $LOCAL_REPO/fps2bios
     rm -fr $LOCAL_REPO/tools
-}
-
-remove_not_yet_free_plugin()
-{
-    echo "Remove non free plugins"
-    # remove also deprecated plugins
-    for plugin in USBqemu zerogs zerospu2
-    do
-        rm -fr $LOCAL_REPO/plugins/$plugin
-    done
 }
 
 remove_remaining_non_free_file()
 {
     echo "Remove remaining non free file. TODO UPSTREAM"
-    rm -fr $LOCAL_REPO/unfree
     rm -fr $LOCAL_REPO/plugins/GSdx/baseclasses
-    rm -f  $LOCAL_REPO/plugins/zzogl-pg/opengl/Win32/aviUtil.h
     rm -f  $LOCAL_REPO/common/src/Utilities/x86/MemcpyFast.cpp
 }
 remove_dot_git()
@@ -116,7 +103,6 @@ remove_dot_git()
 ######################################################################
 download_orig $BRANCH
 remove_3rdparty
-remove_not_yet_free_plugin
 remove_remaining_non_free_file
 
 get_git_version

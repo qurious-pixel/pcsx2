@@ -35,13 +35,11 @@ class GSRendererDX11 final : public GSRendererHW
 	};
 
 private:
-	bool UserHacks_AlphaStencil;
 	bool m_bind_rtsample;
 
 private:
 	inline void ResetStates();
 	inline void SetupIA(const float& sx, const float& sy);
-	inline void EmulateAtst(const int pass, const GSTextureCache::Source* tex);
 	inline void EmulateZbuffer();
 	inline void EmulateBlending();
 	inline void EmulateTextureShuffleAndFbmask();

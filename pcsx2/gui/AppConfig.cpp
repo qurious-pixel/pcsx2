@@ -525,6 +525,7 @@ AppConfig::AppConfig()
 	#endif
 	EnableSpeedHacks	= true;
 	EnableGameFixes		= false;
+	EnableFastBoot		= true;
 
 	EnablePresets		= true;
 	PresetIndex			= 1;
@@ -646,6 +647,7 @@ void AppConfig::LoadSaveRootItems( IniInterface& ini )
 
 	IniEntry( EnableSpeedHacks );
 	IniEntry( EnableGameFixes );
+	IniEntry( EnableFastBoot );
 
 	IniEntry( EnablePresets );
 	IniEntry( PresetIndex );
@@ -671,6 +673,9 @@ void AppConfig::LoadSave( IniInterface& ini )
 	BaseFilenames	.LoadSave( ini );
 	GSWindow		.LoadSave( ini );
 	Framerate		.LoadSave( ini );
+#ifndef DISABLE_RECORDING
+	inputRecording.loadSave(ini);
+#endif
 	Templates		.LoadSave( ini );
 
 	ini.Flush();
@@ -723,8 +728,9 @@ AppConfig::FolderOptions::FolderOptions()
 	, Cheats		( PathDefs::GetCheats() )
 	, CheatsWS      ( PathDefs::GetCheatsWS() )
 
-	, RunIso( PathDefs::GetDocuments() )			// raw default is always the Documents folder.
-	, RunELF( PathDefs::GetDocuments() )			// raw default is always the Documents folder.
+	, RunIso	( PathDefs::GetDocuments() )			// raw default is always the Documents folder.
+	, RunELF	( PathDefs::GetDocuments() )			// raw default is always the Documents folder.
+	, RunDisc	( PathDefs::GetDocuments().GetFilename() )
 {
 	bitset = 0xffffffff;
 }
@@ -764,6 +770,7 @@ void AppConfig::FolderOptions::LoadSave( IniInterface& ini )
 
 	IniEntryDirFile( RunIso, rel );
 	IniEntryDirFile( RunELF, rel );
+	IniEntryDirFile( RunDisc, rel );
 
 	if( ini.IsLoading() )
 	{
@@ -895,6 +902,20 @@ void AppConfig::GSWindowOptions::LoadSave( IniInterface& ini )
 
 	if( ini.IsLoading() ) SanityCheck();
 }
+
+#ifndef DISABLE_RECORDING
+AppConfig::InputRecordingOptions::InputRecordingOptions()
+	: VirtualPadPosition(wxDefaultPosition)
+{
+}
+
+void AppConfig::InputRecordingOptions::loadSave(IniInterface& ini)
+{
+	ScopedIniGroup path(ini, L"InputRecording");
+
+	IniEntry(VirtualPadPosition);
+}
+#endif
 
 // ----------------------------------------------------------------------------
 AppConfig::FramerateOptions::FramerateOptions()
@@ -1032,7 +1053,6 @@ bool AppConfig::IsOkApplyPreset(int n, bool ignoreMTVU)
 	Framerate.SlomoScalar = original_Framerate.SlomoScalar;
 	Framerate.TurboScalar = original_Framerate.TurboScalar;
 
-	EnableSpeedHacks	= false;
 	EnableGameFixes		= false;
 
 	EmuOptions.EnablePatches		= true;
@@ -1044,6 +1064,7 @@ bool AppConfig::IsOkApplyPreset(int n, bool ignoreMTVU)
 	EmuOptions.Speedhacks			= default_Pcsx2Config.Speedhacks;
 	EmuOptions.Speedhacks.bitset	= 0; //Turn off individual hacks to make it visually clear they're not used.
 	EmuOptions.Speedhacks.vuThread	= original_SpeedHacks.vuThread;
+	EmuOptions.Speedhacks.vu1Instant= original_SpeedHacks.vu1Instant;
 	EnableSpeedHacks = true;
 
 	// Actual application of current preset over the base settings which all presets use (mostly pcsx2's default values).
@@ -1054,30 +1075,32 @@ bool AppConfig::IsOkApplyPreset(int n, bool ignoreMTVU)
 		case 5: // Mostly Harmful
 			isRateSet ? 0 : (isRateSet = true, EmuOptions.Speedhacks.EECycleRate = 1); // +1 EE cyclerate
 			isSkipSet ? 0 : (isSkipSet = true, EmuOptions.Speedhacks.EECycleSkip = 1); // +1 EE cycle skip
-            // Fall through
+			[[fallthrough]];
 		
 		case 4: // Very Aggressive
 			isRateSet ? 0 : (isRateSet = true, EmuOptions.Speedhacks.EECycleRate = -2); // -2 EE cyclerate
-            // Fall through
+			[[fallthrough]];
 
 		case 3: // Aggressive
 			isRateSet ? 0 : (isRateSet = true, EmuOptions.Speedhacks.EECycleRate = -1); // -1 EE cyclerate
-            // Fall through
+			[[fallthrough]];
 
 		case 2: // Balanced
 			isMTVUSet ? 0 : (isMTVUSet = true, EmuOptions.Speedhacks.vuThread = true); // Enable MTVU
-            // Fall through
+			[[fallthrough]];
 
 		case 1: // Safe (Default)
 			EmuOptions.Speedhacks.IntcStat = true;
 			EmuOptions.Speedhacks.WaitLoop = true;
 			EmuOptions.Speedhacks.vuFlagHack = true;
+			EmuOptions.Speedhacks.vu1Instant = true;
 			
 			// If waterfalling from > Safe, break to avoid MTVU disable.
 			if (n > 1) break;
-            // Fall through
+			[[fallthrough]];
 			
 		case 0: // Safest
+			if(n == 0) EmuOptions.Speedhacks.vu1Instant = false;
 			isMTVUSet ? 0 : (isMTVUSet = true, EmuOptions.Speedhacks.vuThread = false); // Disable MTVU
 			break;
 
@@ -1253,7 +1276,21 @@ static void LoadUiSettings()
 	g_Conf->LoadSave( loader );
 
 	if( !wxFile::Exists( g_Conf->CurrentIso ) )
+	{
 		g_Conf->CurrentIso.clear();
+	}
+
+#if defined(_WIN32)
+	if( !g_Conf->Folders.RunDisc.DirExists() )
+	{
+		g_Conf->Folders.RunDisc.Clear();
+	}
+#else
+	if (!g_Conf->Folders.RunDisc.Exists())
+	{
+		g_Conf->Folders.RunDisc.Clear();
+	}
+#endif
 
 	sApp.DispatchUiSettingsEvent( loader );
 }
@@ -1286,7 +1323,21 @@ void AppLoadSettings()
 static void SaveUiSettings()
 {	
 	if( !wxFile::Exists( g_Conf->CurrentIso ) )
+	{
 		g_Conf->CurrentIso.clear();
+	}
+
+#if defined(_WIN32)
+	if (!g_Conf->Folders.RunDisc.DirExists())
+	{
+		g_Conf->Folders.RunDisc.Clear();
+	}
+#else
+	if (!g_Conf->Folders.RunDisc.Exists())
+	{
+		g_Conf->Folders.RunDisc.Clear();
+	}
+#endif
 
 	sApp.GetRecentIsoManager().Add( g_Conf->CurrentIso );
 

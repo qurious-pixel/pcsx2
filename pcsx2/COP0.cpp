@@ -121,10 +121,9 @@ __fi void COP0_UpdatePCCR()
 {
 	//if( cpuRegs.CP0.n.Status.b.ERL || !cpuRegs.PERF.n.pccr.b.CTE ) return;
 
-	// TODO : Implement memory mode checks here (kernel/super/user)
-	// For now we just assume kernel mode.
+	// Implemented memory mode check (kernel/super/user)
 
-	if( cpuRegs.PERF.n.pccr.val & 0xf )
+	if( cpuRegs.PERF.n.pccr.val & ((1 << (cpuRegs.CP0.n.Status.b.KSU + 2)) | (cpuRegs.CP0.n.Status.b.EXL << 1)))
 	{
 		// ----------------------------------
 		//    Update Performance Counter 0
@@ -175,7 +174,7 @@ __fi void COP0_UpdatePCCR()
 		}
 	}
 
-	if( cpuRegs.PERF.n.pccr.b.U1 )
+	if( cpuRegs.PERF.n.pccr.val & ((1 << (cpuRegs.CP0.n.Status.b.KSU + 12)) | (cpuRegs.CP0.n.Status.b.EXL << 11)))
 	{
 		// ----------------------------------
 		//    Update Performance Counter 1
@@ -452,6 +451,7 @@ void MFC0()
 			s_iLastCOP0Cycle = cpuRegs.cycle;
 			if( !_Rt_ ) break;
 		}
+			[[fallthrough]];
 
 		default:
 			cpuRegs.GPR.r[_Rt_].UD[0] = (s64)cpuRegs.CP0.r[_Rd_];

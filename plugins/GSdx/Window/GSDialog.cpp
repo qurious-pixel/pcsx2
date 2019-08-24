@@ -71,7 +71,7 @@ INT_PTR CALLBACK GSDialog::DialogProc(HWND hWnd, UINT message, WPARAM wParam, LP
 		if (((LPNMHDR)lParam)->code == TTN_GETDISPINFO)
 		{
 			LPNMTTDISPINFO pInfo = (LPNMTTDISPINFO)lParam;
-			UINT id = GetWindowLongPtr((HWND)pInfo->hdr.idFrom, GWL_ID);
+			const UINT id = (UINT)GetWindowLongPtr((HWND)pInfo->hdr.idFrom, GWL_ID);
 
 			// lpszText is used only if hinst is NULL. Seems to be NULL already,
 			// but it can't hurt to explicitly set it.
@@ -200,12 +200,22 @@ void GSDialog::ComboBoxInit(UINT id, const std::vector<GSSetting>& settings, int
 int GSDialog::ComboBoxAppend(UINT id, const char* str, LPARAM data, bool select)
 {
 	HWND hWnd = GetDlgItem(m_hWnd, id);
+	int item = (int)SendMessageA(hWnd, CB_ADDSTRING, 0, (LPARAM)str);
+	return BoxAppend(hWnd, item, data, select);
+}
 
-	int item = (int)SendMessage(hWnd, CB_ADDSTRING, 0, (LPARAM)str);
+int GSDialog::ComboBoxAppend(UINT id, const wchar_t* str, LPARAM data, bool select)
+{
+	HWND hWnd = GetDlgItem(m_hWnd, id);
+	int item = (int)SendMessageW(hWnd, CB_ADDSTRING, 0, (LPARAM)str);
+	return BoxAppend(hWnd, item, data, select);
+}
 
+int GSDialog::BoxAppend(HWND& hWnd, int item, LPARAM data, bool select)
+{
 	SendMessage(hWnd, CB_SETITEMDATA, item, (LPARAM)data);
 
-	if(select)
+	if (select)
 	{
 		SendMessage(hWnd, CB_SETCURSEL, item, 0);
 	}
@@ -217,7 +227,7 @@ bool GSDialog::ComboBoxGetSelData(UINT id, INT_PTR& data)
 {
 	HWND hWnd = GetDlgItem(m_hWnd, id);
 
-	int item = SendMessage(hWnd, CB_GETCURSEL, 0, 0);
+	const int item = (int)SendMessage(hWnd, CB_GETCURSEL, 0, 0);
 
 	if(item >= 0)
 	{

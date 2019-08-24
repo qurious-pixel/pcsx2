@@ -26,10 +26,6 @@ GSRendererDX11::GSRendererDX11()
 	: GSRendererHW(new GSTextureCache11(this))
 {
 	m_sw_blending = theApp.GetConfigI("accurate_blending_unit_d3d11");
-	if (theApp.GetConfigB("UserHacks"))
-		UserHacks_AlphaStencil = theApp.GetConfigB("UserHacks_AlphaStencil");
-	else
-		UserHacks_AlphaStencil = false;
 
 	ResetStates();
 }
@@ -45,7 +41,7 @@ void GSRendererDX11::SetupIA(const float& sx, const float& sy)
 
 	D3D11_PRIMITIVE_TOPOLOGY t;
 
-	bool unscale_pt_ln = m_userHacks_enabled_unscale_ptln && (GetUpscaleMultiplier() != 1);
+	const bool unscale_pt_ln = m_userHacks_enabled_unscale_ptln && (GetUpscaleMultiplier() != 1);
 
 	switch (m_vt.m_primclass)
 	{
@@ -58,6 +54,7 @@ void GSRendererDX11::SetupIA(const float& sx, const float& sy)
 
 		t = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
 		break;
+
 	case GS_LINE_CLASS:
 		if (unscale_pt_ln)
 		{
@@ -66,16 +63,29 @@ void GSRendererDX11::SetupIA(const float& sx, const float& sy)
 		}
 
 		t = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
-
 		break;
+
 	case GS_SPRITE_CLASS:
-		t = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+		// Lines: GPU conversion.
+		// Triangles: CPU conversion.
+		if (!m_vt.m_accurate_stq && m_vertex.next > 32)  // <=> 16 sprites (based on Shadow Hearts)
+		{
+			t = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+		}
+		else
+		{
+			m_gs_sel.cpu_sprite = 1;
+			Lines2Sprites();
+
+			t = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		}
+
 		break;
+
 	case GS_TRIANGLE_CLASS:
-
 		t = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-
 		break;
+
 	default:
 		__assume(0);
 	}
@@ -103,50 +113,6 @@ void GSRendererDX11::SetupIA(const float& sx, const float& sy)
 	dev->IASetPrimitiveTopology(t);
 }
 
-void GSRendererDX11::EmulateAtst(const int pass, const GSTextureCache::Source* tex)
-{
-	static const uint32 inverted_atst[] = {ATST_ALWAYS, ATST_NEVER, ATST_GEQUAL, ATST_GREATER, ATST_NOTEQUAL, ATST_LESS, ATST_LEQUAL, ATST_EQUAL};
-	int atst = (pass == 2) ? inverted_atst[m_context->TEST.ATST] : m_context->TEST.ATST;
-
-	if (!m_context->TEST.ATE) return;
-
-	switch (atst)
-	{
-		case ATST_LESS:
-			ps_cb.FogColor_AREF.a = (float)m_context->TEST.AREF - 0.1f;
-			m_ps_sel.atst = 1;
-			break;
-		case ATST_LEQUAL:
-			ps_cb.FogColor_AREF.a = (float)m_context->TEST.AREF - 0.1f + 1.0f;
-			m_ps_sel.atst = 1;
-			break;
-		case ATST_GEQUAL:
-			// Maybe a -1 trick multiplication factor could be used to merge with ATST_LEQUAL case
-			ps_cb.FogColor_AREF.a = (float)m_context->TEST.AREF - 0.1f;
-			m_ps_sel.atst = 2;
-			break;
-		case ATST_GREATER:
-			// Maybe a -1 trick multiplication factor could be used to merge with ATST_LESS case
-			ps_cb.FogColor_AREF.a = (float)m_context->TEST.AREF - 0.1f + 1.0f;
-			m_ps_sel.atst = 2;
-			break;
-		case ATST_EQUAL:
-			ps_cb.FogColor_AREF.a = (float)m_context->TEST.AREF;
-			m_ps_sel.atst = 3;
-			break;
-		case ATST_NOTEQUAL:
-			ps_cb.FogColor_AREF.a = (float)m_context->TEST.AREF;
-			m_ps_sel.atst = 4;
-			break;
-
-		case ATST_NEVER: // Draw won't be done so no need to implement it in shader
-		case ATST_ALWAYS:
-		default:
-			m_ps_sel.atst = 0;
-			break;
-	}
-}
-
 void GSRendererDX11::EmulateZbuffer()
 {
 	if (m_context->TEST.ZTE)
@@ -159,37 +125,25 @@ void GSRendererDX11::EmulateZbuffer()
 		m_om_dssel.ztst = ZTST_ALWAYS;
 	}
 
-	uint32 max_z;
-	if (m_context->ZBUF.PSM == PSM_PSMZ32)
-	{
-		max_z = 0xFFFFFFFF;
-	}
-	else if (m_context->ZBUF.PSM == PSM_PSMZ24)
-	{
-		max_z = 0xFFFFFF;
-	}
-	else
-	{
-		max_z = 0xFFFF;
-	}
+	// On the real GS we appear to do clamping on the max z value the format allows.
+	// Clamping is done after rasterization.
+	const uint32 max_z = 0xFFFFFFFF >> (GSLocalMemory::m_psm[m_context->ZBUF.PSM].fmt * 8);
+	const bool clamp_z = (uint32)(GSVector4i(m_vt.m_max.p).z) > max_z;
 
-	// The real GS appears to do no masking based on the Z buffer format and writing larger Z values
-	// than the buffer supports seems to be an error condition on the real GS, causing it to crash.
-	// We are probably receiving bad coordinates from VU1 in these cases.
+	vs_cb.MaxDepth = GSVector2i(0xFFFFFFFF);
+	//ps_cb.Af_MaxDepth.y = 1.0f;
+	m_ps_sel.zclamp = 0;
 
-	if (m_om_dssel.ztst >= ZTST_ALWAYS && m_om_dssel.zwe && (m_context->ZBUF.PSM != PSM_PSMZ32))
+	if (clamp_z)
 	{
-		if (m_vt.m_max.p.z > max_z)
+		if (m_vt.m_primclass == GS_SPRITE_CLASS || m_vt.m_primclass == GS_POINT_CLASS)
 		{
-			ASSERT(m_vt.m_min.p.z > max_z); // sfex capcom logo
-			// Fixme :Following conditional fixes some dialog frame in Wild Arms 3, but may not be what was intended.
-			if (m_vt.m_min.p.z > max_z)
-			{
-#ifdef _DEBUG
-				fprintf(stdout, "%d: Bad Z size on %s buffers\n", s_n, psm_str(m_context->ZBUF.PSM));
-#endif
-				m_om_dssel.ztst = ZTST_ALWAYS;
-			}
+			vs_cb.MaxDepth = GSVector2i(max_z);
+		}
+		else
+		{
+			ps_cb.Af_MaxDepth.y = max_z * ldexpf(1, -32);
+			m_ps_sel.zclamp = 1;
 		}
 	}
 
@@ -295,7 +249,7 @@ void GSRendererDX11::EmulateTextureShuffleAndFbmask()
 
 		if (m_ps_sel.fbmask && enable_fbmask_emulation)
 		{
-			// fprintf(stderr, "%d: FBMASK SW emulated fb_mask:%x on tex shuffle\n", s_n, fbmask);
+			// fprintf(stderr, "%d: FBMASK Unsafe SW emulated fb_mask:%x on tex shuffle\n", s_n, fbmask);
 			ps_cb.FbMask.r = rg_mask;
 			ps_cb.FbMask.g = rg_mask;
 			ps_cb.FbMask.b = ba_mask;
@@ -329,7 +283,7 @@ void GSRendererDX11::EmulateTextureShuffleAndFbmask()
 			// it will work. Masked bit will be constant and normally the same everywhere
 			// RT/FS output/Cached value.
 
-			/*fprintf(stderr, "%d: FBMASK SW emulated fb_mask:%x on %d bits format\n", s_n, m_context->FRAME.FBMSK,
+			/*fprintf(stderr, "%d: FBMASK Unsafe SW emulated fb_mask:%x on %d bits format\n", s_n, m_context->FRAME.FBMSK,
 				(GSLocalMemory::m_psm[m_context->FRAME.PSM].fmt == 2) ? 16 : 32);*/
 			m_bind_rtsample = true;
 		}
@@ -496,7 +450,7 @@ void GSRendererDX11::EmulateChannelShuffle(GSTexture** rt, const GSTextureCache:
 
 void GSRendererDX11::EmulateBlending()
 {
-	// Partial port of OGL SW blending. Currently only works for accumulation blend.
+	// Partial port of OGL SW blending. Currently only works for accumulation and non recursive blend.
 	const GIFRegALPHA& ALPHA = m_context->ALPHA;
 	bool sw_blending         = false;
 
@@ -505,64 +459,59 @@ void GSRendererDX11::EmulateBlending()
 		return;
 
 	m_om_bsel.abe = 1;
-	m_om_bsel.a = ALPHA.A;
-	m_om_bsel.b = ALPHA.B;
-	m_om_bsel.c = ALPHA.C;
-	m_om_bsel.d = ALPHA.D;
 
 	if (m_env.PABE.PABE)
 	{
-		if (m_om_bsel.a == 0 && m_om_bsel.b == 1 && m_om_bsel.c == 0 && m_om_bsel.d == 1)
+		if (ALPHA.A == 0 && ALPHA.B == 1 && ALPHA.C == 0 && ALPHA.D == 1)
 		{
 			// this works because with PABE alpha blending is on when alpha >= 0x80, but since the pixel shader
 			// cannot output anything over 0x80 (== 1.0) blending with 0x80 or turning it off gives the same result
 
 			m_om_bsel.abe = 0;
 		}
-		else
-		{
-			//Breath of Fire Dragon Quarter triggers this in battles. Graphics are fine though.
-			//ASSERT(0);
-		}
+
+		// Breath of Fire Dragon Quarter, Strawberry Shortcake, Super Robot Wars.
 	}
 
-	uint8 blend_index  = uint8(((ALPHA.A * 3 + ALPHA.B) * 3 + ALPHA.C) * 3 + ALPHA.D);
-	int blend_flag = m_dev->GetBlendFlags(blend_index);
-
-	// SW free blend.
-	bool free_blend = !!(blend_flag & (BLEND_NO_BAR|BLEND_ACCU));
+	m_om_bsel.blend_index = uint8(((ALPHA.A * 3 + ALPHA.B) * 3 + ALPHA.C) * 3 + ALPHA.D);
+	const int blend_flag = m_dev->GetBlendFlags(m_om_bsel.blend_index);
 
 	// Do the multiplication in shader for blending accumulation: Cs*As + Cd or Cs*Af + Cd
-	bool accumulation_blend = !!(blend_flag & BLEND_ACCU);
+	const bool accumulation_blend = !!(blend_flag & BLEND_ACCU);
+
+	// Blending doesn't require sampling of the rt
+	const bool blend_non_recursive = !!(blend_flag & BLEND_NO_REC);
 
 	switch (m_sw_blending)
 	{
 		case ACC_BLEND_HIGH_D3D11:
 		case ACC_BLEND_MEDIUM_D3D11:
 		case ACC_BLEND_BASIC_D3D11:
-			sw_blending |= free_blend;
-			// fall through
+			sw_blending |= accumulation_blend || blend_non_recursive;
+			[[fallthrough]];
 		default: break;
 	}
 
+	// Color clip
 	if (m_env.COLCLAMP.CLAMP == 0)
 	{
-		if (accumulation_blend)
+		// fprintf(stderr, "%d: COLCLIP Info (Blending: %d/%d/%d/%d)\n", s_n, ALPHA.A, ALPHA.B, ALPHA.C, ALPHA.D);
+		if (blend_non_recursive)
 		{
-			// fprintf(stderr, "%d: COLCLIP HDR mode with accumulation blend\n", s_n);
+			// The fastest algo that requires a single pass
+			// fprintf(stderr, "%d: COLCLIP Free mode ENABLED\n", s_n);
+			m_ps_sel.colclip = 1;
+			sw_blending = true;
+		}
+		else if (accumulation_blend)
+		{
+			// fprintf(stderr, "%d: COLCLIP Fast HDR mode ENABLED\n", s_n);
 			sw_blending = true;
 			m_ps_sel.hdr = 1;
 		}
-		else if (sw_blending)
-		{
-			// So far only BLEND_NO_BAR should hit this path, it's faster than standard HDR algo.
-			// Note: Isolate the code to BLEND_NO_BAR if other blending conditions are added.
-			// fprintf(stderr, "%d: COLCLIP SW ENABLED (blending is %d/%d/%d/%d)\n", s_n, ALPHA.A, ALPHA.B, ALPHA.C, ALPHA.D);
-			m_ps_sel.colclip = 1;
-		}
 		else
 		{
-			// fprintf(stderr, "%d: COLCLIP HDR mode\n", s_n);
+			// fprintf(stderr, "%d: COLCLIP HDR mode ENABLED\n", s_n);
 			m_ps_sel.hdr = 1;
 		}
 	}
@@ -594,13 +543,15 @@ void GSRendererDX11::EmulateBlending()
 		else
 		{
 			// Disable HW blending
-			// Only BLEND_NO_BAR should hit this code path for now.
 			m_om_bsel.abe = 0;
+
+			// Only BLEND_NO_REC should hit this code path for now
+			ASSERT(blend_non_recursive);
 		}
 
 		// Require the fix alpha vlaue
 		if (ALPHA.C == 2)
-			ps_cb.Af.x = (float)ALPHA.FIX / 128.0f;
+			ps_cb.Af_MaxDepth.x = (float)ALPHA.FIX / 128.0f;
 	}
 	else
 	{
@@ -613,7 +564,9 @@ void GSRendererDX11::EmulateBlending()
 
 void GSRendererDX11::EmulateTextureSampler(const GSTextureCache::Source* tex)
 {
-	const GSLocalMemory::psm_t &psm = GSLocalMemory::m_psm[m_context->TEX0.PSM];
+	// Warning fetch the texture PSM format rather than the context format. The latter could have been corrected in the texture cache for depth.
+	//const GSLocalMemory::psm_t &psm = GSLocalMemory::m_psm[m_context->TEX0.PSM];
+	const GSLocalMemory::psm_t &psm = GSLocalMemory::m_psm[tex->m_TEX0.PSM];
 	const GSLocalMemory::psm_t &cpsm = psm.pal > 0 ? GSLocalMemory::m_psm[m_context->TEX0.CPSM] : psm;
 
 	const uint8 wms = m_context->CLAMP.WMS;
@@ -844,7 +797,7 @@ void GSRendererDX11::DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Sou
 		{
 			// DATE case not supported yet so keep using the old method.
 			// Leave the check in to make sure other DATE cases are triggered correctly.
-			// fprintf(stderr, "%d: DATE with texture shuffle\n", s_n);
+			// fprintf(stderr, "%d: DATE: With texture shuffle\n", s_n);
 		}
 		else if (m_om_bsel.wa && !m_context->TEST.ATE)
 		{
@@ -853,31 +806,31 @@ void GSRendererDX11::DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Sou
 			if (m_context->TEST.DATM && m_vt.m_alpha.max < 128)
 			{
 				// Only first pixel (write 0) will pass (alpha is 1)
-				// fprintf(stderr, "%d: Fast DATE with alpha %d-%d\n", s_n, m_vt.m_alpha.min, m_vt.m_alpha.max);
+				// fprintf(stderr, "%d: DATE: Fast with alpha %d-%d\n", s_n, m_vt.m_alpha.min, m_vt.m_alpha.max);
 				DATE_one = true;
 			}
 			else if (!m_context->TEST.DATM && m_vt.m_alpha.min >= 128)
 			{
 				// Only first pixel (write 1) will pass (alpha is 0)
-				// fprintf(stderr, "%d: Fast DATE with alpha %d-%d\n", s_n, m_vt.m_alpha.min, m_vt.m_alpha.max);
+				// fprintf(stderr, "%d: DATE: Fast with alpha %d-%d\n", s_n, m_vt.m_alpha.min, m_vt.m_alpha.max);
 				DATE_one = true;
 			}
 			else if ((m_vt.m_primclass == GS_SPRITE_CLASS /*&& m_drawlist.size() < 50*/) || (m_index.tail < 100))
 			{
 				// DATE case not supported yet so keep using the old method.
 				// Leave the check in to make sure other DATE cases are triggered correctly.
-				// fprintf(stderr, "%d: Slow DATE with alpha %d-%d not supported\n", s_n, m_vt.m_alpha.min, m_vt.m_alpha.max);
+				// fprintf(stderr, "%d: DATE: Slow with alpha %d-%d not supported\n", s_n, m_vt.m_alpha.min, m_vt.m_alpha.max);
 			}
 			else
 			{
 				if (m_accurate_date)
 				{
-					// fprintf(stderr, "%d: Fast Accurate DATE with alpha %d-%d\n", s_n, m_vt.m_alpha.min, m_vt.m_alpha.max);
+					// fprintf(stderr, "%d: DATE: Fast AD with alpha %d-%d\n", s_n, m_vt.m_alpha.min, m_vt.m_alpha.max);
 					DATE_one = true;
 				}
 				else
 				{
-					// fprintf(stderr, "%d: Inaccurate DATE with alpha %d-%d\n", s_n, m_vt.m_alpha.min, m_vt.m_alpha.max);
+					// fprintf(stderr, "%d: "DATE: Off AD with alpha %d-%d\n", s_n, m_vt.m_alpha.min, m_vt.m_alpha.max);
 				}
 			}
 		}
@@ -980,6 +933,16 @@ void GSRendererDX11::DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Sou
 	}
 
 	m_ps_sel.fba = m_context->FBA.FBA;
+	m_ps_sel.dither = m_dithering > 0 && m_ps_sel.dfmt == 2 && m_env.DTHE.DTHE;
+
+	if(m_ps_sel.dither)
+	{
+		m_ps_sel.dither = m_dithering;
+		ps_cb.DitherMatrix[0] = GSVector4(m_env.DIMX.DM00, m_env.DIMX.DM10, m_env.DIMX.DM20, m_env.DIMX.DM30);
+		ps_cb.DitherMatrix[1] = GSVector4(m_env.DIMX.DM01, m_env.DIMX.DM11, m_env.DIMX.DM21, m_env.DIMX.DM31);
+		ps_cb.DitherMatrix[2] = GSVector4(m_env.DIMX.DM02, m_env.DIMX.DM12, m_env.DIMX.DM22, m_env.DIMX.DM32);
+		ps_cb.DitherMatrix[3] = GSVector4(m_env.DIMX.DM03, m_env.DIMX.DM13, m_env.DIMX.DM23, m_env.DIMX.DM33);
+	}
 
 	if (PRIM->FGE)
 	{
@@ -988,9 +951,9 @@ void GSRendererDX11::DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Sou
 		GSVector4 fc = GSVector4::rgba32(m_env.FOGCOL.u32[0]);
 #if _M_SSE >= 0x401
 		// Blend AREF to avoid to load a random value for alpha (dirty cache)
-		ps_cb.FogColor_AREF = fc.blend32<8>(ps_cb.FogColor_AREF) / 255;
+		ps_cb.FogColor_AREF = fc.blend32<8>(ps_cb.FogColor_AREF);
 #else
-		ps_cb.FogColor_AREF = fc / 255;
+		ps_cb.FogColor_AREF = fc;
 #endif
 	}
 
@@ -1000,11 +963,12 @@ void GSRendererDX11::DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Sou
 	// pass to handle the depth based on the alpha test.
 	bool ate_RGBA_then_Z = false;
 	bool ate_RGB_then_ZA = false;
+	uint8 ps_atst = 0;
 	if (ate_first_pass & ate_second_pass)
 	{
 		// fprintf(stdout, "%d: Complex Alpha Test\n", s_n);
-		bool commutative_depth = (m_om_dssel.ztst == ZTST_GEQUAL && m_vt.m_eq.z) || (m_om_dssel.ztst == ZTST_ALWAYS);
-		bool commutative_alpha = (m_context->ALPHA.C != 1); // when either Alpha Src or a constant
+		const bool commutative_depth = (m_om_dssel.ztst == ZTST_GEQUAL && m_vt.m_eq.z) || (m_om_dssel.ztst == ZTST_ALWAYS);
+		const bool commutative_alpha = (m_context->ALPHA.C != 1); // when either Alpha Src or a constant
 
 		ate_RGBA_then_Z = (m_context->TEST.AFAIL == AFAIL_FB_ONLY) & commutative_depth;
 		ate_RGB_then_ZA = (m_context->TEST.AFAIL == AFAIL_RGB_ONLY) & commutative_depth & commutative_alpha;
@@ -1027,30 +991,9 @@ void GSRendererDX11::DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Sou
 	}
 	else
 	{
-		EmulateAtst(1, tex);
+		EmulateAtst(ps_cb.FogColor_AREF, ps_atst, false);
+		m_ps_sel.atst = ps_atst;
 	}
-
-	// FIXME: Purge it when remaining DATE cases in DATE selection are supported properly.
-	// Destination alpha pseudo stencil hack: use a stencil operation combined with an alpha test
-	// to only draw pixels which would cause the destination alpha test to fail in the future once.
-	// Unfortunately this also means only drawing those pixels at all, which is why this is a hack.
-	// It helps render transparency in Amagami, breaks a lot of other games.
-	if (UserHacks_AlphaStencil && DATE && !DATE_one && !m_texture_shuffle && m_om_bsel.wa && !m_context->TEST.ATE)
-	{
-		// fprintf(stderr, "%d: Alpha Stencil detected\n", s_n);
-		if (!m_context->FBA.FBA)
-		{
-			if (m_context->TEST.DATM == 0)
-				m_ps_sel.atst = 2; // >=
-			else
-				m_ps_sel.atst = 1; // <
-
-			ps_cb.FogColor_AREF.a = (float)0x80;
-		}
-		if (!(m_context->FBA.FBA && m_context->TEST.DATM == 1))
-			m_om_dssel.date_one = 1;
-	}
-	// END OF FIXME
 
 	if (tex)
 	{
@@ -1138,14 +1081,16 @@ void GSRendererDX11::DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Sou
 		{
 			// Enable ATE as first pass to update the depth
 			// of pixels that passed the alpha test
-			EmulateAtst(1, tex);
+			EmulateAtst(ps_cb.FogColor_AREF, ps_atst, false);
 		}
 		else
 		{
 			// second pass will process the pixels that failed
 			// the alpha test
-			EmulateAtst(2, tex);
+			EmulateAtst(ps_cb.FogColor_AREF, ps_atst, true);
 		}
+
+		m_ps_sel.atst = ps_atst;
 
 		dev->SetupPS(m_ps_sel, &ps_cb, m_ps_ssel);
 

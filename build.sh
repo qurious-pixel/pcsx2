@@ -99,7 +99,7 @@ run_cppcheck()
 
     define=""
     for undef in _WINDOWS _M_AMD64 _MSC_VER WIN32 __INTEL_COMPILER __x86_64__ \
-    __SSE4_1__ __SSSE3__ __SSE__ __AVX2__ __USE_ISOC11 ASAN_WORKAROUND ENABLE_OPENCL ENABLE_OGL_DEBUG \
+    __SSE4_1__ __SSSE3__ __SSE__ __AVX2__ __USE_ISOC11 ASAN_WORKAROUND ENABLE_OGL_DEBUG \
     XBYAK_USE_MMAP_ALLOCATOR MAP_ANONYMOUS MAP_ANON XBYAK_DISABLE_AVX512
     do
         define="$define -U$undef"
@@ -107,7 +107,7 @@ run_cppcheck()
 
     check="--enable=warning,style,missingInclude"
 
-    for d in pcsx2 common plugins/GSdx plugins/spu2\-x plugins/onepad plugins/cdvdGigaherz
+    for d in pcsx2 common plugins/GSdx
     do
         flat_d=$(echo $d | sed -e 's@/@_@')
         log=cpp_check__${flat_d}.log
@@ -126,7 +126,7 @@ run_clangtidy()
     compile_json=compile_commands.json
     cpp_list=cpp_file.txt
     summary=clang_tidy_summary.txt
-    grep '"file"' $compile_json | sed -e 's/"//g' -e 's/^\s*file\s*:\s*//' | grep -v "aVUzerorec.S" | sort -u  > $cpp_list
+    grep '"file"' $compile_json | sed -e 's/"//g' -e 's/^\s*file\s*:\s*//' | sort -u  > $cpp_list
 
     # EXAMPLE
     #
@@ -195,6 +195,7 @@ for ARG in "$@"; do
         --clean             ) cleanBuild=1 ;;
         --clean-plugins     ) cleanBuild=2 ;;
         --clang-tidy        ) flags="$flags -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"; clangTidy=1 ; useClang=1;;
+        --ftime-trace       ) flags="$flags -DTIMETRACE=TRUE"; useClang=1;;
         --clang             ) useClang=1 ;;
         --intel             ) useIcc=1 ;;
         --cppcheck          ) cppcheck=1 ;;
@@ -203,16 +204,15 @@ for ARG in "$@"; do
         --rel|--release     ) flags="$flags -DCMAKE_BUILD_TYPE=Release" ; build="$root/build_rel";;
         --prof              ) flags="$flags -DCMAKE_BUILD_TYPE=Prof"    ; build="$root/build_prof";;
         --strip             ) flags="$flags -DCMAKE_BUILD_STRIP=TRUE" ;;
-        --glsl              ) flags="$flags -DGLSL_API=TRUE" ;;
-        --egl               ) flags="$flags -DEGL_API=TRUE" ;;
         --sdl12             ) flags="$flags -DSDL2_API=FALSE" ;;
         --extra             ) flags="$flags -DEXTRA_PLUGINS=TRUE" ;;
+        --use-system-yaml   ) flags="$flags -DUSE_SYSTEM_YAML=TRUE" ;;
         --asan              ) flags="$flags -DUSE_ASAN=TRUE" ;;
-        --gtk3              ) flags="$flags -DGTK3_API=TRUE" ;;
+        --gtk2              ) flags="$flags -DGTK2_API=TRUE" ;;
         --lto               ) flags="$flags -DUSE_LTO=TRUE" ;;
         --pgo-optimize      ) flags="$flags -DUSE_PGO_OPTIMIZE=TRUE" ;;
         --pgo-generate      ) flags="$flags -DUSE_PGO_GENERATE=TRUE" ;;
-        --no-dev9ghzdrk     ) flags="$flags -DDISABLE_DEV9GHZDRK=TRUE" ;;
+        --no-portaudio      ) flags="$flags -DPORTAUDIO_API=FALSE" ;;
         --no-simd           ) flags="$flags -DDISABLE_ADVANCE_SIMD=TRUE" ;;
         --no-trans          ) flags="$flags -DNO_TRANSLATION=TRUE" ;;
         --cross-multilib    ) flags="$flags -DCMAKE_TOOLCHAIN_FILE=$toolfile"; useCross=1; ;;
@@ -236,16 +236,15 @@ for ARG in "$@"; do
             echo "--no-simd       : Only allow sse2"
             echo
             echo "** Developer option **"
-            echo "--glsl          : Replace CG backend of ZZogl by GLSL"
-            echo "--egl           : Replace GLX by EGL (ZZogl/GSdx plugins)"
             echo "--cross-multilib: Build a 32bit PCSX2 on a 64bit machine using multilib."
             echo
             echo "** Distribution Compatibilities **"
             echo "--sdl12         : Build with SDL1.2 (requires if wx is linked against SDL1.2)"
-	    echo "--no-dev9ghzdrk : Skip dev9ghzdrk. (Avoids needing escalated privileges to build.)"
+            echo "--no-portaudio  : Skip portaudio for spu2x."
+            echo "--use-system-yaml  : Use the system version of yaml-cpp, if available."
             echo
             echo "** Expert Developer option **"
-            echo "--gtk3          : replace GTK2 by GTK3"
+            echo "--gtk2          : use GTK 2 instead of GTK 3"
             echo "--no-cross-multilib: Build a native PCSX2 (nonfunctional recompiler)"
             echo "--no-trans      : Don't regenerate mo files when building."
             echo "--clang         : Build with Clang/llvm"
@@ -260,6 +259,7 @@ for ARG in "$@"; do
             echo "--cppcheck      : Do a cppcheck analysis. Results can be found in build directory"
             echo "--coverity      : Do a build for coverity"
             echo "--vtune         : Plug GSdx with VTUNE"
+            echo "--ftime-trace   : Analyse build time. Clang only."
 
             exit 1
     esac

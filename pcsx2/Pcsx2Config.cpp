@@ -35,36 +35,63 @@ void TraceLogFilters::LoadSave( IniInterface& ini )
 	IniEntry( IOP.bitset );
 }
 
+const wxChar* const tbl_SpeedhackNames[] =
+	{
+		L"mvuFlag",
+		L"InstantVU1"};
+
+const __fi wxChar* EnumToString(SpeedhackId id)
+{
+	return tbl_SpeedhackNames[id];
+}
+
+void Pcsx2Config::SpeedhackOptions::Set(SpeedhackId id, bool enabled)
+{
+	EnumAssert(id);
+	switch (id)
+	{
+		case Speedhack_mvuFlag:
+			vuFlagHack = enabled;
+			break;
+		case Speedhack_InstantVU1:
+			vu1Instant = enabled;
+			break;
+			jNO_DEFAULT;
+	}
+}
+
 Pcsx2Config::SpeedhackOptions::SpeedhackOptions()
 {
 	DisableAll();
-	
+
 	// Set recommended speedhacks to enabled by default. They'll still be off globally on resets.
 	WaitLoop = true;
 	IntcStat = true;
 	vuFlagHack = true;
+	vu1Instant = true;
 }
 
 Pcsx2Config::SpeedhackOptions& Pcsx2Config::SpeedhackOptions::DisableAll()
 {
-	bitset			= 0;
-	EECycleRate		= 0;
-	EECycleSkip		= 0;
-	
+	bitset = 0;
+	EECycleRate = 0;
+	EECycleSkip = 0;
+
 	return *this;
 }
 
-void Pcsx2Config::SpeedhackOptions::LoadSave( IniInterface& ini )
+void Pcsx2Config::SpeedhackOptions::LoadSave(IniInterface& ini)
 {
-	ScopedIniGroup path( ini, L"Speedhacks" );
+	ScopedIniGroup path(ini, L"Speedhacks");
 
-	IniBitfield( EECycleRate );
-	IniBitfield( EECycleSkip );
-	IniBitBool( fastCDVD );
-	IniBitBool( IntcStat );
-	IniBitBool( WaitLoop );
-	IniBitBool( vuFlagHack );
-	IniBitBool( vuThread );
+	IniBitfield(EECycleRate);
+	IniBitfield(EECycleSkip);
+	IniBitBool(fastCDVD);
+	IniBitBool(IntcStat);
+	IniBitBool(WaitLoop);
+	IniBitBool(vuFlagHack);
+	IniBitBool(vuThread);
+	IniBitBool(vu1Instant);
 }
 
 void Pcsx2Config::ProfilerOptions::LoadSave( IniInterface& ini )
@@ -252,23 +279,22 @@ int Pcsx2Config::GSOptions::GetVsync() const
 const wxChar *const tbl_GamefixNames[] =
 {
 	L"VuAddSub",
-	L"VuClipFlag",
 	L"FpuCompare",
 	L"FpuMul",
 	L"FpuNegDiv",
 	L"XGKick",
-	L"IpuWait",
+	L"IPUWait",
 	L"EETiming",
-	L"SkipMpeg",
+	L"SkipMPEG",
 	L"OPHFlag",
 	L"DMABusy",
 	L"VIFFIFO",
 	L"VIF1Stall",
 	L"GIFFIFO",
-	L"FMVinSoftware",
 	L"GoemonTlb",
 	L"ScarfaceIbit",
-    L"CrashTagTeamRacingIbit"
+	L"CrashTagTeamRacingIbit",
+	L"VU0Kickstart"
 };
 
 const __fi wxChar* EnumToString( GamefixId id )
@@ -316,7 +342,6 @@ void Pcsx2Config::GamefixOptions::Set( GamefixId id, bool enabled )
 	switch(id)
 	{
 		case Fix_VuAddSub:		VuAddSubHack		= enabled;	break;
-		case Fix_VuClipFlag:	VuClipFlagHack		= enabled;	break;
 		case Fix_FpuCompare:	FpuCompareHack		= enabled;	break;
 		case Fix_FpuMultiply:	FpuMulHack			= enabled;	break;
 		case Fix_FpuNegDiv:		FpuNegDivHack		= enabled;	break;
@@ -329,10 +354,10 @@ void Pcsx2Config::GamefixOptions::Set( GamefixId id, bool enabled )
 		case Fix_VIFFIFO:		VIFFIFOHack			= enabled;  break;
 		case Fix_VIF1Stall:		VIF1StallHack		= enabled;  break;
 		case Fix_GIFFIFO:		GIFFIFOHack			= enabled;  break;
-		case Fix_FMVinSoftware:	FMVinSoftwareHack	= enabled;  break;
 		case Fix_GoemonTlbMiss: GoemonTlbHack		= enabled;  break;
 		case Fix_ScarfaceIbit:  ScarfaceIbit        = enabled;  break;
-        case Fix_CrashTagTeamIbit: CrashTagTeamRacingIbit = enabled; break;
+		case Fix_CrashTagTeamIbit: CrashTagTeamRacingIbit = enabled; break;
+		case Fix_VU0Kickstart:	VU0KickstartHack	= enabled; break;
 		jNO_DEFAULT;
 	}
 }
@@ -343,7 +368,6 @@ bool Pcsx2Config::GamefixOptions::Get( GamefixId id ) const
 	switch(id)
 	{
 		case Fix_VuAddSub:		return VuAddSubHack;
-		case Fix_VuClipFlag:	return VuClipFlagHack;
 		case Fix_FpuCompare:	return FpuCompareHack;
 		case Fix_FpuMultiply:	return FpuMulHack;
 		case Fix_FpuNegDiv:		return FpuNegDivHack;
@@ -356,10 +380,10 @@ bool Pcsx2Config::GamefixOptions::Get( GamefixId id ) const
 		case Fix_VIFFIFO:		return VIFFIFOHack;
 		case Fix_VIF1Stall:		return VIF1StallHack;
 		case Fix_GIFFIFO:		return GIFFIFOHack;
-		case Fix_FMVinSoftware:	return FMVinSoftwareHack;
 		case Fix_GoemonTlbMiss: return GoemonTlbHack;
 		case Fix_ScarfaceIbit:  return ScarfaceIbit;
-        case Fix_CrashTagTeamIbit: return CrashTagTeamRacingIbit;
+		case Fix_CrashTagTeamIbit: return CrashTagTeamRacingIbit;
+		case Fix_VU0Kickstart:	return VU0KickstartHack;
 		jNO_DEFAULT;
 	}
 	return false;		// unreachable, but we still need to suppress warnings >_<
@@ -370,7 +394,6 @@ void Pcsx2Config::GamefixOptions::LoadSave( IniInterface& ini )
 	ScopedIniGroup path( ini, L"Gamefixes" );
 
 	IniBitBool( VuAddSubHack );
-	IniBitBool( VuClipFlagHack );
 	IniBitBool( FpuCompareHack );
 	IniBitBool( FpuMulHack );
 	IniBitBool( FpuNegDivHack );
@@ -383,10 +406,10 @@ void Pcsx2Config::GamefixOptions::LoadSave( IniInterface& ini )
 	IniBitBool( VIFFIFOHack );
 	IniBitBool( VIF1StallHack );
 	IniBitBool( GIFFIFOHack );
-	IniBitBool( FMVinSoftwareHack );
 	IniBitBool( GoemonTlbHack );
 	IniBitBool( ScarfaceIbit );
-    IniBitBool( CrashTagTeamRacingIbit );
+	IniBitBool( CrashTagTeamRacingIbit );
+	IniBitBool( VU0KickstartHack );
 }
 
 
@@ -436,12 +459,14 @@ void Pcsx2Config::LoadSave( IniInterface& ini )
 	IniBitBool( CdvdShareWrite );
 	IniBitBool( EnablePatches );
 	IniBitBool( EnableCheats );
+	IniBitBool( EnableIPC );
 	IniBitBool( EnableWideScreenPatches );
 #ifndef DISABLE_RECORDING
 	IniBitBool( EnableRecordingTools );
 #endif
 	IniBitBool( ConsoleToStdio );
 	IniBitBool( HostFs );
+	IniBitBool( FullBootConfig );
 
 	IniBitBool( BackupSavestate );
 	IniBitBool( McdEnableEjection );

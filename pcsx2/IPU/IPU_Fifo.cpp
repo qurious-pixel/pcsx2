@@ -119,23 +119,14 @@ int IPU_Fifo_Output::write(const u32 *value, uint size)
 		size -= transsize;
 		while (transsize > 0)
 		{
-			//For some reason this causes stack corruption or something 
-			//and it loses the pointer causing access violations in Klonoa 2 - Ref
-			//CopyQWC(&data[writepos], value);
-			//Here's the workaround
-			data[writepos] = value[0];
-			writepos = (writepos + 1) & 31;
-			data[writepos] = value[1];
-			writepos = (writepos + 1) & 31;
-			data[writepos] = value[2];
-			writepos = (writepos + 1) & 31;
-			data[writepos] = value[3];
-			writepos = (writepos + 1) & 31;
+			CopyQWC(&data[writepos], value);
+			writepos = (writepos + 4) & 31;
 			value += 4;
 			--transsize;
 		}
 	/*} while(true);*/
-
+	if(ipu0ch.chcr.STR)
+		IPU_INT_FROM(64);
 	return origsize - size;
 }
 
