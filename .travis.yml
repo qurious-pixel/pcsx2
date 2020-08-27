@@ -12,7 +12,7 @@ addons:
 install: 
   - mkdir -p "$HOME/.ccache"
   - docker pull quriouspixel/dolphin:18.04
-  - docker run -u root --env-file travis/common/travis-ci.env -v $(pwd):/dolphin -v "$HOME/.ccache":/root/.ccache quriouspixel/dolphin:18.04 /bin/bash /dolphin/travis/appimage/docker.sh
+  - docker run -u root --env-file .travis/appimage/travis-ci.env -v $(pwd):/pcsx2 -v "$HOME/.ccache":/root/.ccache quriouspixel/dolphin:18.04 /bin/bash /pcsx2/.travis/appimage/docker.sh
 script: 
   - ls -al
 after_success: 
