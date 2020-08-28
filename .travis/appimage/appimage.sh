@@ -2,7 +2,7 @@
 
 branch=$TRAVIS_BRANCH
 
-BUILDBIN=/pcsx2/pcsx2/build/bin
+BUILDBIN=/pcsx2/appimage/pcsx2/build/bin
 BINFILE=PCSX2-x86_64.AppImage
 LOG_FILE=$HOME/curl.log
 CXX=g++-9
