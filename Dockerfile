@@ -38,6 +38,7 @@ RUN \
     libpng++-dev \
     zlib1g-dev \
     liblzma-dev \
+    liblzma5 \
     x11-common \
     zenity \
     wget \
