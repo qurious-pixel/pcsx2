@@ -30,6 +30,9 @@ cd /tmp
 #curl -sLO "https://raw.githubusercontent.com/qurious-pixel/pcsx2/$branch/.travis/appimage/appimage.sh"
 #chmod a+x appimage.sh
 #./appimage.sh
-ls -al /pcsx2/appimage/pcsx2/build/bin
-ls -al /pcsx2/appimage/pcsx2/build/bin/pcsx2
-find /pcsx2/appimage/pcsx2/build/bin/ -type f -iname "pcsx2"
+echo "ls -al /pcsx2/appimage/pcsx2/"
+ls -al /pcsx2/appimage/pcsx2/
+echo "ls -al /pcsx2/appimage/pcsx2/build/"
+ls -al /pcsx2/appimage/pcsx2/build/
+echo "find pcsx2"
+find /pcsx2/appimage/pcsx2/ -type f -iname "pcsx2"
