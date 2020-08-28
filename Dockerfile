@@ -27,7 +27,7 @@ RUN \
 		libasound2-dev \
 		libegl1-mesa-dev \
 		libgtk2.0-dev \
-		libpng12-dev \
+		libpng-dev \
 		libsdl2-dev \
 		libsoundtouch-dev \
 		libwxgtk3.0-dev \
