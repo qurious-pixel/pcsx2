@@ -2,8 +2,8 @@
 
 branch=$TRAVIS_BRANCH
 
-BUILDBIN=/pcsx2/pcsx2/build/< >
-BINFILE=dolphin-emu-x86_64.AppImage
+BUILDBIN=/pcsx2/pcsx2/build/bin
+BINFILE=PCSX2-x86_64.AppImage
 LOG_FILE=$HOME/curl.log
 CXX=g++-9
 
@@ -17,7 +17,7 @@ export PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
 
 cd /tmp
 	curl -sLO "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-	curl -sLO "https://github.com/qurious-pixel/dolphin/raw/$branch/travis/appimage/update.tar.gz"
+	curl -sLO "https://github.com/qurious-pixel/pcsx2/raw/$branch/travis/appimage/update.tar.gz"
 	tar -xzf update.tar.gz
 	chmod a+x linuxdeployqt*.AppImage
 ./linuxdeployqt-continuous-x86_64.AppImage --appimage-extract
@@ -55,7 +55,7 @@ unset QT_PLUGIN_PATH
 unset LD_LIBRARY_PATH
 unset QTDIR
 
-# /tmp/squashfs-root/AppRun $HOME/squashfs-root/usr/bin/dolphin-emu -appimage -unsupported-allow-new-glibc -no-copy-copyright-files -no-translations -bundle-non-qt-libs
+# /tmp/squashfs-root/AppRun $HOME/squashfs-root/usr/bin/pcsx2 -appimage -unsupported-allow-new-glibc -no-copy-copyright-files -no-translations -bundle-non-qt-libs
 /tmp/squashfs-root/AppRun $HOME/squashfs-root/usr/bin/PCSX2 -unsupported-allow-new-glibc -no-copy-copyright-files -no-translations -bundle-non-qt-libs
 export PATH=$(readlink -f /tmp/squashfs-root/usr/bin/):$PATH
 #cp /usr/lib/x86_64-linux-gnu/libp11-kit.so.0 $HOME/squashfs-root/usr/lib/
@@ -72,8 +72,8 @@ mkdir -p /pcsx2/artifacts/
 mv PCSX2-x86_64.AppImage* $HOME/artifacts
 cp -R $HOME/artifacts/ /pcsx2/
 chmod -R 777 /pcsx2/artifacts
-cd /dolphin/artifacts
-ls -al /dolphin/artifacts/
+cd /pcsx2/artifacts
+ls -al /pcsx2/artifacts/
 curl --upload-file PCSX2-x86_64.AppImage https://transfersh.com/PCSX2-x86_64.AppImage
 
 # touch $HOME/curl.log
