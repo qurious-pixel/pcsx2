@@ -8,3 +8,4 @@ Comment=Sony PlayStation 2 emulator
 Exec=env GDK_BACKEND=x11 __GL_THREADED_OPTIMIZATIONS=1 mesa_glthread=true MESA_NO_ERROR=1 PCSX2
 Icon=PCSX2
 Keywords=game;emulator;
+Categories=Game;Emulator;
