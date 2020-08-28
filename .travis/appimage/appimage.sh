@@ -17,7 +17,7 @@ export PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
 
 cd /tmp
 	curl -sLO "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-	curl -sLO "https://github.com/qurious-pixel/pcsx2/raw/$branch/travis/appimage/update.tar.gz"
+	curl -sLO "https://github.com/qurious-pixel/pcsx2/raw/$branch/.travis/appimage/update.tar.gz"
 	tar -xzf update.tar.gz
 	chmod a+x linuxdeployqt*.AppImage
 ./linuxdeployqt-continuous-x86_64.AppImage --appimage-extract
