@@ -27,12 +27,7 @@ ninja
 #cat /pcsx2/appimage/pcsx2/build/CMakeFiles/CMakeError.log | curl -F 'f:1=<-' ix.io
 
 cd /tmp
-#curl -sLO "https://raw.githubusercontent.com/qurious-pixel/pcsx2/$branch/.travis/appimage/appimage.sh"
-#chmod a+x appimage.sh
-#./appimage.sh
-echo "ls -al /pcsx2/appimage/pcsx2/"
-ls -al /pcsx2/appimage/pcsx2/
-echo "ls -al /pcsx2/appimage/pcsx2/build/"
-ls -al /pcsx2/appimage/pcsx2/build/
-echo "find pcsx2"
-find /pcsx2/appimage/pcsx2/ -type f -iname "pcsx2"
+curl -sLO "https://raw.githubusercontent.com/qurious-pixel/pcsx2/$branch/.travis/appimage/appimage.sh"
+chmod a+x appimage.sh
+./appimage.sh
+
