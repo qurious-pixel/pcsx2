@@ -23,6 +23,7 @@ cd /tmp
 ./linuxdeployqt-continuous-x86_64.AppImage --appimage-extract
 cd $HOME
 mkdir -p squashfs-root/usr/bin
+ls -al $BUILDBIN
 cp -P "$BUILDBIN"/PCSX2 $HOME/squashfs-root/usr/bin/
 
 curl -sL https://github.com/PCSX2/pcsx2/raw/master/pcsx2/gui/Resources/AppIcon64.png -o ./squashfs-root/pcsx2.svg
