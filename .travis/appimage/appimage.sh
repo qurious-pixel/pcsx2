@@ -27,7 +27,7 @@ ls -al $BUILDBIN
 cp -P "$BUILDBIN"/PCSX2 $HOME/squashfs-root/usr/bin/
 
 curl -sL https://github.com/PCSX2/pcsx2/raw/master/pcsx2/gui/Resources/AppIcon64.png -o ./squashfs-root/pcsx2.svg
-curl -sL https://raw.githubusercontent.com/PCSX2/pcsx2/master/linux_various/PCSX2.desktop.in -o ./squashfs-root/pcsx2.desktop
+curl -sL https://raw.githubusercontent.com/qurious-pixel/pcsx2/$branch/linux_various/PCSX2.desktop -o ./squashfs-root/pcsx2.desktop
 curl -sL https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-x86_64 -o ./squashfs-root/runtime
 mkdir -p squashfs-root/usr/share/applications && cp ./squashfs-root/pcsx2.desktop ./squashfs-root/usr/share/applications
 mkdir -p squashfs-root/usr/share/icons && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/icons
