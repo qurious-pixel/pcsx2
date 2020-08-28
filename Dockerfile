@@ -23,26 +23,31 @@ RUN \
     dpkg \
     fuse \
     $GCC_BINARY $GXX_BINARY \
-		libaio-dev \
-		libasound2-dev \
-		libegl1-mesa-dev \
-		libgtk2.0-dev \
-		libpng-dev \
-		libsdl2-dev \
-		libsoundtouch-dev \
-		libwxgtk3.0-dev \
-		portaudio19-dev \
-		libxml2-dev \
-		libpcap0.8-dev \
+    libaio-dev \
+    libasound2-dev \
+    libegl1-mesa-dev \
+    libgtk2.0-dev \
+    libpng-dev \
+    libsdl2-dev \
+    libsoundtouch-dev \
+    libwxgtk3.0-dev \
+    portaudio19-dev \
+    libxml2-dev \
+    libpcap0.8-dev \
+    libglvnd-dev \
+    libpng++-dev \
+    zlib1g-dev \
+    liblzma-dev \
+    x11-common \
     zenity \
     wget \
     curl \
     git \
     gettext \
-	  ccache \
-	  make \
-	  cmake \
-	  git \
+    ccache \
+    make \
+    cmake \
+    git \
     ninja-build 
     
 ENV CMAKEVER=3.18.1
