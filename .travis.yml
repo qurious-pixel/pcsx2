@@ -4,6 +4,9 @@ language: cpp
 cache: ccache
 compiler: 
   - gcc
+git:
+  clone: true
+  submodules: false
 addons: 
   apt: 
     sources:
