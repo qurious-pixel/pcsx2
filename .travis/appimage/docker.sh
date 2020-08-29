@@ -13,7 +13,7 @@ ln -s /home/pcsx2/.conan /root
 cd /pcsx2
 
 mkdir appimage && cd appimage
-git clone --branch x86_64-support https://github.com/beaumanvienna/pcsx2.git
+git clone --single-branch --branch x86_64-support https://github.com/beaumanvienna/pcsx2.git
 git submodule update --init --recursive
 
 cd pcsx2/
