@@ -14,9 +14,10 @@ cd /pcsx2
 
 mkdir appimage && cd appimage
 git clone --single-branch --branch x86_64-support https://github.com/beaumanvienna/pcsx2.git
+cd pcsx2/
 git submodule update --init --recursive
 
-cd pcsx2/
+
 
 
 mkdir build
