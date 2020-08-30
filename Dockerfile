@@ -60,5 +60,11 @@ RUN \
 	sh cmake-${CMAKEVER}-Linux-x86_64.sh --prefix=/usr --skip-license && \
 	rm ./cmake*.sh && \
 	cmake --version
+	
+RUN \
+	update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${GCCVER} 10 && \
+	update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-${GCCVER} 10 && \
+	gcc --version && \
+	g++ --version 
   
 RUN 	apt-get clean autoclean && apt-get autoremove --yes && rm -rf /var/lib/apt /var/lib/cache /var/lib/log
