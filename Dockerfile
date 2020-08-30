@@ -26,6 +26,7 @@ RUN \
     libaio-dev \
     libasound2-dev \
     libegl1-mesa-dev \
+    libgl1-mesa-dev \
     libgtk2.0-dev \
     libpng-dev \
     libsdl2-dev \
@@ -39,6 +40,7 @@ RUN \
     zlib1g-dev \
     liblzma-dev \
     liblzma5 \
+    libxext-dev \
     x11-common \
     zenity \
     wget \
