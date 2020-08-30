@@ -5,7 +5,7 @@ branch=$TRAVIS_BRANCH
 BUILDBIN=/pcsx2/appimage/pcsx2/build/pcsx2/
 BINFILE=PCSX2-x86_64.AppImage
 LOG_FILE=$HOME/curl.log
-CXX=g++-9
+CXX=g++-10
 
 # QT 5.14.2
 # source /opt/qt514/bin/qt514-env.sh
