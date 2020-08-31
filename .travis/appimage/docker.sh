@@ -23,8 +23,8 @@ git submodule update --init --recursive
 
 mkdir build
 cd build
-cmake .. -G Ninja -DCMAKE_C_COMPILER=/usr/lib/ccache/gcc -DCMAKE_CXX_COMPILER=/usr/lib/ccache/g++ -DCMAKE_BUILD_TYPE=Release -DXDG_STD=TRUE -DDISABLE_ADVANCE_SIMD=TRUE \
--DPACKAGE_MODE=TRUE -DGSDX_LEGACY=TRUE
+cmake .. -G Ninja -DCMAKE_C_COMPILER=/usr/lib/ccache/gcc -DCMAKE_CXX_COMPILER=/usr/lib/ccache/g++ -DCMAKE_BUILD_TYPE=Release  
+#\ -DXDG_STD=TRUE -DDISABLE_ADVANCE_SIMD=TRUE -DPACKAGE_MODE=TRUE -DGSDX_LEGACY=TRUE
 ninja
 
 #cat /pcsx2/appimage/pcsx2/build/CMakeFiles/CMakeError.log | curl -F 'f:1=<-' ix.io
