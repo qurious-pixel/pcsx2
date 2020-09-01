@@ -8,6 +8,9 @@ export PATH=$QT_BASE_DIR/bin:$PATH
 export LD_LIBRARY_PATH=$QT_BASE_DIR/lib/x86_64-linux-gnu:$QT_BASE_DIR/lib:$LD_LIBRARY_PATH
 export PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
 
+apt-get update
+apt-get install -y libgtk2.0-0
+
 ln -s /home/pcsx2/.conan /root
 
 cd /pcsx2
@@ -31,7 +34,7 @@ ninja
 #cat /pcsx2/appimage/pcsx2/build/CMakeFiles/CMakeError.log | curl -F 'f:1=<-' ix.io
 
 cd /tmp
-curl -sLO "https://raw.githubusercontent.com/qurious-pixel/pcsx2/$branch/.travis/appimage/appimage.sh"
-chmod a+x appimage.sh
-./appimage.sh
+#curl -sLO "https://raw.githubusercontent.com/qurious-pixel/pcsx2/$branch/.travis/appimage/appimage.sh"
+#chmod a+x appimage.sh
+#./appimage.sh
 
