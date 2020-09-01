@@ -63,6 +63,8 @@ export PATH=$(readlink -f /tmp/squashfs-root/usr/bin/):$PATH
 #cp /usr/lib/x86_64-linux-gnu/libselinux.so* $HOME/squashfs-root/usr/lib/
 mv /tmp/update/AppImageUpdate $HOME/squashfs-root/usr/bin/
 mv /tmp/update/* $HOME/squashfs-root/usr/lib/
+mkdir -p $HOME/squashfs-root/usr/lib/pcsx2
+cp -R $BUILDBIN/../plugins $HOME/squashfs-root/usr/lib/pcsx2
 mkdir -p $HOME/squashfs-root/usr/lib/updater
 mv $HOME/squashfs-root/usr/lib/libcurl.so.4 $HOME/squashfs-root/usr/lib/updater
 /tmp/squashfs-root/usr/bin/appimagetool $HOME/squashfs-root -u "gh-releases-zsync|qurious-pixel|pcsx2|continuous|PCSX2-x86_64.AppImage.zsync"
@@ -70,6 +72,7 @@ mv $HOME/squashfs-root/usr/lib/libcurl.so.4 $HOME/squashfs-root/usr/lib/updater
 mkdir $HOME/artifacts/
 mkdir -p /pcsx2/artifacts/
 mv PCSX2-x86_64.AppImage* $HOME/artifacts
+cp $BUILDBIN/PCSX2 /pcsx2/
 cp -R $HOME/artifacts/ /pcsx2/
 chmod -R 777 /pcsx2/artifacts
 cd /pcsx2/artifacts
