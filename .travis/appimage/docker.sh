@@ -27,7 +27,7 @@ git submodule update --init --recursive
 mkdir build
 cd build
 cmake .. -G Ninja -DCMAKE_C_COMPILER=/usr/lib/ccache/gcc -DCMAKE_CXX_COMPILER=/usr/lib/ccache/g++ -DCMAKE_BUILD_TYPE=Release -DGTK3_API=TRUE 
--DPACKAGE_MODE=TRUE -DXDG_STD=TRUE 
+-DPACKAGE_MODE=TRUE -DXDG_STD=TRUE -DPLUGIN_DIR="./usr/bin/pcsx2/"
 #\ -DDISABLE_ADVANCE_SIMD=TRUE -DGSDX_LEGACY=TRUE
 ninja
 
