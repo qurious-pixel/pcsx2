@@ -10,6 +10,14 @@ export PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
 
 ln -s /home/pcsx2/.conan /root
 
+git clone --recurse-submodules https://github.com/wxWidgets/wxWidgets.git
+cd wxWidgets
+mkdir buildgtk
+cd buildgtk
+../configure --with-gtk
+make
+make install
+
 cd /pcsx2
 
 mkdir appimage && cd appimage
