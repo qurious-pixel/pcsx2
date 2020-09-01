@@ -24,15 +24,23 @@ RUN \
     fuse \
     $GCC_BINARY $GXX_BINARY \
     libaio-dev \
+    libbz2-dev \
+    libcgg1 \
+    libjpeg-dev \
+    nvidia-cg-toolkit \
+    libegl1-mesa-dev \
     libasound2-dev \
     libegl1-mesa-dev \
     libgl1-mesa-dev \
     libgtk2.0-dev \
     libpng-dev \
     libsdl2-dev \
+    libsdl1.2-dev \
+    libasound2-dev \
     libsoundtouch-dev \
     libwxgtk3.0-dev \
     libgtk-3-dev \
+    libwxgtk3.0-gtk3-dev
     portaudio19-dev \
     libxml2-dev \
     libpcap0.8-dev \
@@ -42,6 +50,7 @@ RUN \
     liblzma-dev \
     liblzma5 \
     libxext-dev \
+    libxml2-dev \
     x11-common \
     zenity \
     wget \
