@@ -32,6 +32,7 @@ RUN \
     libsdl2-dev \
     libsoundtouch-dev \
     libwxgtk3.0-dev \
+    libgtk-3-dev \
     portaudio19-dev \
     libxml2-dev \
     libpcap0.8-dev \
@@ -60,6 +61,18 @@ RUN \
 	sh cmake-${CMAKEVER}-Linux-x86_64.sh --prefix=/usr --skip-license && \
 	rm ./cmake*.sh && \
 	cmake --version
+
+ENV WXVER=3.1.4
+RUN \
+	cd /tmp && \
+	curl -sLO https://github.com/wxWidgets/wxWidgets/releases/download/v${WXVER}/wxWidgets-${WXVER}.tar.bz2 && \
+	tar xjf wxWidgets-${WXVER}.tar.bz2 && \
+	cd wxWidgets-${WXVER} && \
+	mkdir buildgtk && cd buildgtk && \
+	../configure --with-gtk && \
+	make && make install && \
+	ldconfig && \
+	rm ../../wxWidgets-${WXVER}.tar.bz2 
 	
 RUN \
 	update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${GCCVER} 10 && \
