@@ -8,6 +8,9 @@ export PATH=$QT_BASE_DIR/bin:$PATH
 export LD_LIBRARY_PATH=$QT_BASE_DIR/lib/x86_64-linux-gnu:$QT_BASE_DIR/lib:$LD_LIBRARY_PATH
 export PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
 
+apt-get update
+apt-get install -y libwxgtk3.0-dev libgtk-3-dev libwxgtk3.0-gtk3-dev 
+
 ln -s /home/pcsx2/.conan /root
 
 cd /pcsx2
