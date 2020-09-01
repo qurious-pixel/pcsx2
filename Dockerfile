@@ -25,7 +25,7 @@ RUN \
     $GCC_BINARY $GXX_BINARY \
     libaio-dev \
     libbz2-dev \
-    libcgg1 \
+    libcggl \
     libjpeg-dev \
     nvidia-cg-toolkit \
     libegl1-mesa-dev \
