@@ -23,7 +23,7 @@ after_success:
   - cd artifacts/
   - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
   - chmod a+x upload.sh
-  - bash upload.sh PCSX2-x86_64.AppImage*
+  - bash upload.sh PCSX2*
 branches: 
   except: 
     - /^(?i:continuous.*)$/
