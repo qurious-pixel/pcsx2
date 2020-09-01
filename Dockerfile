@@ -40,7 +40,7 @@ RUN \
     libsoundtouch-dev \
     libwxgtk3.0-dev \
     libgtk-3-dev \
-    libwxgtk3.0-gtk3-dev
+    libwxgtk3.0-gtk3-dev \
     portaudio19-dev \
     libxml2-dev \
     libpcap0.8-dev \
