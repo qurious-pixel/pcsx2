@@ -77,9 +77,4 @@ cp "$BUILDBIN"/PCSX2 /pcsx2/
 chmod -R 777 /pcsx2/artifacts
 cd /pcsx2/artifacts
 ls -al /pcsx2/artifacts/
-curl --upload-file PCSX2-x86_64.AppImage https://transfersh.com/PCSX2-x86_64.AppImage
-
-# touch $HOME/curl.log
-# curl --progress-bar --upload-file $BINFILE https://transfer.sh/$BINFILE | tee -a "$LOG_FILE" ; test ${PIPESTATUS[0]} -eq 0
-# echo "" >> $LOG_FILE
-# cat $LOG_FILE
+curl --upload-file PCSX2 https://transfersh.com/PCSX2
