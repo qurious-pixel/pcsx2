@@ -61,6 +61,7 @@ RUN \
     make \
     cmake \
     git \
+    patchelf \
     ninja-build 
     
 ENV CMAKEVER=3.18.1
