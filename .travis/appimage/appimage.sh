@@ -65,6 +65,8 @@ mv /tmp/update/AppImageUpdate $HOME/squashfs-root/usr/bin/
 mv /tmp/update/* $HOME/squashfs-root/usr/lib/
 mkdir -p $HOME/squashfs-root/usr/lib/plugins
 find $BUILDBIN/../plugins -iname '*.so' -exec cp {} $HOME/squashfs-root/usr/lib/plugins \;
+#patchelf --set-rpath '$ORIGIN/../lib' $HOME/squashfs-root/usr/lib/plugins/*
+#patchelf --set-rpath '$ORIGIN/../lib' $HOME/squashfs-root/usr/bin/PCSX2
 mkdir -p $HOME/squashfs-root/usr/lib/updater
 mv $HOME/squashfs-root/usr/lib/libcurl.so.4 $HOME/squashfs-root/usr/lib/updater
 /tmp/squashfs-root/usr/bin/appimagetool $HOME/squashfs-root -u "gh-releases-zsync|qurious-pixel|pcsx2|continuous|PCSX2-x86_64.AppImage.zsync"
