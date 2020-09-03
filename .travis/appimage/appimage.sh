@@ -77,4 +77,4 @@ cp "$BUILDBIN"/PCSX2 /pcsx2/artifacts/
 chmod -R 777 /pcsx2/artifacts
 cd /pcsx2/artifacts
 ls -al /pcsx2/artifacts/
-curl --upload-file PCSX2 https://transfersh.com/PCSX2
+#curl --upload-file PCSX2 https://transfersh.com/PCSX2
