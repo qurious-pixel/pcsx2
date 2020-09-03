@@ -15,6 +15,9 @@ set(TOP_CMAKE_WAS_SOURCED TRUE)
 # set module path
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
+# Allow LD_LIBRARY_PATH overrides
+set(CMAKE_SKIP_RPATH TRUE)
+
 # include some generic functions to ensure correctness of the env
 include(Pcsx2Utils)
 
