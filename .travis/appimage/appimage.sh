@@ -61,7 +61,7 @@ unset QTDIR
 export PATH=$(readlink -f /tmp/squashfs-root/usr/bin/):$PATH
 	cp /usr/lib/x86_64-linux-gnu/libSoundTouch.so.1 $HOME/squashfs-root/usr/lib/
 	cp /usr/lib/x86_64-linux-gnu/libportaudio.so.2 $HOME/squashfs-root/usr/lib/
-	cp /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so. $HOME/squashfs-root/usr/lib/
+	cp /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0 $HOME/squashfs-root/usr/lib/
 mv /tmp/update/AppImageUpdate $HOME/squashfs-root/usr/bin/
 mv /tmp/update/* $HOME/squashfs-root/usr/lib/
 mkdir -p $HOME/squashfs-root/usr/lib/plugins
