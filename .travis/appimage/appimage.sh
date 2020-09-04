@@ -25,6 +25,7 @@ cd $HOME
 mkdir -p squashfs-root/usr/bin
 ls -al $BUILDBIN
 cp -P "$BUILDBIN"/PCSX2 $HOME/squashfs-root/usr/bin/
+patchelf --set-rpath /tmp/PCSX2LIBS $HOME/squashfs-root/usr/bin/PCSX2
 
 curl -sL https://github.com/PCSX2/pcsx2/raw/master/pcsx2/gui/Resources/AppIcon64.png -o ./squashfs-root/pcsx2.svg
 curl -sL https://raw.githubusercontent.com/qurious-pixel/pcsx2/$branch/linux_various/PCSX2.desktop -o ./squashfs-root/pcsx2.desktop
@@ -67,7 +68,7 @@ mv /tmp/update/* $HOME/squashfs-root/usr/lib/
 mkdir -p $HOME/squashfs-root/usr/lib/plugins
 find $BUILDBIN/../plugins -iname '*.so' -exec cp {} $HOME/squashfs-root/usr/lib/plugins \;
 patchelf --set-rpath /tmp/PCSX2LIBS $HOME/squashfs-root/usr/lib/plugins/*
-patchelf --set-rpath /tmp/PCSX2LIBS $HOME/squashfs-root/usr/bin/PCSX2
+#patchelf --set-rpath /tmp/PCSX2LIBS $HOME/squashfs-root/usr/bin/PCSX2
 mkdir -p $HOME/squashfs-root/usr/lib/updater
 mv $HOME/squashfs-root/usr/lib/libcurl.so.4 $HOME/squashfs-root/usr/lib/updater
 /tmp/squashfs-root/usr/bin/appimagetool $HOME/squashfs-root -u "gh-releases-zsync|qurious-pixel|pcsx2|continuous|PCSX2-x86_64.AppImage.zsync"
