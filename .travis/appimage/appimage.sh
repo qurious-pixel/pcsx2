@@ -70,7 +70,7 @@ mkdir -p $HOME/squashfs-root/usr/lib/plugins
 find $BUILDBIN/../plugins -iname '*.so' -exec cp {} $HOME/squashfs-root/usr/lib/plugins \;
 arr=( $(ls -d $HOME/squashfs-root/usr/lib/plugins/* ) )
 for i in "${arr[@]}"; do patchelf --set-rpath /tmp/PCSX2LIBS "$i"; done
-#patchelf --set-rpath /tmp/PCSX2LIBS $HOME/squashfs-root/usr/bin/PCSX2
+patchelf --set-rpath /tmp/PCSX2LIBS $HOME/squashfs-root/usr/lib/libSDL2-2.0.so.0
 mkdir -p $HOME/squashfs-root/usr/lib/updater
 mv $HOME/squashfs-root/usr/lib/libcurl.so.4 $HOME/squashfs-root/usr/lib/updater
 /tmp/squashfs-root/usr/bin/appimagetool $HOME/squashfs-root -u "gh-releases-zsync|qurious-pixel|pcsx2|continuous|PCSX2-x86_64.AppImage.zsync"
