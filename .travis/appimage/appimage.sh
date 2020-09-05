@@ -35,9 +35,7 @@ mkdir -p squashfs-root/usr/share/icons && cp ./squashfs-root/pcsx2.svg ./squashf
 mkdir -p squashfs-root/usr/share/icons/hicolor/scalable/apps && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/icons/hicolor/scalable/apps
 mkdir -p squashfs-root/usr/share/pixmaps && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/pixmaps
 mkdir -p squashfs-root/usr/optional/ ; mkdir -p squashfs-root/usr/optional/libstdc++/
-mkdir -p squashfs-root/usr/share/zenity 
-cp /usr/share/zenity/zenity.ui ./squashfs-root/usr/share/zenity
-cp /usr/bin/zenity ./squashfs-root/usr/bin/
+
 curl -sL "https://raw.githubusercontent.com/qurious-pixel/pcsx2/$branch/.travis/appimage/update.sh" -o $HOME/squashfs-root/update.sh
 curl -sL "https://raw.githubusercontent.com/qurious-pixel/pcsx2/$branch/.travis/appimage/AppRun" -o $HOME/squashfs-root/AppRun
 curl -sL "https://github.com/RPCS3/AppImageKit-checkrt/releases/download/continuous2/AppRun-patched-x86_64" -o $HOME/squashfs-root/AppRun-patched
@@ -64,6 +62,13 @@ export PATH=$(readlink -f /tmp/squashfs-root/usr/bin/):$PATH
 	cp /usr/lib/x86_64-linux-gnu/libportaudio.so.2 $HOME/squashfs-root/usr/lib/
 	cp /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0 $HOME/squashfs-root/usr/lib/
 	cp /usr/lib/x86_64-linux-gnu/libsndio.so.6.1 $HOME/squashfs-root/usr/lib/
+# Add dialog as the fallback
+cp /usr/bin/dialog ./squashfs-root/usr/bin/
+cp /usr/lib/x86_64-linux-gnu/libncursesw.so.5 $HOME/squashfs-root/usr/lib/
+cp /usr/lib/x86_64-linux-gnu/libtinfo.so.5 $HOME/squashfs-root/usr/lib/
+cp /usr/lib/x86_64-linux-gnu/libdl.so.2 $HOME/squashfs-root/usr/lib/
+
+# Add AppImageUpdate as the internal updater
 mv /tmp/update/AppImageUpdate $HOME/squashfs-root/usr/bin/
 mv /tmp/update/* $HOME/squashfs-root/usr/lib/
 mkdir -p $HOME/squashfs-root/usr/lib/plugins
