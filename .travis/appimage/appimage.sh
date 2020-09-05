@@ -64,9 +64,9 @@ export PATH=$(readlink -f /tmp/squashfs-root/usr/bin/):$PATH
 	cp /usr/lib/x86_64-linux-gnu/libsndio.so.6.1 $HOME/squashfs-root/usr/lib/
 # Add dialog as the fallback
 cp /usr/bin/dialog ./squashfs-root/usr/bin/
-cp /usr/lib/x86_64-linux-gnu/libncursesw.so.5 $HOME/squashfs-root/usr/lib/
-cp /usr/lib/x86_64-linux-gnu/libtinfo.so.5 $HOME/squashfs-root/usr/lib/
-cp /usr/lib/x86_64-linux-gnu/libdl.so.2 $HOME/squashfs-root/usr/lib/
+cp /lib/x86_64-linux-gnu/libncursesw.so.5 $HOME/squashfs-root/usr/lib/
+cp /lib/x86_64-linux-gnu/libtinfo.so.5 $HOME/squashfs-root/usr/lib/
+cp /lib/x86_64-linux-gnu/libdl.so.2 $HOME/squashfs-root/usr/lib/
 
 # Add AppImageUpdate as the internal updater
 mv /tmp/update/AppImageUpdate $HOME/squashfs-root/usr/bin/
