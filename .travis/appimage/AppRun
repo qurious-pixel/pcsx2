@@ -10,8 +10,28 @@ APPVER=`cat $APPDIR/version.txt`
 
 if [[ -z "$GITVER" ]]; then
 	$APPDIR/AppRun-patched
+	unlink /tmp/PCSX2LIBS
 elif [ "$GITVER" = "$APPVER" ]; then
 	$APPDIR/AppRun-patched
+	unlink /tmp/PCSX2LIBS
 else
-	$APPDIR/update.sh
+	#########################
+	#	APP Updater	#
+	#########################
+	if [ -f /usr/bin/zenity ]; then
+		zenity --question --timeout=10 --title="PCSX2 updater" --text="New update available. Update now?" \ 
+		--icon-name=PCSX2 --window-icon=PCSX2.svg --height=80 --width=400
+		answer=$?	
+	else
+		dialog --title PCSX2 --timeout 10 --yesno "New update available. Update now?" 0 0
+		answer=$?
+	fi
+
+	if [ "$answer" -eq 0 ]; then 
+		$APPDIR/usr/bin/AppImageUpdate $PWD/PCSX2-x86_64.AppImage && $PWD/PCSX2-x86_64.AppImage
+	else 
+		$APPDIR/AppRun-patched
+		unlink /tmp/PCSX2LIBS
+	fi
 fi
+exit 0
