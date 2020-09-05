@@ -7,18 +7,10 @@ BINFILE=PCSX2-x86_64.AppImage
 LOG_FILE=$HOME/curl.log
 CXX=g++-10
 
-# QT 5.14.2
-# source /opt/qt514/bin/qt514-env.sh
-QT_BASE_DIR=/opt/qt514
-export QTDIR=$QT_BASE_DIR
-export PATH=$QT_BASE_DIR/bin:$PATH
-export LD_LIBRARY_PATH=$QT_BASE_DIR/lib/x86_64-linux-gnu:$QT_BASE_DIR/lib:$LD_LIBRARY_PATH
-export PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
-
 cd /tmp
 	curl -sLO "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-	curl -sLO "https://github.com/qurious-pixel/pcsx2/raw/$branch/.travis/appimage/update.tar.gz"
-	tar -xzf update.tar.gz
+	curl -sLO "https://github.com/AppImage/AppImageUpdate/releases/download/continuous/AppImageUpdate-x86_64.AppImage"
+	chmod a+x AppImageUpdate-x86_64.AppImage
 	chmod a+x linuxdeployqt*.AppImage
 ./linuxdeployqt-continuous-x86_64.AppImage --appimage-extract
 cd $HOME
@@ -69,15 +61,12 @@ cp /lib/x86_64-linux-gnu/libtinfo.so.5 $HOME/squashfs-root/usr/lib/
 cp /lib/x86_64-linux-gnu/libdl.so.2 $HOME/squashfs-root/usr/lib/
 
 # Add AppImageUpdate as the internal updater
-mv /tmp/update/AppImageUpdate $HOME/squashfs-root/usr/bin/
-mv /tmp/update/* $HOME/squashfs-root/usr/lib/
+mv /tmp/AppImageUpdate-x86_64.AppImage $HOME/squashfs-root/usr/bin/AppImageUpdate
 mkdir -p $HOME/squashfs-root/usr/lib/plugins
 find $BUILDBIN/../plugins -iname '*.so' -exec cp {} $HOME/squashfs-root/usr/lib/plugins \;
 arr=( $(ls -d $HOME/squashfs-root/usr/lib/plugins/* ) )
 for i in "${arr[@]}"; do patchelf --set-rpath /tmp/PCSX2LIBS "$i"; done
 patchelf --set-rpath /tmp/PCSX2LIBS $HOME/squashfs-root/usr/lib/libSDL2-2.0.so.0
-mkdir -p $HOME/squashfs-root/usr/lib/updater
-mv $HOME/squashfs-root/usr/lib/libcurl.so.4 $HOME/squashfs-root/usr/lib/updater
 /tmp/squashfs-root/usr/bin/appimagetool $HOME/squashfs-root -u "gh-releases-zsync|qurious-pixel|pcsx2|continuous|PCSX2-x86_64.AppImage.zsync"
 
 mkdir $HOME/artifacts/
