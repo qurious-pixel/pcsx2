@@ -63,11 +63,13 @@ export PATH=$(readlink -f /tmp/squashfs-root/usr/bin/):$PATH
 	cp /usr/lib/x86_64-linux-gnu/libSoundTouch.so.1 $HOME/squashfs-root/usr/lib/
 	cp /usr/lib/x86_64-linux-gnu/libportaudio.so.2 $HOME/squashfs-root/usr/lib/
 	cp /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0 $HOME/squashfs-root/usr/lib/
+	cp /usr/lib/x86_64-linux-gnu/libsndio.so.6.1 $HOME/squashfs-root/usr/lib/
 mv /tmp/update/AppImageUpdate $HOME/squashfs-root/usr/bin/
 mv /tmp/update/* $HOME/squashfs-root/usr/lib/
 mkdir -p $HOME/squashfs-root/usr/lib/plugins
 find $BUILDBIN/../plugins -iname '*.so' -exec cp {} $HOME/squashfs-root/usr/lib/plugins \;
-patchelf --set-rpath /tmp/PCSX2LIBS $HOME/squashfs-root/usr/lib/plugins/*
+arr=( $(ls $HOME/squashfs-root/usr/lib/plugins/ ) )
+for i in "${arr[@]}"; do patchelf --set-rpath /tmp/PCSX2LIBS "$i"; done
 #patchelf --set-rpath /tmp/PCSX2LIBS $HOME/squashfs-root/usr/bin/PCSX2
 mkdir -p $HOME/squashfs-root/usr/lib/updater
 mv $HOME/squashfs-root/usr/lib/libcurl.so.4 $HOME/squashfs-root/usr/lib/updater
