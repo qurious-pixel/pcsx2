@@ -61,7 +61,6 @@ RUN \
     make \
     cmake \
     git \
-    patchelf \
     ninja-build 
     
 ENV CMAKEVER=3.18.1
@@ -71,6 +70,14 @@ RUN \
 	sh cmake-${CMAKEVER}-Linux-x86_64.sh --prefix=/usr --skip-license && \
 	rm ./cmake*.sh && \
 	cmake --version
+
+RUN\
+	cd /tmp && \
+	curl -sLO https://github.com/NixOS/patchelf/releases/download/0.12/patchelf-0.12.tar.bz2 && \
+	tar xvf patchelf-0.12.tar.bz2 && \
+	cd patchelf-0.12*/ && \
+	./configure && \
+	make && make install
 
 #ENV WXVER=3.1.4
 #RUN \
