@@ -1,11 +1,13 @@
 #!/bin/bash
 
+unset LD_LIBRARY_PATH
 if [ -f /usr/bin/zenity ]; then
 	zenity --question --timeout=10 --title="PCSX2 updater" --text="New update available. Update now?" --icon-name=PCSX2 --window-icon=PCSX2.svg --height=80 --width=400
 else
 	dialog --title PCSX2 --timeout 10 --yesno "New update available. Update now?" 0 0
 fi
-	
+
+export LD_LIBRARY_PATH="/tmp/PCSX2LIBS:$APPDIR/usb/lib:$LD_LIBRARY_PATH"
 answer=$?
 
 if [ "$answer" -eq 0 ]; then 
