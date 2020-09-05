@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export LD_LIBRARY_PATH="/tmp/PCSX2LIBS:$APPDIR/usb/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH="/tmp/PCSX2LIBS:$APPDIR/usb/lib:$LD_LIBRARY_PATH"
 
 ln -sf $APPDIR/usr/lib /tmp/PCSX2LIBS 
 mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && cp $APPDIR/pcsx2.svg $HOME/.local/share/icons/hicolor/scalable/apps
