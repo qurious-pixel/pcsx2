@@ -16,11 +16,12 @@ elif [ "$GITVER" = "$APPVER" ]; then
 	unlink /tmp/PCSX2LIBS
 else
 	#########################
-	#	APP Updater	#
+	#	APP Updater     #
 	#########################
 	if [ -f /usr/bin/zenity ]; then
-		zenity --question --timeout=10 --title="PCSX2 updater" --text="New update available. Update now?" \ 
-		--icon-name=PCSX2 --window-icon=PCSX2.svg --height=80 --width=400
+		unset LD_LIBRARY_PATH
+		zenity --question --timeout=10 --title="PCSX2 updater" --text="New update available. Update now?" \
+		--icon-name=pcsx2 --window-icon=pcsx2.svg --height=80 --width=400
 		answer=$?	
 	else
 		dialog --title PCSX2 --timeout 10 --yesno "New update available. Update now?" 0 0
