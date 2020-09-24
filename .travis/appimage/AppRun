@@ -5,7 +5,7 @@ export LD_LIBRARY_PATH="/tmp/PCSX2LIBS:$APPDIR/usb/lib:$LD_LIBRARY_PATH"
 ln -sf $APPDIR/usr/lib /tmp/PCSX2LIBS 
 mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && cp $APPDIR/pcsx2.svg $HOME/.local/share/icons/hicolor/scalable/apps
 
-GITVER=`wget -qO- https://www.github.com/qurious-pixel/pcsx2/releases/tag/continuous | grep qurious-pixel/pcsx2/commit/ | cut -d '"' -f 2 | cut -d '/' -f 5 | awk '!x[$0]++'` 
+GITVER=`wget -qO- https://www.github.com/qurious-pixel/pcsx2/releases/tag/continuous | grep -o -P 'builds/.{0,9}' | cut -d '/' -f 2 | awk '!x[$0]++'`
 APPVER=`cat $APPDIR/version.txt`
 
 if [[ -z "$GITVER" ]]; then
