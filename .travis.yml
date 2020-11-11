@@ -17,7 +17,7 @@ install:
   - docker pull quriouspixel/pcsx2:18.04
   - docker run -u root --env-file .travis/appimage/travis-ci.env -v $(pwd):/pcsx2 -v "$HOME/.ccache":/root/.ccache quriouspixel/pcsx2:18.04 /bin/bash /pcsx2/.travis/appimage/docker.sh
 script: 
-  - ls -al
+  - ls -al build/
 after_success: 
   - ls -al artifacts/
   - wget -c https://github.com/tcnksm/ghr/releases/download/v0.13.0/ghr_v0.13.0_linux_amd64.tar.gz
