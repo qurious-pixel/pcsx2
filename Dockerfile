@@ -39,6 +39,7 @@ RUN \
     libsdl1.2-dev \
     libasound2-dev \
     libsoundtouch-dev \
+    libsamplerate0-dev \
     libwxgtk3.0-dev \
     libgtk-3-dev \
     libwxgtk3.0-gtk3-dev \
@@ -64,7 +65,7 @@ RUN \
     git \
     ninja-build 
     
-ENV CMAKEVER=3.18.1
+ENV CMAKEVER=3.18.4
 RUN \
 	cd /tmp && \
 	curl -sLO https://cmake.org/files/v${CMAKEVER%.*}/cmake-${CMAKEVER}-Linux-x86_64.sh && \
