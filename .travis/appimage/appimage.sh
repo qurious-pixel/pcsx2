@@ -42,7 +42,7 @@ curl -sL "https://raw.githubusercontent.com/qurious-pixel/pcsx2/$branch/.travis/
 curl -sL "https://raw.githubusercontent.com/qurious-pixel/pcsx2/$branch/.travis/appimage/AppRun" -o $HOME/squashfs-root/AppRun
 curl -sL "https://github.com/RPCS3/AppImageKit-checkrt/releases/download/continuous2/AppRun-patched-x86_64" -o $HOME/squashfs-root/AppRun-patched
 curl -sL "https://github.com/RPCS3/AppImageKit-checkrt/releases/download/continuous2/exec-x86_64.so" -o $HOME/squashfs-root/usr/optional/exec.so
-curl -sL "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/GameIndex.yaml" -o $HOME/squashfs-root/usr/bin/GameIndex.yaml
+curl -sL "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/GameIndex.yaml" -o $HOME/squashfs-root/usr/lib/plugins/GameIndex.yaml
 chmod a+x ./squashfs-root/AppRun
 chmod a+x ./squashfs-root/runtime
 chmod a+x ./squashfs-root/AppRun-patched
