@@ -15,3 +15,5 @@ elif [ "$GITVER" = "$APPVER" ]; then
 else
 	$APPDIR/update.sh
 fi
+
+unlink /tmp/PCSX2
