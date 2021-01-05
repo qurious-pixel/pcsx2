@@ -31,7 +31,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-20.04
+          #- os: ubuntu-20.04
             platform: x86
             compiler: gcc
             experimental: false
@@ -39,7 +39,7 @@ jobs:
             platform: x64
             compiler: gcc
             experimental: false
-          - os: ubuntu-20.04
+          #- os: ubuntu-20.04
             platform: x86
             compiler: clang
             # Need to disable PCH until cmake 3.17
@@ -47,7 +47,7 @@ jobs:
             cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
             detail: -nopch
             experimental: false
-          - os: ubuntu-20.04
+          #- os: ubuntu-20.04
             platform: x86
             compiler: gcc
             cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
@@ -104,19 +104,31 @@ jobs:
           restore-keys: |
             ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}-ccache-
 
-      - name: Install Packages
-        env:
-          PLATFORM: ${{ matrix.platform }}
-          COMPILER: ${{ matrix.compiler }}
-        run: ./.github/workflows/scripts/linux/install-packages.sh
-
-      - name: Generate CMake
-        env:
-          PLATFORM: ${{ matrix.platform }}
-          COMPILER: ${{ matrix.compiler }}
-          ADDITIONAL_CMAKE_ARGS: ${{ matrix.cmakeflags }}
-        run: ./.github/workflows/scripts/linux/generate-cmake.sh
+      - name: Prepare Artifact Git Info
+        shell: bash
+        run: |
+          echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
+          ARTIFACT_NAME="commit-$(git rev-parse --short "$GITHUB_SHA")"
+          if [ ${{ github.event_name == 'pull_request' }} ]; then
+            echo "##[set-output name=short-sha;]$(git rev-parse --short "${{ github.event.pull_request.head.sha }}")"
+            if [ ! -z "${{ github.event.pull_request.number }}" ]; then
+              ARTIFACT_NAME="pr-${{ github.event.pull_request.number }}-commit-$(git rev-parse --short "${{ github.event.pull_request.head.sha }}")"
+            fi
+          else
+            echo "##[set-output name=short-sha;]$(git rev-parse --short "$GITHUB_SHA")"
+          fi
+          echo "##[set-output name=artifact-metadata;]${ARTIFACT_NAME}"
+        id: git-vars
 
       - name: Build PCSX2
-        working-directory: ./build
-        run: ../.github/workflows/scripts/linux/compile.sh
+        run: |
+              mkdir -p "$HOME/.ccache"
+              docker pull quriouspixel/pcsx2:18.04
+              docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$HOME/.ccache":/root/.ccache quriouspixel/pcsx2:18.04 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
+          
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        continue-on-error: true
+        with:
+          name: PCSX2-linux-${{ matrix.platform }}-${{ matrix.compiler }}-${{ steps.git-vars.outputs.artifact-metadata }}
+          
