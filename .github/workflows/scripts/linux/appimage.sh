@@ -2,7 +2,7 @@
 
 branch=`echo ${GITHUB_REF##*/}`
 
-BUILDBIN=/pcsx2/build/pcsx2/
+BUILDBIN=/home/runner/work/pcsx2/pcsx2/bin/
 BINFILE=PCSX2-x86_64.AppImage
 LOG_FILE=$HOME/curl.log
 CXX=g++-10
