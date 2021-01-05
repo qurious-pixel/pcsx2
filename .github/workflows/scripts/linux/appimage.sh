@@ -66,7 +66,6 @@ mkdir $HOME/artifacts/
 mkdir -p /pcsx2/artifacts/
 mv PCSX2-x86_64.AppImage* $HOME/artifacts
 cp -R $HOME/artifacts/ /pcsx2/
-cp "$BUILDBIN"/PCSX2 /pcsx2/artifacts/
 chmod -R 777 /pcsx2/artifacts
 cd /pcsx2/artifacts
 ls -al /pcsx2/artifacts/
