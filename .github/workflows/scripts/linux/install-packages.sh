@@ -53,7 +53,6 @@ declare -a PCSX2_PACKAGES=(
   "libglu1-mesa-dev"
   "libglu1-mesa"
   "libglvnd-dev"
-  "libglx-dev"
   "libglx-mesa0"
   "libglx0"
   "libgtk-3-dev"
