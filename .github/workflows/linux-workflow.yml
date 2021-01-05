@@ -5,7 +5,7 @@ name: Linux Build
 on:
   push:
     branches:
-      - master
+      - pcsx-appimage
     paths-ignore:
       - .gitignore
       - "**/*.md"
@@ -15,7 +15,7 @@ on:
       - "pcsx2/PAD/Windows/**"
   pull_request:
     branches:
-      - master
+      - pcsx-appimage
     paths-ignore:
       - .gitignore
       - "**/*.md"
