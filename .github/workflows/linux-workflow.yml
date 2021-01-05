@@ -131,4 +131,4 @@ jobs:
         continue-on-error: true
         with:
           name: PCSX2-linux-${{ matrix.platform }}-${{ matrix.compiler }}-${{ steps.git-vars.outputs.artifact-metadata }}
-          
+          path: /pcsx2/artifacts/
