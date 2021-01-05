@@ -26,7 +26,7 @@ cp -P "$BUILDBIN"/PCSX2 $HOME/squashfs-root/usr/bin/
 patchelf --set-rpath /tmp/PCSX2LIBS $HOME/squashfs-root/usr/bin/PCSX2
 
 cp /pcsx2/pcsx2/gui/Resources/AppIcon64.png ./squashfs-root/pcsx2.svg
-cp /pcsx2/linux_various/PCSX2.desktop ./squashfs-root/pcsx2.desktop
+cp /pcsx2/linux_various/PCSX2.desktop.in ./squashfs-root/pcsx2.desktop
 curl -sL https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-x86_64 -o ./squashfs-root/runtime
 mkdir -p squashfs-root/usr/share/applications && cp ./squashfs-root/pcsx2.desktop ./squashfs-root/usr/share/applications
 mkdir -p squashfs-root/usr/share/icons && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/icons
