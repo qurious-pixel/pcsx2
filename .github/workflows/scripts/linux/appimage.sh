@@ -70,8 +70,3 @@ cp "$BUILDBIN"/PCSX2 /pcsx2/artifacts/
 chmod -R 777 /pcsx2/artifacts
 cd /pcsx2/artifacts
 ls -al /pcsx2/artifacts/
-
-#echo "echo: PCSX2-linux-${{ matrix.platform }}-${{ matrix.compiler }}-${{ steps.git-vars.outputs.artifact-metadata }}"
-echo "echo: PCSX2-linux-$matrix.platform-$matrix.compile-$steps.git-vars.outputs.artifact-metadata"
-echo "echo: PCSX2-linux-$(matrix.platform)-$(matrix.compile)-$(steps.git-vars.outputs.artifact-metadata)"
-echo "Done"
