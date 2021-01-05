@@ -26,10 +26,10 @@
 #include "AppCommon.h"
 #include "AppCoreThread.h"
 #include "RecentIsoList.h"
+#include "DriveList.h"
 
 #ifndef DISABLE_RECORDING
-#	include "Recording/VirtualPad.h"
-#	include "Recording/NewRecordingFrame.h"
+#include "Recording/NewRecordingFrame.h"
 #endif
 
 class DisassemblyDialog;
@@ -76,7 +76,7 @@ enum TopLevelMenuIndices
 	TopLevelMenu_Window,
 	TopLevelMenu_Capture,
 #ifndef DISABLE_RECORDING
-	TopLevelMenu_Recording,
+	TopLevelMenu_InputRecording,
 #endif
 	TopLevelMenu_Help
 };
@@ -99,12 +99,14 @@ enum MenuIdentifiers
 	// Run SubSection
 	MenuId_Cdvd_Source,
 	MenuId_Src_Iso,
-	MenuId_Src_Plugin,
+	MenuId_Src_Disc,
 	MenuId_Src_NoDisc,
 	MenuId_Boot_Iso,			// Opens submenu with Iso browser, and recent isos.
 	MenuId_RecentIsos_reservedStart,
 	MenuId_IsoBrowse = MenuId_RecentIsos_reservedStart + 100,			// Open dialog, runs selected iso.
 	MenuId_IsoClear,
+	MenuId_DriveSelector,
+	MenuId_DriveListRefresh,
 	MenuId_Ask_On_Booting,
 	MenuId_Boot_CDVD,
 	MenuId_Boot_CDVD2,
@@ -120,8 +122,9 @@ enum MenuIdentifiers
 	MenuId_GameSettingsSubMenu,
 	MenuId_EnablePatches,
 	MenuId_EnableCheats,
+	MenuId_EnableIPC,
 	MenuId_EnableWideScreenPatches,
-	MenuId_EnableRecordingTools,
+	MenuId_EnableInputRecording,
 	MenuId_EnableLuaTools,
 	MenuId_EnableHostFs,
 
@@ -192,16 +195,19 @@ enum MenuIdentifiers
 	MenuId_Capture_Video_Record,
 	MenuId_Capture_Video_Stop,
 	MenuId_Capture_Screenshot,
+	MenuId_Capture_Screenshot_Screenshot,
+	MenuId_Capture_Screenshot_Screenshot_As,
 
 #ifndef DISABLE_RECORDING
-	// Recording Subsection
+	// Input Recording Subsection
 	MenuId_Recording_New,
 	MenuId_Recording_Play,
 	MenuId_Recording_Stop,
-	MenuId_Recording_Editor,
+	MenuId_Recording_TogglePause,
+	MenuId_Recording_FrameAdvance,
+	MenuId_Recording_ToggleRecordingMode,
 	MenuId_Recording_VirtualPad_Port0,
 	MenuId_Recording_VirtualPad_Port1,
-	MenuId_Recording_Conversions,
 #endif
 
 };
@@ -526,6 +532,7 @@ protected:
 	std::unique_ptr<PipeRedirectionBase> m_StderrRedirHandle;
 
 	std::unique_ptr<RecentIsoList> m_RecentIsoList;
+	std::unique_ptr<DriveList> m_DriveList;
 	std::unique_ptr<pxAppResources> m_Resources;
 
 public:
@@ -543,7 +550,6 @@ protected:
 	wxWindowID			m_id_Disassembler;
 
 #ifndef DISABLE_RECORDING
-	wxWindowID			m_id_VirtualPad[2];
 	wxWindowID			m_id_NewRecordingFrame;
 #endif
 
@@ -572,7 +578,6 @@ public:
 	DisassemblyDialog*	GetDisassemblyPtr() const	{ return (DisassemblyDialog*)wxWindow::FindWindowById(m_id_Disassembler); }
 
 #ifndef DISABLE_RECORDING
-	VirtualPad*			GetVirtualPadPtr(int port) const	{ return (VirtualPad*)wxWindow::FindWindowById(m_id_VirtualPad[port]); }
 	NewRecordingFrame*	GetNewRecordingFramePtr() const		{ return (NewRecordingFrame*)wxWindow::FindWindowById(m_id_NewRecordingFrame); }
 #endif
 
@@ -617,6 +622,7 @@ public:
 
 	wxMenu&				GetRecentIsoMenu();
 	RecentIsoManager&	GetRecentIsoManager();
+	wxMenu&				GetDriveListMenu();
 
 	pxAppResources&		GetResourceCache();
 	const wxIconBundle&	GetIconBundle();
@@ -802,6 +808,7 @@ extern void ShutdownPlugins();
 
 extern bool SysHasValidState();
 extern void SysUpdateIsoSrcFile( const wxString& newIsoFile );
+extern void SysUpdateDiscSrcDrive( const wxString& newDiscDrive );
 extern void SysStatus( const wxString& text );
 
 extern bool				HasMainFrame();

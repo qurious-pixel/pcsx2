@@ -79,6 +79,12 @@ mVUop(mVU_DIV) {
 
 		writeQreg(Fs, mVUinfo.writeQ);
 
+		if (mVU.cop2)
+		{
+			xAND(gprF0, ~0xc0000);
+			xOR(gprF0, ptr32[&mVU.divFlag]);
+		}
+
 		mVU.regAlloc->clearNeeded(Fs);
 		mVU.regAlloc->clearNeeded(Ft);
 		mVU.regAlloc->clearNeeded(t1);
@@ -98,6 +104,12 @@ mVUop(mVU_SQRT) {
 		if (CHECK_VU_OVERFLOW) xMIN.SS(Ft, ptr32[mVUglob.maxvals]); // Clamp infinities (only need to do positive clamp since xmmFt is positive)
 		xSQRT.SS(Ft, Ft);
 		writeQreg(Ft, mVUinfo.writeQ);
+
+		if (mVU.cop2)
+		{
+			xAND(gprF0, ~0xc0000);
+			xOR(gprF0, ptr32[&mVU.divFlag]);
+		}
 
 		mVU.regAlloc->clearNeeded(Ft);
 		mVU.profiler.EmitOp(opSQRT);
@@ -137,6 +149,12 @@ mVUop(mVU_RSQRT) {
 		djmp.SetTarget();
 
 		writeQreg(Fs, mVUinfo.writeQ);
+
+		if (mVU.cop2)
+		{
+			xAND(gprF0, ~0xc0000);
+			xOR(gprF0, ptr32[&mVU.divFlag]);
+		}
 
 		mVU.regAlloc->clearNeeded(Fs);
 		mVU.regAlloc->clearNeeded(Ft);
@@ -890,12 +908,17 @@ static void writeBackISW(microVU& mVU, void *base_ptr, xAddressReg reg) {
 				xLEA(gprT3q, ptr[(void*)((sptr)base_ptr + offset)]);
 				register_offset = offset;
 			}
-			xMOV(ptr32[gprT3q+gprT2q+(offset-register_offset)], gprT1);
+			xMOV(ptr32[gprT3q+reg+(offset-register_offset)], gprT1);
 		};
 		if (_X) writeBackAt(0);
 		if (_Y) writeBackAt(4);
 		if (_Z) writeBackAt(8);
 		if (_W) writeBackAt(12);
+	} else if (reg.IsEmpty()) {
+		if (_X) xMOV(ptr32[(void*)((uptr)base_ptr)], gprT1);
+		if (_Y) xMOV(ptr32[(void*)((uptr)base_ptr+4)], gprT1);
+		if (_Z) xMOV(ptr32[(void*)((uptr)base_ptr+8)], gprT1);
+		if (_W) xMOV(ptr32[(void*)((uptr)base_ptr+12)], gprT1);
 	} else {
 		if (_X) xMOV(ptr32[base_ptr+reg], gprT1);
 		if (_Y) xMOV(ptr32[base_ptr+reg+4], gprT1);
@@ -916,10 +939,10 @@ mVUop(mVU_ISW) {
 		if (!_Is_)
 			xXOR(gprT2, gprT2);
 		xADD(gprT2, _Imm11_);
-		mVUaddrFix (mVU, gprT2);
+		mVUaddrFix (mVU, gprT2q);
 
 		mVUallocVIa(mVU, gprT1, _It_);
-		writeBackISW(mVU, ptr, gprT2);
+		writeBackISW(mVU, ptr, gprT2q);
 		mVU.profiler.EmitOp(opISW);
 	}
 	pass3 { mVUlog("ISW.%s vi%02d, vi%02d + %d", _XYZW_String, _Ft_, _Fs_, _Imm11_);  }

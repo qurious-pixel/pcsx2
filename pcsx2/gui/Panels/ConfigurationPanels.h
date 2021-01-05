@@ -325,6 +325,7 @@ namespace Panels
 	class SpeedHacksPanel : public BaseApplicableConfigPanel_SpecificConfig
 	{
 	protected:
+		wxBoxSizer* m_sizer;
 		wxFlexGridSizer* s_table;
 
 		pxCheckBox*		m_check_Enable;
@@ -342,6 +343,7 @@ namespace Panels
 		pxCheckBox*		m_check_fastCDVD;
 		pxCheckBox*		m_check_vuFlagHack;
 		pxCheckBox*		m_check_vuThread;
+		pxCheckBox*		m_check_vu1Instant;
 
 	public:
 		virtual ~SpeedHacksPanel() = default;
@@ -356,7 +358,6 @@ namespace Panels
 		const wxChar* GetEECycleSkipSliderMsg( int val );
 		void SetEEcycleSliderMsg();
 		void SetVUcycleSliderMsg();
-		void TrigLayout();
 
 		void OnEnable_Toggled( wxCommandEvent& evt );
 		void Defaults_Click( wxCommandEvent& evt );
