@@ -18,6 +18,9 @@ cmake .. -G Ninja -DCMAKE_C_COMPILER=/usr/lib/ccache/gcc -DCMAKE_CXX_COMPILER=/u
 ninja
 
 cd /tmp
-curl -sLO "https://raw.githubusercontent.com/$GITHUB_REPOSITORY/$branch/.github/workflows/scripts/linux/appimage.sh"
+#curl -sLO "https://raw.githubusercontent.com/$GITHUB_REPOSITORY/$branch/.github/workflows/scripts/linux/appimage.sh"
+#Temporary Work-Around for PR#
+curl -sLO "https://raw.githubusercontent.com/qurious-pixel/pcsx2/app-test/.github/workflows/scripts/linux/appimage.sh"
+qurious-pixel/pcsx2/
 chmod a+x appimage.sh
 ./appimage.sh
