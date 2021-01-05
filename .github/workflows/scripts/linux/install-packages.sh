@@ -6,7 +6,7 @@ set -e
 declare -a BUILD_PACKAGES=(
   "ccache"
   "cmake"
-  "g++-8-multilib"
+  "g++-10-multilib"
 )
 
 declare -a GCC_PACKAGES=(
@@ -18,15 +18,15 @@ declare -a CLANG_PACKAGES=(
   "clang-tidy"
   "clang-tools"
   "clang"
-  "clangd-10"
+  "clangd"
   "libc++-dev"
   "libc++1"
   "libc++abi-dev"
   "libc++abi1"
   "libclang-dev"
   "libclang1"
-  "liblldb-10-dev"
-  "libllvm-10-ocaml-dev"
+  "liblldb-dev"
+  "libllvm-ocaml-dev"
   "libomp-dev"
   "libomp5"
   "lld"
@@ -34,26 +34,30 @@ declare -a CLANG_PACKAGES=(
   "llvm-dev"
   "llvm-runtime"
   "llvm"
-  "python-clang-9"
+  "python-clang"
 )
 
 # Packages - PCSX2
 declare -a PCSX2_PACKAGES=(
-  "fuse"
   "libaio-dev"
   "libasound2-dev"
   "libcairo2-dev"
+  "libegl-dev"
   "libegl1-mesa-dev"
   "libgdk-pixbuf2.0-dev"
   "libgirepository-1.0-1"
+  "libgl-dev"
   "libgl1-mesa-dev"
   "libgl1-mesa-dri"
   "libgl1"
+  "libgles-dev"
+  "libgles-dev"
   "libgles2-mesa-dev"
   "libglib2.0-dev"
   "libglu1-mesa-dev"
   "libglu1-mesa"
   "libglvnd-dev"
+  "libglx-dev"
   "libglx-mesa0"
   "libglx0"
   "libgtk-3-dev"
@@ -66,9 +70,7 @@ declare -a PCSX2_PACKAGES=(
   "libpulse-dev"
   "libsdl2-dev"
   "libsamplerate0-dev"
-  "libsndio-dev"
   "libsoundtouch-dev"
-  "libwxgtk3.0-dev"
   "libwxgtk3.0-gtk3-0v5"
   "libwxgtk3.0-gtk3-dev"
   "libx11-xcb-dev"
@@ -106,27 +108,14 @@ else
 fi
 
 echo "Will install the following packages for building - ${BUILD_PACKAGE_STR}"
-#sudo apt remove gcc-9 g++-9
+sudo apt remove gcc-9 g++-9
 sudo apt-get -y install ${BUILD_PACKAGE_STR}
 
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 10
-sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 10
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 10
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
 sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 30
 sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 30
 
-curl -sLO https://github.com/NixOS/patchelf/releases/download/0.12/patchelf-0.12.tar.bz2 
-  tar xvf patchelf-0.12.tar.bz2
-  cd patchelf-0.12*/
-  ./configure
-  make && sudo make install
-  cd ..
-  
-# Install and add FUSE
-sudo modprobe fuse
-sudo groupadd fuse
-user="$(whoami)"
-sudo usermod -a -G fuse $user
-  
 # Install packages needed by pcsx2
 PCSX2_PACKAGES_STR=""
 for i in "${PCSX2_PACKAGES[@]}"; do

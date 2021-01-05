@@ -5,7 +5,7 @@ name: Linux Build
 on:
   push:
     branches:
-      - docker
+      - master
     paths-ignore:
       - .gitignore
       - "**/*.md"
@@ -98,6 +98,22 @@ jobs:
         if: steps.cache-submodules.outputs.cache-hit != 'true'
         run: git submodule update --init --recursive --jobs 2
 
+      - name: Prepare Artifact Git Info
+        shell: bash
+        run: |
+          echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
+          ARTIFACT_NAME="commit-$(git rev-parse --short "$GITHUB_SHA")"
+          if [ ${{ github.event_name == 'pull_request' }} ]; then
+            echo "##[set-output name=short-sha;]$(git rev-parse --short "${{ github.event.pull_request.head.sha }}")"
+            if [ ! -z "${{ github.event.pull_request.number }}" ]; then
+              ARTIFACT_NAME="pr-${{ github.event.pull_request.number }}-commit-$(git rev-parse --short "${{ github.event.pull_request.head.sha }}")"
+            fi
+          else
+            echo "##[set-output name=short-sha;]$(git rev-parse --short "$GITHUB_SHA")"
+          fi
+          echo "##[set-output name=artifact-metadata;]${ARTIFACT_NAME}"
+        id: git-vars
+        
       # -- SETUP CCACHE - https://cristianadam.eu/20200113/speeding-up-c-plus-plus-github-actions-using-ccache/
       - name: Prepare ccache timestamp
         id: ccache_cache_timestamp
@@ -113,7 +129,7 @@ jobs:
           key: ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
           restore-keys: |
             ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}-ccache-
-
+        
       - name: Install Packages
         env:
           PLATFORM: ${{ matrix.platform }}
@@ -148,10 +164,16 @@ jobs:
               docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$GITHUB_WORKSPACE/.ccache":/root/.ccache quriouspixel/pcsx2:18.04 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
           fi   
         continue-on-error: true
-        
+        run: ../.github/workflows/scripts/linux/compile.sh
+
+      - name: Build AppImage Artifacts
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        run: chmod +x ./.github/workflows/scripts/linux/appimage.sh && ./.github/workflows/scripts/linux/appimage.sh
+
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         continue-on-error: true
         with:
           name: PCSX2-linux-${{ matrix.platform }}-${{ matrix.compiler }}
-          path: artifacts
+

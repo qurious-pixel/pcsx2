@@ -26,5 +26,4 @@ ninja
 
 cp ../.github/workflows/scripts/linux/appimage.sh /tmp
 cd /tmp
-chmod a+x appimage.sh
 ./appimage.sh

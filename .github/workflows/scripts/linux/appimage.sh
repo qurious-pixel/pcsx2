@@ -13,6 +13,7 @@ else
 	ARCH="x86_64"
 fi
 
+
 BUILDBIN=/pcsx2/build/pcsx2
 BINFILE=PCSX2-$ARCH.AppImage
 CXX=g++-8
