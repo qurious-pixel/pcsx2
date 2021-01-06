@@ -58,12 +58,12 @@ export PATH=$(readlink -f /tmp/squashfs-root/usr/bin/):$PATH
 	cp $LIBARCH/libportaudio.so.2 $GITHUB_WORKSPACE/squashfs-root/usr/lib/
 	cp $LIBARCH/libSDL2-2.0.so.0 $GITHUB_WORKSPACE/squashfs-root/usr/lib/
 	cp $LIBARCH/libsndio.so.6.1 $GITHUB_WORKSPACE/squashfs-root/usr/lib/
-mkdir -p $GITHUB_WORKSPACE/squashfs-root/usr/lib/plugins
-find $BUILDBIN/plugins -iname '*.so' -exec cp {} $GITHUB_WORKSPACE/squashfs-root/usr/lib/plugins \;
+mkdir -p $GITHUB_WORKSPACE/squashfs-root/usr/bin/plugins
+find $BUILDBIN/plugins -iname '*.so' -exec cp {} $GITHUB_WORKSPACE/squashfs-root/usr/bin/plugins \;
 arr=( $(ls -d $GITHUB_WORKSPACE/squashfs-root/usr/lib/plugins/* ) )
 for i in "${arr[@]}"; do patchelf --set-rpath /tmp/PCSX2 "$i"; done
 patchelf --set-rpath /tmp/PCSX2 $GITHUB_WORKSPACE/squashfs-root/usr/lib/libSDL2-2.0.so.0
-cp ./bin/GameIndex.yaml $GITHUB_WORKSPACE/squashfs-root/usr/lib/plugins/GameIndex.yaml
+cp ./bin/GameIndex.yaml $GITHUB_WORKSPACE/squashfs-root/usr/bin/GameIndex.yaml
 /tmp/squashfs-root/usr/bin/appimagetool $GITHUB_WORKSPACE/squashfs-root
 
 mkdir $GITHUB_WORKSPACE/artifacts/
