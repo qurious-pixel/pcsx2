@@ -41,6 +41,7 @@ mkdir -p squashfs-root/usr/share/icons && cp ./squashfs-root/pcsx2.svg ./squashf
 mkdir -p squashfs-root/usr/share/icons/hicolor/scalable/apps && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/icons/hicolor/scalable/apps
 mkdir -p squashfs-root/usr/share/pixmaps && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/pixmaps
 mkdir -p squashfs-root/usr/optional/ ; mkdir -p squashfs-root/usr/optional/libstdc++/
+mkdir -p squashfs-root/usr/lib/
 cp ./.github/workflows/scripts/linux/AppRun $GITHUB_WORKSPACE/squashfs-root/AppRun
 curl -sL "https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-$APPARCH" -o $GITHUB_WORKSPACE/squashfs-root/AppRun-patched
 chmod a+x ./squashfs-root/AppRun
