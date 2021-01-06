@@ -1,6 +1,4 @@
-#!/bin/bash 
-
-set -e
+#!/bin/bash -ex
 
 branch=`echo ${GITHUB_REF##*/}`
 
