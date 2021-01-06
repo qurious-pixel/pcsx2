@@ -10,7 +10,8 @@ if [ "${PLATFORM}" == "x86" ]; then
 	APPARCH="i686"
 	ARCH="i386"
 else
-	LIBARCH="/usr/lib/x86_64-linux-gnu"  
+	LIBARCH="/usr/lib/x86_64-linux-gnu" 
+	APPARCH="x86_64"
 	ARCH="x86_64"
 fi
 
