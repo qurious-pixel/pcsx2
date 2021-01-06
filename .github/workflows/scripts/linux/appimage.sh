@@ -7,6 +7,7 @@ echo $GITHUB_WORKSPACE
 echo "${PLATFORM}"
 if [ "${PLATFORM}" == "x86" ]; then
   	LIBARCH="/usr/lib/i386-linux-gnu"
+	APPARCH="i686"
 	ARCH="i386"
 else
 	LIBARCH="/usr/lib/x86_64-linux-gnu"  
@@ -33,14 +34,14 @@ echo $GITHUB_WORKSPACE
 
 cp ./pcsx2/gui/Resources/AppIcon64.png ./squashfs-root/pcsx2.svg
 cp ./linux_various/PCSX2.desktop ./squashfs-root/pcsx2.desktop
-curl -sL https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-$ARCH -o ./squashfs-root/runtime
+curl -sL https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-$APPARCH -o ./squashfs-root/runtime
 mkdir -p squashfs-root/usr/share/applications && cp ./squashfs-root/pcsx2.desktop ./squashfs-root/usr/share/applications
 mkdir -p squashfs-root/usr/share/icons && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/icons
 mkdir -p squashfs-root/usr/share/icons/hicolor/scalable/apps && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/icons/hicolor/scalable/apps
 mkdir -p squashfs-root/usr/share/pixmaps && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/pixmaps
 mkdir -p squashfs-root/usr/optional/ ; mkdir -p squashfs-root/usr/optional/libstdc++/
 cp ./.github/workflows/scripts/linux/AppRun $GITHUB_WORKSPACE/squashfs-root/AppRun
-curl -sL "https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-$ARCH" -o $GITHUB_WORKSPACE/squashfs-root/AppRun-patched
+curl -sL "https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-$APPARCH" -o $GITHUB_WORKSPACE/squashfs-root/AppRun-patched
 chmod a+x ./squashfs-root/AppRun
 chmod a+x ./squashfs-root/runtime
 chmod a+x ./squashfs-root/AppRun-patched
