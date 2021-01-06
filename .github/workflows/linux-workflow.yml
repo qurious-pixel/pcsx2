@@ -145,7 +145,7 @@ jobs:
       - name: Tar AppImage to Preserve File Permissions
         # https://github.com/actions/upload-artifact#maintaining-file-permissions-and-case-sensitive-files
         continue-on-error: true
-        run: cd artifacts && tar -cvf appImage.tar *
+        run: cd artifacts && tar -cvf appImage.tar * --remove-files
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
