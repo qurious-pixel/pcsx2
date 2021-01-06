@@ -25,15 +25,18 @@ ls -al $BUILDBIN
 cp -P "$BUILDBIN"/PCSX2 $HOME/squashfs-root/usr/bin/
 patchelf --set-rpath /tmp/PCSX2LIBS $HOME/squashfs-root/usr/bin/PCSX2
 
-cp /pcsx2/pcsx2/gui/Resources/AppIcon64.png ./squashfs-root/pcsx2.svg
-cp /pcsx2/linux_various/PCSX2.desktop ./squashfs-root/pcsx2.desktop
+pwd
+ls -al
+
+cp ./pcsx2/pcsx2/gui/Resources/AppIcon64.png ./squashfs-root/pcsx2.svg
+cp ./pcsx2/linux_various/PCSX2.desktop ./squashfs-root/pcsx2.desktop
 curl -sL https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-x86_64 -o ./squashfs-root/runtime
 mkdir -p squashfs-root/usr/share/applications && cp ./squashfs-root/pcsx2.desktop ./squashfs-root/usr/share/applications
 mkdir -p squashfs-root/usr/share/icons && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/icons
 mkdir -p squashfs-root/usr/share/icons/hicolor/scalable/apps && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/icons/hicolor/scalable/apps
 mkdir -p squashfs-root/usr/share/pixmaps && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/pixmaps
 mkdir -p squashfs-root/usr/optional/ ; mkdir -p squashfs-root/usr/optional/libstdc++/
-cp /pcsx2/.github/workflows/scripts/linux/AppRun $HOME/squashfs-root/AppRun
+cp ./pcsx2/.github/workflows/scripts/linux/AppRun $HOME/squashfs-root/AppRun
 curl -sL "https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-x86_64" -o $HOME/squashfs-root/AppRun-patched
 chmod a+x ./squashfs-root/AppRun
 chmod a+x ./squashfs-root/runtime
@@ -56,13 +59,13 @@ find $BUILDBIN/../plugins -iname '*.so' -exec cp {} $HOME/squashfs-root/usr/lib/
 arr=( $(ls -d $HOME/squashfs-root/usr/lib/plugins/* ) )
 for i in "${arr[@]}"; do patchelf --set-rpath /tmp/PCSX2LIBS "$i"; done
 patchelf --set-rpath /tmp/PCSX2LIBS $HOME/squashfs-root/usr/lib/libSDL2-2.0.so.0
-cp /pcsx2/bin/GameIndex.yaml $HOME/squashfs-root/usr/lib/plugins/GameIndex.yaml
+cp ./pcsx2/bin/GameIndex.yaml $HOME/squashfs-root/usr/lib/plugins/GameIndex.yaml
 /tmp/squashfs-root/usr/bin/appimagetool $HOME/squashfs-root
 
 mkdir $HOME/artifacts/
-mkdir -p /pcsx2/artifacts/
+mkdir -p ./pcsx2/artifacts/
 mv PCSX2-x86_64.AppImage* $HOME/artifacts
-cp -R $HOME/artifacts/ /pcsx2/
-chmod -R 777 /pcsx2/artifacts
-cd /pcsx2/artifacts
-ls -al /pcsx2/artifacts/
+cp -R $HOME/artifacts/ ./pcsx2/
+chmod -R 777 ./pcsx2/artifacts
+cd ./pcsx2/artifacts
+ls -al ./pcsx2/artifacts/
