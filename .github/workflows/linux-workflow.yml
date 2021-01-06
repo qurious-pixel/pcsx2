@@ -124,7 +124,7 @@ jobs:
       - name: Build AppImage Artifacts
         env:
           PLATFORM: ${{ matrix.platform }}
-        run: ./.github/workflows/scripts/linux/appimage.sh
+        run: chmod +x ./.github/workflows/scripts/linux/appimage.sh && ./.github/workflows/scripts/linux/appimage.sh
 
       - name: Tar AppImage to Preserve File Permissions
         # https://github.com/actions/upload-artifact#maintaining-file-permissions-and-case-sensitive-files
