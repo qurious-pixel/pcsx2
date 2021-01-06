@@ -18,9 +18,9 @@ BINFILE=PCSX2-$ARCH.AppImage
 CXX=g++-10
 
 cd /tmp
-	curl -sLO "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-$ARCH.AppImage"
-	chmod a+x linuxdeploy*.AppImage
-./linuxdeploy-$ARCH.AppImage --appimage-extract
+	curl -sLO "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+	chmod a+x linuxdeployqt*.AppImage
+./linuxdeployqt-continuous-x86_64.AppImage --appimage-extract
 cd $GITHUB_WORKSPACE
 mkdir -p squashfs-root/usr/bin
 ls -al $BUILDBIN
@@ -51,7 +51,7 @@ unset QT_PLUGIN_PATH
 unset LD_LIBRARY_PATH
 unset QTDIR
 
-/tmp/squashfs-root/AppRun --appdir=$GITHUB_WORKSPACE/squashfs-root/
+/tmp/squashfs-root/AppRun $GITHUB_WORKSPACE/squashfs-root/usr/bin/PCSX2 -unsupported-allow-new-glibc -no-copy-copyright-files -no-translations -bundle-non-qt-libs
 export PATH=$(readlink -f /tmp/squashfs-root/usr/bin/):$PATH
 	cp $LIBARCH/libSoundTouch.so.1 $GITHUB_WORKSPACE/squashfs-root/usr/lib/
 	cp $LIBARCH/libportaudio.so.2 $GITHUB_WORKSPACE/squashfs-root/usr/lib/
