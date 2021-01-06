@@ -60,7 +60,7 @@ export PATH=$(readlink -f /tmp/squashfs-root/usr/bin/):$PATH
 	cp $LIBARCH/libsndio.so.6.1 $GITHUB_WORKSPACE/squashfs-root/usr/lib/
 mkdir -p $GITHUB_WORKSPACE/squashfs-root/usr/bin/plugins
 find $BUILDBIN/plugins -iname '*.so' -exec cp {} $GITHUB_WORKSPACE/squashfs-root/usr/bin/plugins \;
-arr=( $(ls -d $GITHUB_WORKSPACE/squashfs-root/usr/lib/plugins/* ) )
+arr=( $(ls -d $GITHUB_WORKSPACE/squashfs-root/usr/bin/plugins/* ) )
 for i in "${arr[@]}"; do patchelf --set-rpath /tmp/PCSX2 "$i"; done
 patchelf --set-rpath /tmp/PCSX2 $GITHUB_WORKSPACE/squashfs-root/usr/lib/libSDL2-2.0.so.0
 cp ./bin/GameIndex.yaml $GITHUB_WORKSPACE/squashfs-root/usr/bin/GameIndex.yaml
