@@ -43,6 +43,8 @@ declare -a PCSX2_PACKAGES=(
   "libasound2-dev"
   "libcairo2-dev"
   "libegl1-mesa-dev"
+  "libfuse2"
+  "libfuse3-dev"
   "libgdk-pixbuf2.0-dev"
   "libgirepository-1.0-1"
   "libgl1-mesa-dev"
