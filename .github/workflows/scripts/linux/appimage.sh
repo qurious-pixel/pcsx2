@@ -51,7 +51,7 @@ unset QT_PLUGIN_PATH
 unset LD_LIBRARY_PATH
 unset QTDIR
 
-/tmp/squashfs-root/AppRun --appdir=$GITHUB_WORKSPACE/squashfs-root/usr/bin/PCSX2
+/tmp/squashfs-root/AppRun --appdir=$GITHUB_WORKSPACE/squashfs-root/
 export PATH=$(readlink -f /tmp/squashfs-root/usr/bin/):$PATH
 	cp $LIBARCH/libSoundTouch.so.1 $GITHUB_WORKSPACE/squashfs-root/usr/lib/
 	cp $LIBARCH/libportaudio.so.2 $GITHUB_WORKSPACE/squashfs-root/usr/lib/
