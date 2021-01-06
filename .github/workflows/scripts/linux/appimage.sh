@@ -66,6 +66,7 @@ arr=( $(ls -d $GITHUB_WORKSPACE/squashfs-root/usr/bin/plugins/* ) )
 for i in "${arr[@]}"; do patchelf --set-rpath /tmp/PCSX2 "$i"; done
 patchelf --set-rpath /tmp/PCSX2 $GITHUB_WORKSPACE/squashfs-root/usr/lib/libSDL2-2.0.so.0
 cp ./bin/GameIndex.yaml $GITHUB_WORKSPACE/squashfs-root/usr/bin/GameIndex.yaml
+export OUTPUT=PCSX2-$ARCH.AppImage
 /tmp/linuxdeploy-$ARCH.AppImage --appdir=$GITHUB_WORKSPACE/squashfs-root/ --output appimage
 
 mkdir $GITHUB_WORKSPACE/artifacts/
