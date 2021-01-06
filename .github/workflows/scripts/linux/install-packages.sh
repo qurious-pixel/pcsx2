@@ -113,6 +113,13 @@ sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
 sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 30
 sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 30
 
+	curl -sLO https://github.com/NixOS/patchelf/releases/download/0.12/patchelf-0.12.tar.bz2 
+  tar xvf patchelf-0.12.tar.bz2
+  cd patchelf-0.12*/
+  ./configure
+  make && sudo make install
+  cd ..
+  
 # Install packages needed by pcsx2
 PCSX2_PACKAGES_STR=""
 for i in "${PCSX2_PACKAGES[@]}"; do
