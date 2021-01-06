@@ -5,7 +5,7 @@ name: Linux Build
 on:
   push:
     branches:
-      - pcsx-appimage
+      - pcsx-appimage-test
     paths-ignore:
       - .gitignore
       - "**/*.md"
@@ -15,7 +15,7 @@ on:
       - "pcsx2/PAD/Windows/**"
   pull_request:
     branches:
-      - pcsx-appimage
+      - pcsx-appimage-test
     paths-ignore:
       - .gitignore
       - "**/*.md"
@@ -39,20 +39,20 @@ jobs:
             platform: x64
             compiler: gcc
             experimental: false
-          - os: ubuntu-18.04
-            platform: x86
-            compiler: clang
+          #- os: ubuntu-18.04
+          #  platform: x86
+          #  compiler: clang
             # Need to disable PCH until cmake 3.17
             # (PCH conflicts with ccache, fixed by https://gitlab.kitware.com/cmake/cmake/-/merge_requests/4400)
-            cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
-            detail: -nopch
-            experimental: false
-          - os: ubuntu-18.04
-            platform: x86
-            compiler: gcc
-            cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
-            detail: -nopch
-            experimental: false
+          #  cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
+          #  detail: -nopch
+          #  experimental: false
+          #- os: ubuntu-18.04
+          #  platform: x86
+          #  compiler: gcc
+          #  cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
+          #  detail: -nopch
+          #  experimental: false
 
     name: ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}
     runs-on: ${{ matrix.os }}
