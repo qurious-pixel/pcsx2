@@ -24,21 +24,21 @@ cd $GITHUB_WORKSPACE
 mkdir -p squashfs-root/usr/bin
 ls -al $BUILDBIN
 cp -P "$BUILDBIN"/PCSX2 $GITHUB_WORKSPACE/squashfs-root/usr/bin/
-patchelf --set-rpath /tmp/PCSX2LIBS $GITHUB_WORKSPACE/squashfs-root/usr/bin/PCSX2
+patchelf --set-rpath /tmp/PCSX2 $GITHUB_WORKSPACE/squashfs-root/usr/bin/PCSX2
 
 pwd
 ls -al
 echo $GITHUB_WORKSPACE
 
-cp ./pcsx2/pcsx2/gui/Resources/AppIcon64.png ./squashfs-root/pcsx2.svg
-cp ./pcsx2/linux_various/PCSX2.desktop ./squashfs-root/pcsx2.desktop
+cp ./pcsx2/gui/Resources/AppIcon64.png ./squashfs-root/pcsx2.svg
+cp ./linux_various/PCSX2.desktop ./squashfs-root/pcsx2.desktop
 curl -sL https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-x86_64 -o ./squashfs-root/runtime
 mkdir -p squashfs-root/usr/share/applications && cp ./squashfs-root/pcsx2.desktop ./squashfs-root/usr/share/applications
 mkdir -p squashfs-root/usr/share/icons && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/icons
 mkdir -p squashfs-root/usr/share/icons/hicolor/scalable/apps && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/icons/hicolor/scalable/apps
 mkdir -p squashfs-root/usr/share/pixmaps && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/pixmaps
 mkdir -p squashfs-root/usr/optional/ ; mkdir -p squashfs-root/usr/optional/libstdc++/
-cp ./pcsx2/.github/workflows/scripts/linux/AppRun $GITHUB_WORKSPACE/squashfs-root/AppRun
+cp ./.github/workflows/scripts/linux/AppRun $GITHUB_WORKSPACE/squashfs-root/AppRun
 curl -sL "https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-x86_64" -o $GITHUB_WORKSPACE/squashfs-root/AppRun-patched
 chmod a+x ./squashfs-root/AppRun
 chmod a+x ./squashfs-root/runtime
@@ -60,13 +60,13 @@ mkdir -p $GITHUB_WORKSPACE/squashfs-root/usr/lib/plugins
 find $BUILDBIN/../plugins -iname '*.so' -exec cp {} $GITHUB_WORKSPACE/squashfs-root/usr/lib/plugins \;
 arr=( $(ls -d $GITHUB_WORKSPACE/squashfs-root/usr/lib/plugins/* ) )
 for i in "${arr[@]}"; do patchelf --set-rpath /tmp/PCSX2LIBS "$i"; done
-patchelf --set-rpath /tmp/PCSX2LIBS $GITHUB_WORKSPACE/squashfs-root/usr/lib/libSDL2-2.0.so.0
-cp ./pcsx2/bin/GameIndex.yaml $GITHUB_WORKSPACE/squashfs-root/usr/lib/plugins/GameIndex.yaml
+patchelf --set-rpath /tmp/PCSX2 $GITHUB_WORKSPACE/squashfs-root/usr/lib/libSDL2-2.0.so.0
+cp ./bin/GameIndex.yaml $GITHUB_WORKSPACE/squashfs-root/usr/lib/plugins/GameIndex.yaml
 /tmp/squashfs-root/usr/bin/appimagetool $GITHUB_WORKSPACE/squashfs-root
 
 mkdir $GITHUB_WORKSPACE/artifacts/
-mkdir -p ./pcsx2/artifacts/
+mkdir -p ./artifacts/
 mv PCSX2-x86_64.AppImage* $GITHUB_WORKSPACE/artifacts
-chmod -R 777 ./pcsx2/artifacts
-cd ./pcsx2/artifacts
-ls -al ./pcsx2/artifacts/
+chmod -R 777 ./artifacts
+cd ./artifacts
+ls -al ./artifacts/
