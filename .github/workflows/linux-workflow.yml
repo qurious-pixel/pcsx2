@@ -5,7 +5,7 @@ name: Linux Build
 on:
   push:
     branches:
-      - pcsx-appimage-test
+      - docker
     paths-ignore:
       - .gitignore
       - "**/*.md"
@@ -15,7 +15,7 @@ on:
       - "pcsx2/PAD/Windows/**"
   pull_request:
     branches:
-      - pcsx-appimage-test
+      - master
     paths-ignore:
       - .gitignore
       - "**/*.md"
@@ -31,28 +31,38 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - os: ubuntu-20.04
+            platform: x86
+            compiler: gcc
+            experimental: false
+          - os: ubuntu-20.04
+            platform: x64
+            compiler: gcc
+            experimental: false
+          - os: ubuntu-20.04
+            platform: x86
+            compiler: clang
+            # Need to disable PCH until cmake 3.17
+            # (PCH conflicts with ccache, fixed by https://gitlab.kitware.com/cmake/cmake/-/merge_requests/4400)
+            cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
+            detail: -nopch
+            experimental: false
+          - os: ubuntu-20.04
+            platform: x86
+            compiler: gcc
+            cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
+            detail: -nopch
+            experimental: false
           - os: ubuntu-18.04
             platform: x86
             compiler: gcc
+            detail: -appimage
             experimental: false
           - os: ubuntu-18.04
             platform: x64
             compiler: gcc
             experimental: false
-          #- os: ubuntu-18.04
-          #  platform: x86
-          #  compiler: clang
-            # Need to disable PCH until cmake 3.17
-            # (PCH conflicts with ccache, fixed by https://gitlab.kitware.com/cmake/cmake/-/merge_requests/4400)
-          #  cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
-          #  detail: -nopch
-          #  experimental: false
-          #- os: ubuntu-18.04
-          #  platform: x86
-          #  compiler: gcc
-          #  cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
-          #  detail: -nopch
-          #  experimental: false
+            detail: -appimage 
 
     name: ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}
     runs-on: ${{ matrix.os }}
@@ -74,7 +84,7 @@ jobs:
 
       - name: Cache Submodules
         id: cache-submodules
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.4
         with:
           key: submodules-${{ hashFiles('./.gitmodules') }}
           path: |
@@ -88,22 +98,6 @@ jobs:
         if: steps.cache-submodules.outputs.cache-hit != 'true'
         run: git submodule update --init --recursive --jobs 2
 
-      - name: Prepare Artifact Git Info
-        shell: bash
-        run: |
-          echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
-          ARTIFACT_NAME="commit-$(git rev-parse --short "$GITHUB_SHA")"
-          if [ ${{ github.event_name == 'pull_request' }} ]; then
-            echo "##[set-output name=short-sha;]$(git rev-parse --short "${{ github.event.pull_request.head.sha }}")"
-            if [ ! -z "${{ github.event.pull_request.number }}" ]; then
-              ARTIFACT_NAME="pr-${{ github.event.pull_request.number }}-commit-$(git rev-parse --short "${{ github.event.pull_request.head.sha }}")"
-            fi
-          else
-            echo "##[set-output name=short-sha;]$(git rev-parse --short "$GITHUB_SHA")"
-          fi
-          echo "##[set-output name=artifact-metadata;]${ARTIFACT_NAME}"
-        id: git-vars
-        
       # -- SETUP CCACHE - https://cristianadam.eu/20200113/speeding-up-c-plus-plus-github-actions-using-ccache/
       - name: Prepare ccache timestamp
         id: ccache_cache_timestamp
@@ -113,17 +107,18 @@ jobs:
           message("::set-output name=timestamp::${current_date}")
 
       - name: ccache cache files
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.4
         with:
           path: .ccache
           key: ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
           restore-keys: |
             ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}-ccache-
-        
+
       - name: Install Packages
         env:
           PLATFORM: ${{ matrix.platform }}
           COMPILER: ${{ matrix.compiler }}
+        if: ${{ matrix.detail != '-appimage' }}
         run: ./.github/workflows/scripts/linux/install-packages.sh
 
       - name: Generate CMake
@@ -131,25 +126,32 @@ jobs:
           PLATFORM: ${{ matrix.platform }}
           COMPILER: ${{ matrix.compiler }}
           ADDITIONAL_CMAKE_ARGS: ${{ matrix.cmakeflags }}
+        if: ${{ matrix.detail != '-appimage' }}
         run: ./.github/workflows/scripts/linux/generate-cmake.sh
 
       - name: Build PCSX2
         working-directory: ./build
+        if: ${{ matrix.detail != '-appimage' }}
         run: ../.github/workflows/scripts/linux/compile.sh
 
-      - name: Build AppImage Artifacts
+      - name: Build AppImage
         env:
           PLATFORM: ${{ matrix.platform }}
-        run: chmod +x ./.github/workflows/scripts/linux/appimage.sh && ./.github/workflows/scripts/linux/appimage.sh
-
-      - name: Tar AppImage to Preserve File Permissions
-        # https://github.com/actions/upload-artifact#maintaining-file-permissions-and-case-sensitive-files
+          COMPILER: ${{ matrix.compiler }}
+        if: ${{ matrix.detail == '-appimage' }}
+        run: |
+          if [ ${{ matrix.platform }} = x86 ]; then 
+              docker pull quriouspixel/pcsx2:18.04-386
+              docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$GITHUB_WORKSPACE/.ccache":/root/.ccache quriouspixel/pcsx2:18.04-386 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
+          else
+              docker pull quriouspixel/pcsx2:18.04
+              docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$GITHUB_WORKSPACE/.ccache":/root/.ccache quriouspixel/pcsx2:18.04 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
+          fi   
         continue-on-error: true
-        run: cd artifacts && tar -cvf appImage.tar * --remove-files
-
+        
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         continue-on-error: true
         with:
-          name: PCSX2-linux-${{ matrix.platform }}-${{ matrix.compiler }}-${{ steps.git-vars.outputs.artifact-metadata }}
+          name: PCSX2-linux-${{ matrix.platform }}-${{ matrix.compiler }}
           path: artifacts

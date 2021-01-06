@@ -2,8 +2,8 @@
 
 export LD_LIBRARY_PATH="/tmp/PCSX2:$APPDIR/usr/lib:$LD_LIBRARY_PATH"
 
-ln -sf $APPDIR/usr/lib/plugins /tmp/PCSX2 
-mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && cp $APPDIR/pcsx2.svg $HOME/.local/share/icons/hicolor/scalable/apps
+ln -sf $APPDIR/usr/bin/plugins /tmp/PCSX2 
+mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && cp $APPDIR/PCSX2.png $HOME/.local/share/icons/hicolor/scalable/apps
 
 $APPDIR/AppRun-patched
 

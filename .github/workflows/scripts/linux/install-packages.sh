@@ -6,7 +6,7 @@ set -e
 declare -a BUILD_PACKAGES=(
   "ccache"
   "cmake"
-  "g++-10-multilib"
+  "g++-8-multilib"
 )
 
 declare -a GCC_PACKAGES=(
@@ -106,11 +106,11 @@ else
 fi
 
 echo "Will install the following packages for building - ${BUILD_PACKAGE_STR}"
-sudo apt remove gcc-9 g++-9
+#sudo apt remove gcc-9 g++-9
 sudo apt-get -y install ${BUILD_PACKAGE_STR}
 
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 10
-sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 10
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 10
 sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 30
 sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 30
 
