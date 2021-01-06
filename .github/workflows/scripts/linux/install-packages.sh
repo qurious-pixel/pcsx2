@@ -39,12 +39,11 @@ declare -a CLANG_PACKAGES=(
 
 # Packages - PCSX2
 declare -a PCSX2_PACKAGES=(
+  "fuse"
   "libaio-dev"
   "libasound2-dev"
   "libcairo2-dev"
   "libegl1-mesa-dev"
-  "libfuse2"
-  "libfuse3-dev"
   "libgdk-pixbuf2.0-dev"
   "libgirepository-1.0-1"
   "libgl1-mesa-dev"
@@ -115,12 +114,18 @@ sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
 sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 30
 sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 30
 
-	curl -sLO https://github.com/NixOS/patchelf/releases/download/0.12/patchelf-0.12.tar.bz2 
+curl -sLO https://github.com/NixOS/patchelf/releases/download/0.12/patchelf-0.12.tar.bz2 
   tar xvf patchelf-0.12.tar.bz2
   cd patchelf-0.12*/
   ./configure
   make && sudo make install
   cd ..
+  
+# Install and add FUSE
+sudo modprobe fuse
+sudo groupadd fuse
+user="$(whoami)"
+sudo usermod -a -G fuse $user
   
 # Install packages needed by pcsx2
 PCSX2_PACKAGES_STR=""
