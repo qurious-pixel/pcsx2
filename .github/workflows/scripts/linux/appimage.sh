@@ -69,4 +69,4 @@ mkdir -p ./artifacts/
 mv PCSX2-x86_64.AppImage* $GITHUB_WORKSPACE/artifacts
 chmod -R 777 ./artifacts
 cd ./artifacts
-ls -al ./artifacts/
+ls -al .
