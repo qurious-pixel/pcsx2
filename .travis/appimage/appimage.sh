@@ -69,8 +69,9 @@ mv /tmp/update/* $HOME/squashfs-root/usr/lib/
 mkdir -p $HOME/squashfs-root/usr/lib/plugins
 find $BUILDBIN/../plugins -iname '*.so' -exec cp {} $HOME/squashfs-root/usr/lib/plugins \;
 arr=( $(ls -d $HOME/squashfs-root/usr/lib/plugins/* ) )
-for i in "${arr[@]}"; do patchelf --set-rpath /tmp/PCSX2LIBS "$i"; done
-patchelf --set-rpath /tmp/PCSX2LIBS $HOME/squashfs-root/usr/lib/libSDL2-2.0.so.0
+for i in "${arr[@]}"; do patchelf --set-rpath /tmp/PCSX2 "$i"; done
+patchelf --set-rpath /tmp/PCSX2 $HOME/squashfs-root/usr/lib/libSDL2-2.0.so.0
+patchelf --set-rpath /tmp/PCSX2 $HOME/squashfs-root/usr/lib/libsndio.so.6.1
 mkdir -p $HOME/squashfs-root/usr/lib/updater
 mv $HOME/squashfs-root/usr/lib/libcurl.so.4 $HOME/squashfs-root/usr/lib/updater
 curl -sL "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/GameIndex.yaml" -o $HOME/squashfs-root/usr/lib/plugins/GameIndex.yaml
