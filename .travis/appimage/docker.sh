@@ -20,10 +20,10 @@ cd pcsx2/
 
 	update-alternatives --list gcc 
 	update-alternatives --list g++
-	#apt update
-	#apt install gcc g++
-	#/usr/bin/gcc --version 
-	#/usr/bin/g++ --version 
+	apt update
+	apt install gcc-9 g++-9
+	gcc --version 
+	g++ --version 
 
 
 mkdir build
