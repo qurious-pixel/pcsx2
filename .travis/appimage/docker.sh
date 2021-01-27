@@ -20,10 +20,10 @@ cd pcsx2/
 
 	update-alternatives --remove-all gcc 
 	update-alternatives --remove-all g++
-	apt update
-	apt install gcc g++
-	gcc --version 
-	g++ --version 
+	#apt update
+	#apt install gcc g++
+	/usr/bin/gcc --version 
+	/usr/bin/g++ --version 
 
 
 mkdir build
