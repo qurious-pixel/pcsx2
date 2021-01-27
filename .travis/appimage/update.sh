@@ -9,7 +9,7 @@ else
 	answer=$?
 fi
 
-export LD_LIBRARY_PATH="/tmp/PCSX2LIBS:$APPDIR/usb/lib:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="/tmp/PCSX2:$APPDIR/usr/lib:$LD_LIBRARY_PATH"
 
 
 if [ "$answer" -eq 0 ]; then 
