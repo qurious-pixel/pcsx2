@@ -18,8 +18,10 @@ git clone --recursive https://github.com/PCSX2/pcsx2.git
 cd pcsx2/
 #git submodule update --init --recursive
 
-	update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 11 
-	update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 11 
+	update-alternatives --remove-all gcc 
+	update-alternatives --remove-all g++
+	apt update
+	apt install gcc g++
 	gcc --version 
 	g++ --version 
 
