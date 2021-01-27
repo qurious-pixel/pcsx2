@@ -18,22 +18,22 @@ git clone --recursive https://github.com/PCSX2/pcsx2.git
 cd pcsx2/
 #git submodule update --init --recursive
 
-	sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 11 
-	sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 11 
+	update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 11 
+	update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 11 
 	gcc --version 
 	g++ --version 
 
 
 mkdir build
 cd build
-cmake .. -G Ninja -DCMAKE_C_COMPILER=/usr/lib/ccache/gcc -DCMAKE_CXX_COMPILER=/usr/lib/ccache/g++ -DCMAKE_BUILD_TYPE=Release -DPACKAGE_MODE=TRUE -DGTK3_API=TRUE -DDISABLE_ADVANCE_SIMD=TRUE -DXDG_STD=TRUE -DCMAKE_INSTALL_LIBDIR="/tmp/" -DCMAKE_INSTALL_DATADIR="/tmp/"
+##cmake .. -G Ninja -DCMAKE_C_COMPILER=/usr/lib/ccache/gcc -DCMAKE_CXX_COMPILER=/usr/lib/ccache/g++ -DCMAKE_BUILD_TYPE=Release -DPACKAGE_MODE=TRUE -DGTK3_API=TRUE -DDISABLE_ADVANCE_SIMD=TRUE -DXDG_STD=TRUE -DCMAKE_INSTALL_LIBDIR="/tmp/" -DCMAKE_INSTALL_DATADIR="/tmp/"
 #\ -DDISABLE_ADVANCE_SIMD=TRUE -DGSDX_LEGACY=TRUE -DGTK2_API=TRUE -DPLUGIN_DIR= -DGAMEINDEX_DIR= 
 
-ninja
+##ninja
 #cat /pcsx2/appimage/pcsx2/build/CMakeFiles/CMakeError.log | curl -F 'f:1=<-' ix.io
 
 cd /tmp
-curl -sLO "https://raw.githubusercontent.com/qurious-pixel/pcsx2/$branch/.travis/appimage/appimage.sh"
-chmod a+x appimage.sh
-./appimage.sh
+##curl -sLO "https://raw.githubusercontent.com/qurious-pixel/pcsx2/$branch/.travis/appimage/appimage.sh"
+##chmod a+x appimage.sh
+##./appimage.sh
 
