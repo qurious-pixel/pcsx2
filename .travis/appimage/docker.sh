@@ -22,6 +22,8 @@ cd pcsx2/
 	update-alternatives --list g++
 	apt update
 	apt install -y gcc-9 g++-9
+	update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 11 
+	update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 11 
 	gcc --version 
 	g++ --version 
 
