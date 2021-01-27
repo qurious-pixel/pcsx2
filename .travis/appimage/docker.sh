@@ -38,4 +38,5 @@ ninja
 
 cd /tmp
 curl -sLO "https://raw.githubusercontent.com/qurious-pixel/pcsx2/$branch/.travis/appimage/appimage.sh"
+chmod a+x appimage.sh
 ./appimage.sh
