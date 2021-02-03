@@ -1,12 +1,7 @@
 FROM ubuntu:18.04
 MAINTAINER quriouspixel
 
-ENV LLVMVER=10
 ENV GCCVER=10
-
-ENV CLANG_BINARY=clang-${LLVMVER}
-ENV CLANGXX_BINARY=clang++-${LLVMVER}
-ENV LLD_BINARY=lld-${LLVMVER}
 ENV GCC_BINARY=gcc-${GCCVER}
 ENV GXX_BINARY=g++-${GCCVER}
 
@@ -14,7 +9,6 @@ RUN \
     apt-get update -y && \
     apt-get install -y curl software-properties-common apt-transport-https apt-utils && \
     add-apt-repository -y ppa:ubuntu-toolchain-r/test && \
-    add-apt-repository -y ppa:beineri/opt-qt-${QTVER}-bionic && \
     DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y full-upgrade && \
     DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
     build-essential \
