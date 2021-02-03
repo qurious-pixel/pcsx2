@@ -27,7 +27,7 @@ RUN \
     libcairo2-dev:i386 \
     libegl1-mesa-dev:i386 \
     libglew-dev:i386 \
-    libgles2-mese-dev:i386 \
+    libgles2-mesa-dev:i386 \
     libgdk-pixbuf2.0-dev:i386 \
     libgirepository-1.0-1:i386 \
     libglib2.0-dev:i386 \
