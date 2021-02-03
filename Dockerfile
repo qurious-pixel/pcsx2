@@ -1,8 +1,6 @@
 FROM ubuntu:18.04
 MAINTAINER quriouspixel
 
-ENV QTVER=5.14.2
-ENV QTVERMIN=514
 ENV LLVMVER=10
 ENV GCCVER=10
 
@@ -29,10 +27,11 @@ RUN \
     libcggl \
     libjpeg-dev \
     nvidia-cg-toolkit \
-    libegl1-mesa-dev \
     libasound2-dev \
     libegl1-mesa-dev \
     libgl1-mesa-dev \
+    libgles2-mesa-dev \
+    libglew-dev \
     libgtk2.0-dev \
     libpng-dev \
     libsdl2-dev \
@@ -43,6 +42,8 @@ RUN \
     libwxgtk3.0-dev \
     libgtk-3-dev \
     libwxgtk3.0-gtk3-dev \
+    libjack-jackd2-dev \
+    libportaudiocpp0 \
     portaudio19-dev \
     libxml2-dev \
     libpcap0.8-dev \
