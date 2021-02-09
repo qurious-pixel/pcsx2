@@ -1613,6 +1613,7 @@ SCES-51607:
   compat: 5
   gameFixes:
     - VU0KickstartHack # Fixes Character SPS.
+    - EETimingHack # Fixes DMA errors 
   memcardFilters: # Reads Ratchet 1 data.
     - "SCES-51607"
     - "SCES-50916"
@@ -1924,6 +1925,8 @@ SCES-52677:
   name: "Network Access Disc & Hardware - Online Arena"
   region: "PAL-M7"
   compat: 5
+  speedHacks:
+    InstantVU1SpeedHack: 1  # Fixes not rendering most the screen
   patches:
     default:
       content: |-
@@ -7724,6 +7727,13 @@ SLES-50846:
 SLES-50848:
   name: "Speed Kings"
   region: "PAL-M5"
+  patches:
+    4C133D9D:
+      content: |-
+        author=Prafull
+        // Fixes hang before going ingame.
+        // Needed due to lack of VIF FIFO in PCSX2.
+        patch=1,EE,0022ee34,word,00000000
 SLES-50849:
   name: "Urban Freestyle Soccer"
   region: "PAL-M5"
@@ -9660,6 +9670,8 @@ SLES-51887:
 SLES-51888:
   name: "RTL Ski Jumping 2004"
   region: "PAL-E-G"
+  clampModes:
+    vuClampMode: 3 # Fixes SPS 
 SLES-51890:
   name: "Buffy the Vampire Slayer - Chaos Bleeds"
   region: "PAL-M4"
@@ -12069,16 +12081,10 @@ SLES-53098:
 SLES-53099:
   name: "Pilot Down - Behind Enemy Lines"
   region: "PAL-M5"
+  gameFixes:
+    - DMABusyHack # Game has weird DMA handling, this allows required DMA's to finish.
   roundModes:
     vuRoundMode: 0
-  patches:
-    53BB63A0:
-      content: |-
-        author=kozarovv
-        // Patch allow sending VU1 mpg successfully. This fix missing graphic. Thanks to PSI for figuring what is wrong.
-        // Game need at least -2 EE cyclerate + MTVU on my pc to get full speed.
-        // To fix shadows set VU rounding to nearest - thx Atomic83
-        patch=1,EE,00426140,word,00000000
 SLES-53100:
   name: "Scooby Doo! Unmasked"
   region: "PAL-M4"
@@ -12357,6 +12363,8 @@ SLES-53301:
 SLES-53303:
   name: "Ski Jumping 2006"
   region: "PAL-E-G"
+  clampModes:
+    vuClampMode: 3 # Fixes SPS 
 SLES-53309:
   name: "Transformers [Director's Cut]"
   region: "PAL-M5"
@@ -12546,9 +12554,13 @@ SLES-53393:
   name: "Spartan Total Warrior"
   region: "PAL-M5"
   compat: 5
+  gameFixes:
+    - VU0KickstartHack # Fixes Character SPS.
 SLES-53396:
   name: "Spartan Total Warrior"
   region: "PAL-M3"
+  gameFixes:
+    - VU0KickstartHack # Fixes Character SPS.
 SLES-53398:
   name: "Zombie Zone"
   region: "PAL-E"
@@ -16692,9 +16704,13 @@ SLES-55376:
 SLES-55378:
   name: "RTL Biathlon 2009"
   region: "PAL-E-G"
+  clampModes:
+    vuClampMode: 3 # Fixes SPS in game 
 SLES-55379:
   name: "RTL Biathlon 2009"
   region: "PAL-E-G"
+  clampModes:
+    vuClampMode: 3 # Fixes SPS in game 
 SLES-55380:
   name: "Sonic Unleashed"
   region: "PAL-M5"
@@ -16846,6 +16862,8 @@ SLES-55470:
 SLES-55472:
   name: "Guitar Hero - Metalica"
   region: "PAL-M5"
+  roundModes:
+    vuRoundMode: 0  # Crashes without.
 SLES-55474:
   name: "Shin Megami Tensei: Persona 4"
   region: "PAL-E"
@@ -20168,6 +20186,9 @@ SLPM-64502:
 SLPM-64504:
   name: "Maximo"
   region: "NTSC-K"
+SLPM-64513:
+  name: "Crash Bandicoot: Return of the Demon King"
+  region: "NTSC-K"
 SLPM-64522:
   name: "La Pucelle"
   region: "NTSC-K"
@@ -20240,6 +20261,8 @@ SLPM-65014:
   name: "Bouken Jidai Katsugeki - Goemon"
   region: "NTSC-J"
   compat: 5
+  gameFixes:
+    - GoemonTlbHack
 SLPM-65015:
   name: "Kessen 2"
   region: "NTSC-J"
@@ -22558,6 +22581,15 @@ SLPM-65797:
   name: "Dragon Quest & Final Fantasy in Itadaki Street"
   region: "NTSC-J"
   compat: 5
+  patches:
+    4CE7FB04:
+      content: |-
+        author=refraction
+        // Game seems to have problems with alpha values being zero in some instances
+        // this patches the results from FPU to be an alpha of 2
+        // Fixes missing board
+        patch=1,EE,00143CBC,word,3C030200
+        patch=1,EE,00143CC0,word,00831825
 SLPM-65798:
   name: "Madden NFL Superbowl 2005"
   region: "NTSC-J"
@@ -24530,6 +24562,8 @@ SLPM-66443:
 SLPM-66444:
   name: "Spartan - Total Warrior"
   region: "NTSC-J"
+  gameFixes:
+    - VU0KickstartHack # Fixes Character SPS.
 SLPM-66445:
   name: "Persona 3"
   region: "NTSC-J"
@@ -32576,6 +32610,14 @@ SLUS-20412:
   name: "Hot Wheels - Velocity X"
   region: "NTSC-U"
   compat: 5
+  patches:
+    E7273BFA:
+      content: |-
+        comment=COP2 DIV Rearrangement to fix SPS
+        patch=0,EE,0023DB00,word,4BE0A39C
+        patch=0,EE,0023DB04,word,4A6F03BC
+        patch=0,EE,0023DB0C,word,4BE0ABDC
+        patch=0,EE,0023DB10,word,4A7003BC
 SLUS-20413:
   name: "Shadow Man - 2econd Coming"
   region: "NTSC-U"
@@ -32611,6 +32653,19 @@ SLUS-20419:
   region: "NTSC-U"
   roundModes:
     eeRoundMode: 0  # Fixes crash when using the Subaru.
+  gameFixes:
+    - XGKickHack # Fixes SPS while ingame (with following patch)
+  patches:
+    5838E074:
+      content: |-
+        author=kozarovv
+        // Rearrange XGKick timing to fix SPS
+        patch=1,EE,0020efa0,word,8000033c
+        patch=1,EE,0020efd8,word,80004efc
+        patch=1,EE,0020f040,word,8000033c
+        patch=1,EE,0020f0b0,word,80004efc
+        patch=1,EE,0020f118,word,8000033c
+        patch=1,EE,0020f188,word,80004efc     
 SLUS-20420:
   name: "Star Wars - Bounty Hunter"
   region: "NTSC-U"
@@ -33292,6 +33347,13 @@ SLUS-20584:
   name: "Speed Kings"
   region: "NTSC-U"
   compat: 3
+  patches:
+    C90920FC:
+      content: |-
+        author=Prafull
+        // Fixes hang before going ingame.
+        // Needed due to lack of VIF FIFO in PCSX2.
+        patch=1,EE,0022b4a4,word,00000000
 SLUS-20585:
   name: "Powerpuff Girls, The - Relish Rampage"
   region: "NTSC-U"
@@ -35903,6 +35965,8 @@ SLUS-21212:
   name: "Spartan - Total Warrior"
   region: "NTSC-U"
   compat: 5
+  gameFixes:
+    - VU0KickstartHack # Fixes Character SPS.
 SLUS-21213:
   name: "Madden NFL '06"
   region: "NTSC-U"
@@ -38487,6 +38551,8 @@ SLUS-21843:
   name: "Guitar Hero - Metallica"
   region: "NTSC-U"
   compat: 5
+  roundModes:
+    vuRoundMode: 0  # Crashes without.
 SLUS-21844:
   name: "Bolt"
   region: "NTSC-U"

@@ -1,17 +1,11 @@
-# GameDB Documentation
+---
+title: "PCSX2 - GameDB Documentation"
+date: "2020"
+footer-left: "[Document Source](https://github.com/PCSX2/pcsx2/blob/{LATEST-GIT-TAG}/pcsx2/Docs/GameIndex.md)"
+urlcolor: "cyan"
+...
 
-- [YAML Game Format](#yaml-game-format)
-- [A Note on Case Sensitivity](#a-note-on-case-sensitivity)
-- [Rounding Modes](#rounding-modes)
-  - [Options](#options)
-- [Clamping Modes](#clamping-modes)
-  - [Options](#options-1)
-- [Game Fixes](#game-fixes)
-  - [Options](#options-2)
-- [SpeedHacks](#speedhacks)
-  - [Options](#options-3)
-- [Memory Card Filter Override](#memory-card-filter-override)
-- [Patches](#patches)
+# GameDB Documentation
 
 ## YAML Game Format
 
@@ -43,6 +37,7 @@ SERIAL-12345: # !required! Serial number for the game, this is how games are loo
     - VIFFIFOHack
     - VIF1StallHack
     - GIFFIFOHack
+    - GoemonTlbHack
     - ScarfaceIbitHack
     - CrashTagTeamRacingIbitHack
     - VU0KickstartHack
@@ -141,8 +136,8 @@ These values are case-sensitive so take care.  If you incorrectly specify a Game
   - SOCOM II HUD and Spy Hunter loading hang.
 - `GIFFIFOHack`
   - Enables the GIF FIFO. Needed for Wallace & Grommit, Hot Wheels, DJ Hero.
-- `FMVinSoftwareHack`
-  - Silent Hill 2-3. Fixes FMVs that are obscured when using hardware rendering by switching to software rendering.
+- `GoemonTlbHack`
+  - Preload TLB hack to avoid tlb miss on Goemon.
 - `ScarfaceIbitHack`
   - VU I bit Hack avoid constant recompilation (Scarface The World Is Yours).
 - `CrashTagTeamRacingIbitHack`

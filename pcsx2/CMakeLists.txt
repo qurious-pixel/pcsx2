@@ -315,6 +315,17 @@ compile_gresources( pcsx2DEV9UIHeaders
 
 # DEV9 sources
 set(pcsx2DEV9Sources
+	DEV9/ATA/Commands/ATA_Command.cpp
+	DEV9/ATA/Commands/ATA_CmdDMA.cpp
+	DEV9/ATA/Commands/ATA_CmdExecuteDeviceDiag.cpp
+	DEV9/ATA/Commands/ATA_CmdNoData.cpp
+	DEV9/ATA/Commands/ATA_CmdPIOData.cpp
+	DEV9/ATA/Commands/ATA_CmdSMART.cpp
+	DEV9/ATA/Commands/ATA_SCE.cpp
+	DEV9/ATA/ATA_Info.cpp
+	DEV9/ATA/ATA_State.cpp
+	DEV9/ATA/ATA_Transfer.cpp
+	DEV9/ATA/HddCreate.cpp
 	DEV9/smap.cpp
 	DEV9/DEV9.cpp
 	DEV9/flash.cpp
@@ -327,8 +338,9 @@ set(pcsx2DEV9Sources
 
 # DEV9 headers
 set(pcsx2DEV9Headers
+	DEV9/ATA/ATA.h
+	DEV9/ATA/HddCreate.h
 	DEV9/DEV9.h
-	DEV9/ata.h
 	DEV9/net.h
 	DEV9/pcap_io.h
 	DEV9/smap.h
@@ -1119,7 +1131,9 @@ if (APPLE)
 	)
 
 	target_sources(${Output} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/gui/Resources/PCSX2.icns")
+	target_sources(${Output} PRIVATE "${CMAKE_SOURCE_DIR}/bin/GameIndex.yaml")
 	set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/gui/Resources/PCSX2.icns" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+	set_source_files_properties("${CMAKE_SOURCE_DIR}/bin/GameIndex.yaml" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 
 	# If they say to skip postprocess bundle, leave the target in but make it so they have
 	# to manually run it

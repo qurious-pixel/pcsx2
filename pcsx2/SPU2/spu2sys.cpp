@@ -130,11 +130,13 @@ void V_Core::Init(int index)
 	Mute = false;
 	DMABits = 0;
 	NoiseClk = 0;
+	NoiseCnt = 0;
+	NoiseOut = 0;
 	AutoDMACtrl = 0;
 	InputDataLeft = 0;
-	InputPosRead = 0;
-	InputPosWrite = 0;
+	InputPosWrite = 0x100;
 	InputDataProgress = 0;
+	InputDataTransferred = 0;
 	ReverbX = 0;
 	LastEffect.Left = 0;
 	LastEffect.Right = 0;
@@ -145,6 +147,7 @@ void V_Core::Init(int index)
 	MADR = 0;
 	TADR = 0;
 	KeyOn = 0;
+	OutPos = 0;
 
 	psxmode = false;
 	psxSoundDataTransferControl = 0;
@@ -333,30 +336,11 @@ void V_Core::UpdateEffectsBufferSize()
 	RevBuffers.APF2_R_SRC = EffectsBufferIndexer(Revb.APF2_R_DST - Revb.APF2_SIZE);
 }
 
-bool V_Voice::Start()
+void V_Voice::Start()
 {
-	if (StartA & 7)
-	{
-		fprintf(stderr, " *** Misaligned StartA %05x!\n", StartA);
-		StartA = (StartA + 0xFFFF8) + 0x8;
-	}
-
-	ADSR.Releasing = false;
-	ADSR.Value = 1;
-	ADSR.Phase = 1;
-	SCurrent = 28;
-	LoopMode = 0;
-	SP = 0;
-	LoopFlags = 0;
-	NextA = StartA | 1;
-	Prev1 = 0;
-	Prev2 = 0;
-
-	PV1 = PV2 = 0;
-	PV3 = PV4 = 0;
-	NextCrest = -0x8000;
 	PlayCycle = Cycles;
-	return true;
+	LoopCycle = Cycles - 1; // Get it out of the start range as to not confuse it
+	PendingLoopStart = false;
 }
 
 void V_Voice::Stop()
@@ -368,6 +352,37 @@ void V_Voice::Stop()
 uint TickInterval = 768;
 static const int SanityInterval = 4800;
 extern void UpdateDebugDialog();
+
+__forceinline bool StartQueuedVoice(uint coreidx, uint voiceidx)
+{
+	V_Voice& vc(Cores[coreidx].Voices[voiceidx]);
+
+	if ((Cycles - vc.PlayCycle) < 2)
+		return false;
+
+	if (vc.StartA & 7)
+	{
+		fprintf(stderr, " *** Misaligned StartA %05x!\n", vc.StartA);
+		vc.StartA = (vc.StartA + 0xFFFF8) + 0x8;
+	}
+
+	vc.ADSR.Releasing = false;
+	vc.ADSR.Value = 1;
+	vc.ADSR.Phase = 1;
+	vc.SCurrent = 28;
+	vc.LoopMode = 0;
+	vc.SP = 0;
+	vc.LoopFlags = 0;
+	vc.NextA = vc.StartA | 1;
+	vc.Prev1 = 0;
+	vc.Prev2 = 0;
+
+	vc.PV1 = vc.PV2 = 0;
+	vc.PV3 = vc.PV4 = 0;
+	vc.NextCrest = -0x8000;
+
+	return true;
+}
 
 __forceinline void TimeUpdate(u32 cClocks)
 {
@@ -402,13 +417,49 @@ __forceinline void TimeUpdate(u32 cClocks)
 	else
 		TickInterval = 768; // Reset to default, in case the user hotswitched from async to something else.
 
+	//Update Mixing Progress
+	while (dClocks >= TickInterval)
+	{
+		for (int i = 0; i < 2; i++)
+		{
+			if (has_to_call_irq[i])
+			{
+				//ConLog("* SPU2: Irq Called (%04x) at cycle %d.\n", Spdif.Info, Cycles);
+				has_to_call_irq[i] = false;
+				if (!(Spdif.Info & (4 << i)) && Cores[i].IRQEnable)
+				{
+					Spdif.Info |= (4 << i);
+					if (!SPU2_dummy_callback)
+						spu2Irq();
+				}
+			}
+		}
+
+		dClocks -= TickInterval;
+		lClocks += TickInterval;
+		Cycles++;
+
+		// Start Queued Voices, they start after 2T (Tested on real HW)
+		for(int c = 0; c < 2; c++)
+			for (int v = 0; v < 24; v++)
+				if(Cores[c].KeyOn & (1 << v))
+					if(StartQueuedVoice(c, v))
+						Cores[c].KeyOn &= ~(1 << v);
+		// Note: IOP does not use MMX regs, so no need to save them.
+		//SaveMMXRegs();
+		Mix();
+		//RestoreMMXRegs();
+	}
+
 	//Update DMA4 interrupt delay counter
 	if (Cores[0].DMAICounter > 0 && (*cyclePtr - Cores[0].LastClock) > 0)
 	{
 		const u32 amt = std::min(*cyclePtr - Cores[0].LastClock, (u32)Cores[0].DMAICounter);
 		Cores[0].DMAICounter -= amt;
 		Cores[0].LastClock = *cyclePtr;
-		Cores[0].MADR += amt / 2;
+		if(!Cores[0].AdmaInProgress)
+			Cores[0].MADR += amt / 2;
+
 		if (Cores[0].DMAICounter <= 0)
 		{
 			if (((Cores[0].AutoDMACtrl & 1) != 1) && Cores[0].ReadSize)
@@ -433,7 +484,7 @@ __forceinline void TimeUpdate(u32 cClocks)
 					}
 				}
 			}
-			if (!Cores[0].DMAICounter)
+			if (Cores[0].DMAICounter <= 0)
 			{
 				Cores[0].MADR = Cores[0].TADR;
 				if (!SPU2_dummy_callback)
@@ -444,7 +495,7 @@ __forceinline void TimeUpdate(u32 cClocks)
 		}
 		else
 		{
-			if (((psxCounters[6].sCycleT + psxCounters[6].CycleT) - psxRegs.cycle) > Cores[0].DMAICounter)
+			if (((psxCounters[6].sCycleT + psxCounters[6].CycleT) - psxRegs.cycle) > (u32)Cores[0].DMAICounter)
 			{
 				psxCounters[6].sCycleT = psxRegs.cycle;
 				psxCounters[6].CycleT = Cores[0].DMAICounter;
@@ -463,7 +514,8 @@ __forceinline void TimeUpdate(u32 cClocks)
 		const u32 amt = std::min(*cyclePtr - Cores[1].LastClock, (u32)Cores[1].DMAICounter);
 		Cores[1].DMAICounter -= amt;
 		Cores[1].LastClock = *cyclePtr;
-		Cores[1].MADR += amt / 2;
+		if (!Cores[1].AdmaInProgress)
+			Cores[1].MADR += amt / 2;
 		if (Cores[1].DMAICounter <= 0)
 		{
 			if (((Cores[1].AutoDMACtrl & 2) != 2) && Cores[1].ReadSize)
@@ -489,7 +541,7 @@ __forceinline void TimeUpdate(u32 cClocks)
 				}
 			}
 
-			if (!Cores[1].DMAICounter)
+			if (Cores[1].DMAICounter <= 0)
 			{
 				Cores[1].MADR = Cores[1].TADR;
 				if (!SPU2_dummy_callback)
@@ -500,7 +552,7 @@ __forceinline void TimeUpdate(u32 cClocks)
 		}
 		else
 		{
-			if (((psxCounters[6].sCycleT + psxCounters[6].CycleT) - psxRegs.cycle) > Cores[1].DMAICounter)
+			if (((psxCounters[6].sCycleT + psxCounters[6].CycleT) - psxRegs.cycle) > (u32)Cores[1].DMAICounter)
 			{
 				psxCounters[6].sCycleT = psxRegs.cycle;
 				psxCounters[6].CycleT = Cores[1].DMAICounter;
@@ -511,34 +563,6 @@ __forceinline void TimeUpdate(u32 cClocks)
 					psxNextCounter = psxCounters[6].CycleT;
 			}
 		}
-	}
-
-	//Update Mixing Progress
-	while (dClocks >= TickInterval)
-	{
-		for (int i = 0; i < 2; i++)
-		{
-			if (has_to_call_irq[i])
-			{
-				//ConLog("* SPU2: Irq Called (%04x) at cycle %d.\n", Spdif.Info, Cycles);
-				has_to_call_irq[i] = false;
-				if (!(Spdif.Info & (4 << i)) && Cores[i].IRQEnable)
-				{
-					Spdif.Info |= (4 << i);
-					if (!SPU2_dummy_callback)
-						spu2Irq();
-				}
-			}
-		}
-
-		dClocks -= TickInterval;
-		lClocks += TickInterval;
-		Cycles++;
-
-		// Note: IOP does not use MMX regs, so no need to save them.
-		//SaveMMXRegs();
-		Mix();
-		//RestoreMMXRegs();
 	}
 }
 
@@ -1195,13 +1219,39 @@ static void __fastcall RegWrite_VoiceAddr(u16 value)
 			break;
 
 		case 2:
-			thisvoice.LoopStartA = ((u32)(value & 0x0F) << 16) | (thisvoice.LoopStartA & 0xFFF8);
-			thisvoice.LoopMode = 1;
+			{
+				u32* LoopReg;
+				if ((Cycles - thisvoice.PlayCycle) < 4)
+				{
+					LoopReg = &thisvoice.PendingLoopStartA;
+					thisvoice.PendingLoopStart = true;
+				}
+				else
+				{
+					LoopReg = &thisvoice.LoopStartA;
+					thisvoice.LoopMode = 1;
+				}
+
+				*LoopReg = ((u32)(value & 0x0F) << 16) | (*LoopReg & 0xFFF8);
+			}
 			break;
 
 		case 3:
-			thisvoice.LoopStartA = (thisvoice.LoopStartA & 0x0F0000) | (value & 0xFFF8);
-			thisvoice.LoopMode = 1;
+			{
+				u32* LoopReg;
+				if ((Cycles - thisvoice.PlayCycle) < 4)
+				{
+					LoopReg = &thisvoice.PendingLoopStartA;
+					thisvoice.PendingLoopStart = true;
+				}
+				else
+				{
+					LoopReg = &thisvoice.LoopStartA;
+					thisvoice.LoopMode = 1;
+				}
+				
+				*LoopReg = (*LoopReg & 0x0F0000) | (value & 0xFFF8);
+			}
 			break;
 
 			// Note that there's no proof that I know of that writing to NextA is
@@ -1519,11 +1569,13 @@ static void __fastcall RegWrite_Core(u16 value)
 				return;
 			}
 			thiscore.AutoDMACtrl = value;
-			if (value == 0 && thiscore.AdmaInProgress && (thiscore.Regs.STATX & 0x400))
+			if (!(value & 0x3) && thiscore.AdmaInProgress)
 			{
+				// Kill the current transfer so it doesn't continue
 				thiscore.AdmaInProgress = 0;
-				thiscore.Regs.STATX &= ~0x400; // Set DMA as not busy transferring
-				// No need to end the DMA here, the IOP seems to handle that
+				thiscore.InputDataLeft = 0;
+				thiscore.DMAICounter = 0;
+				thiscore.InputDataTransferred = 0;
 			}
 			break;
 
@@ -1919,12 +1971,12 @@ void SPU2_FastWrite(u32 rmem, u16 value)
 
 void StartVoices(int core, u32 value)
 {
-	ConLog("KeyOn Write %x\n", value);
-
 	// Optimization: Games like to write zero to the KeyOn reg a lot, so shortcut
 	// this loop if value is zero.
 	if (value == 0)
 		return;
+
+	ConLog("KeyOn Write %x\n", value);
 
 	Cores[core].KeyOn |= value;
 	Cores[core].Regs.ENDX &= ~value;
@@ -1934,8 +1986,7 @@ void StartVoices(int core, u32 value)
 		if (!((value >> vc) & 1))
 			continue;
 
-		if (Cores[core].Voices[vc].Start())
-			Cores[core].KeyOn &= ~(1 << vc);
+		Cores[core].Voices[vc].Start();
 
 		if (IsDevBuild)
 		{
@@ -1956,10 +2007,10 @@ void StartVoices(int core, u32 value)
 
 void StopVoices(int core, u32 value)
 {
-	ConLog("KeyOff Write %x\n", value);
-
 	if (value == 0)
 		return;
+
+	ConLog("KeyOff Write %x\n", value);
 
 	for (u8 vc = 0; vc < V_Core::NumVoices; vc++)
 	{
