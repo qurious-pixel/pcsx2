@@ -118,7 +118,7 @@ jobs:
         env:
           PLATFORM: ${{ matrix.platform }}
           COMPILER: ${{ matrix.compiler }}
-        if: ${{ matrix.detail }} ! == '-appimage' 
+        if: ${{ matrix.detail }} != '-appimage' 
         run: ./.github/workflows/scripts/linux/install-packages.sh
 
       #- name: Generate CMake
