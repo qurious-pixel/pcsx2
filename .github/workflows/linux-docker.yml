@@ -31,10 +31,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          #- os: ubuntu-20.04
-          #  platform: x86
-          #  compiler: gcc
-          #  experimental: false
+          - os: ubuntu-20.04
+            platform: x86
+            compiler: gcc
+            experimental: false
           - os: ubuntu-20.04
             platform: x64
             compiler: gcc
