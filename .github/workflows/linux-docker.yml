@@ -136,7 +136,7 @@ jobs:
         env:
           PLATFORM: ${{ matrix.platform }}
           COMPILER: ${{ matrix.compiler }}
-        if: ${{ matrix.detail = '-appimage' }}
+        if: ${{ matrix.detail == '-appimage' }}
         run: |
           if [ ${{ matrix.platform }} = x86 ]; then 
               docker pull quriouspixel/pcsx2:18.04-386
