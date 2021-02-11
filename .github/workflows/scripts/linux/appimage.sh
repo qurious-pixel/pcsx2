@@ -2,8 +2,6 @@
 
 branch=`echo ${GITHUB_REF##*/}`
 
-echo $GITHUB_WORKSPACE
-
 echo "${PLATFORM}"
 if [ "${PLATFORM}" == "x86" ]; then
   	LIBARCH="/usr/lib/i386-linux-gnu"
@@ -15,7 +13,7 @@ else
 	ARCH="x86_64"
 fi
 
-BUILDBIN=/pcsx2/bin/
+BUILDBIN=/pcsx2/bin
 BINFILE=PCSX2-$ARCH.AppImage
 CXX=g++-8
 
@@ -26,7 +24,7 @@ cd /tmp
 cd /pcsx2
 mkdir -p squashfs-root/usr/bin
 ls -al $BUILDBIN
-cp -P "$BUILDBIN"/PCSX2 $GITHUB_WORKSPACE/squashfs-root/usr/bin/
+cp -P "$BUILDBIN"/PCSX2 /pcsx2/squashfs-root/usr/bin/
 patchelf --set-rpath /tmp/PCSX2 /pcsx2/squashfs-root/usr/bin/PCSX2
 
 pwd
@@ -43,27 +41,27 @@ mkdir -p squashfs-root/usr/share/pixmaps && cp ./squashfs-root/pcsx2.svg ./squas
 #mkdir -p squashfs-root/usr/optional/ ; mkdir -p squashfs-root/usr/optional/libstdc++/
 mkdir -p squashfs-root/usr/lib/
 cp ./.github/workflows/scripts/linux/AppRun /pcsx2/squashfs-root/AppRun
-curl -sL "https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-$APPARCH" -o $GITHUB_WORKSPACE/squashfs-root/AppRun-patched
+curl -sL "https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-$APPARCH" -o /pcsx2/squashfs-root/AppRun-patched
 chmod a+x ./squashfs-root/AppRun
 chmod a+x ./squashfs-root/runtime
 chmod a+x ./squashfs-root/AppRun-patched
 
-echo $GITHUB_RUN_ID > $GITHUB_WORKSPACE/squashfs-root/version.txt
+echo $GITHUB_RUN_ID > /pcsx2/squashfs-root/version.txt
 
-#/tmp/squashfs-root/AppRun --appdir=$GITHUB_WORKSPACE/squashfs-root/ --output appimage
+#/tmp/squashfs-root/AppRun --appdir=/pcsx2/squashfs-root/ --output appimage
 #export PATH=$(readlink -f /tmp/squashfs-root/usr/bin/):$PATH
-#	cp $LIBARCH/libSoundTouch.so.1 $GITHUB_WORKSPACE/squashfs-root/usr/lib/
-#	cp $LIBARCH/libportaudio.so.2 $GITHUB_WORKSPACE/squashfs-root/usr/lib/
-#	cp $LIBARCH/libSDL2-2.0.so.0 $GITHUB_WORKSPACE/squashfs-root/usr/lib/
-#	cp $LIBARCH/libsndio.so.6.1 $GITHUB_WORKSPACE/squashfs-root/usr/lib/
-mkdir -p $GITHUB_WORKSPACE/squashfs-root/usr/bin/plugins
-find $BUILDBIN/plugins -iname '*.so' -exec cp {} $GITHUB_WORKSPACE/squashfs-root/usr/bin/plugins \;
-arr=( $(ls -d $GITHUB_WORKSPACE/squashfs-root/usr/bin/plugins/* ) )
+#	cp $LIBARCH/libSoundTouch.so.1 /pcsx2/squashfs-root/usr/lib/
+#	cp $LIBARCH/libportaudio.so.2 /pcsx2/squashfs-root/usr/lib/
+#	cp $LIBARCH/libSDL2-2.0.so.0 /pcsx2/squashfs-root/usr/lib/
+#	cp $LIBARCH/libsndio.so.6.1 /pcsx2/squashfs-root/usr/lib/
+mkdir -p /pcsx2/squashfs-root/usr/bin/plugins
+find $BUILDBIN/plugins -iname '*.so' -exec cp {} /pcsx2/squashfs-root/usr/bin/plugins \;
+arr=( $(ls -d /pcsx2/squashfs-root/usr/bin/plugins/* ) )
 for i in "${arr[@]}"; do patchelf --set-rpath /tmp/PCSX2 "$i"; done
-#patchelf --set-rpath /tmp/PCSX2 $GITHUB_WORKSPACE/squashfs-root/usr/lib/libSDL2-2.0.so.0
-cp ./bin/GameIndex.yaml $GITHUB_WORKSPACE/squashfs-root/usr/bin/GameIndex.yaml
+#patchelf --set-rpath /tmp/PCSX2 /pcsx2/squashfs-root/usr/lib/libSDL2-2.0.so.0
+cp ./bin/GameIndex.yaml /pcsx2/squashfs-root/usr/bin/GameIndex.yaml
 export OUTPUT=PCSX2-$ARCH.AppImage
-/tmp/linuxdeploy-$ARCH.AppImage --appdir=$GITHUB_WORKSPACE/squashfs-root/ -d $GITHUB_WORKSPACE/squashfs-root/PCSX2.desktop -i $GITHUB_WORKSPACE/squashfs-root/pcsx2.svg --output appimage
+/tmp/linuxdeploy-$ARCH.AppImage --appdir=/pcsx2/squashfs-root/ -d /pcsx2/squashfs-root/PCSX2.desktop -i /pcsx2/squashfs-root/pcsx2.svg --output appimage
 
 mkdir /pcsx2/artifacts/
 mkdir -p ./artifacts/
