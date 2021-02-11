@@ -39,20 +39,20 @@ jobs:
             platform: x64
             compiler: gcc
             experimental: false
-          - os: ubuntu-20.04
-            platform: x86
-            compiler: clang
-            # Need to disable PCH until cmake 3.17
-            # (PCH conflicts with ccache, fixed by https://gitlab.kitware.com/cmake/cmake/-/merge_requests/4400)
-            cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
-            detail: -nopch
-            experimental: false
-          - os: ubuntu-20.04
-            platform: x86
-            compiler: gcc
-            cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
-            detail: -nopch
-            experimental: false
+          #- os: ubuntu-20.04
+          #  platform: x86
+          #  compiler: clang
+          #  # Need to disable PCH until cmake 3.17
+          #  # (PCH conflicts with ccache, fixed by https://gitlab.kitware.com/cmake/cmake/-/merge_requests/4400)
+          #  cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
+          #  detail: -nopch
+          #  experimental: false
+          #- os: ubuntu-20.04
+          #  platform: x86
+          #  compiler: gcc
+          #  cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
+          #  detail: -nopch
+          #  experimental: false
 
     name: ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}
     runs-on: ${{ matrix.os }}
@@ -127,12 +127,13 @@ jobs:
           COMPILER: ${{ matrix.compiler }}
         if: ${{ matrix.compiler }} == 'gcc' &&  ${{ matrix.detail }} ! == '-nopch'
         run: |
-          if [${{ matrix.platform }} == 'x86']; then 
+          if [${{ matrix.platform }} == x86]; then 
               docker pull quriouspixel/pcsx2:18.04-386
               docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$HOME/.ccache":/root/.ccache quriouspixel/pcsx2:18.04-386 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
           else
               docker pull quriouspixel/pcsx2:18.04
               docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$HOME/.ccache":/root/.ccache quriouspixel/pcsx2:18.04 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
+          fi   
         continue-on-error: true
         
       - name: Upload artifact
