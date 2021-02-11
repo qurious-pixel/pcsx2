@@ -31,14 +31,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-20.04
-            platform: x86
-            compiler: gcc
-            experimental: false
-          - os: ubuntu-20.04
-            platform: x64
-            compiler: gcc
-            experimental: false
+          #- os: ubuntu-20.04
+          #  platform: x86
+          #  compiler: gcc
+          #  experimental: false
+          #- os: ubuntu-20.04
+          #  platform: x64
+          #  compiler: gcc
+          #  experimental: false
           #- os: ubuntu-20.04
           #  platform: x86
           #  compiler: clang
@@ -53,6 +53,16 @@ jobs:
           #  cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
           #  detail: -nopch
           #  experimental: false
+          - os: ubuntu-18.04
+            platform: x86
+            compiler: gcc
+            detail: -appimage
+            experimental: false
+          - os: ubuntu-18.04
+            platform: x64
+            compiler: gcc
+            experimental: false
+            detail: -appimage 
 
     name: ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}
     runs-on: ${{ matrix.os }}
@@ -104,11 +114,12 @@ jobs:
           restore-keys: |
             ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}-ccache-
 
-      #- name: Install Packages
-      #  env:
-      #    PLATFORM: ${{ matrix.platform }}
-      #    COMPILER: ${{ matrix.compiler }}
-      #  run: ./.github/workflows/scripts/linux/install-packages.sh
+      - name: Install Packages
+        env:
+          PLATFORM: ${{ matrix.platform }}
+          COMPILER: ${{ matrix.compiler }}
+        if: ${{ matrix.detail }} ! = -appimage 
+        run: ./.github/workflows/scripts/linux/install-packages.sh
 
       #- name: Generate CMake
       #  env:
