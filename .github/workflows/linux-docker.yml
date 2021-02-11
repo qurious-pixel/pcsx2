@@ -31,10 +31,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-20.04
-            platform: x86
-            compiler: gcc
-            experimental: false
+          #- os: ubuntu-20.04
+          #  platform: x86
+          #  compiler: gcc
+          #  experimental: false
           - os: ubuntu-20.04
             platform: x64
             compiler: gcc
@@ -129,10 +129,10 @@ jobs:
         run: |
           if [ ${{ matrix.platform }} = x86 ]; then 
               docker pull quriouspixel/pcsx2:18.04-386
-              docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$HOME/.ccache":/root/.ccache quriouspixel/pcsx2:18.04-386 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
+              docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$GITHUB_WORKSPACE/.ccache":/root/.ccache quriouspixel/pcsx2:18.04-386 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
           else
               docker pull quriouspixel/pcsx2:18.04
-              docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$HOME/.ccache":/root/.ccache quriouspixel/pcsx2:18.04 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
+              docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$GITHUB_WORKSPACE/.ccache":/root/.ccache quriouspixel/pcsx2:18.04 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
           fi   
         continue-on-error: true
         
