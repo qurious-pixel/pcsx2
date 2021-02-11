@@ -63,7 +63,7 @@ for i in "${arr[@]}"; do patchelf --set-rpath /tmp/PCSX2 "$i"; done
 #patchelf --set-rpath /tmp/PCSX2 /pcsx2/squashfs-root/usr/lib/libSDL2-2.0.so.0
 cp ./bin/GameIndex.yaml /pcsx2/squashfs-root/usr/bin/GameIndex.yaml
 export OUTPUT=PCSX2-$ARCH.AppImage
-/tmp/linuxdeploy-$ARCH.AppImage --appdir=/pcsx2/squashfs-root/ -d /pcsx2/squashfs-root/PCSX2.desktop -i /pcsx2/squashfs-root/pcsx2.svg --output appimage
+/tmp/squashfs-root/AppRun --appdir=/pcsx2/squashfs-root/ -d /pcsx2/squashfs-root/PCSX2.desktop -i /pcsx2/squashfs-root/pcsx2.svg --output appimage
 
 mkdir /pcsx2/artifacts/
 #mkdir -p ./artifacts/
