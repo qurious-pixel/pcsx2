@@ -114,12 +114,12 @@ jobs:
           restore-keys: |
             ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}-ccache-
 
-      - name: Install Packages
-        env:
-          PLATFORM: ${{ matrix.platform }}
-          COMPILER: ${{ matrix.compiler }}
-        if: ${{ matrix.detail }} != '-appimage' 
-        run: ./.github/workflows/scripts/linux/install-packages.sh
+      #- name: Install Packages
+      #  env:
+      #    PLATFORM: ${{ matrix.platform }}
+      #    COMPILER: ${{ matrix.compiler }}
+      #  if: ${{ matrix.detail }} != '-appimage' 
+      #  run: ./.github/workflows/scripts/linux/install-packages.sh
 
       #- name: Generate CMake
       #  env:
@@ -136,7 +136,7 @@ jobs:
         env:
           PLATFORM: ${{ matrix.platform }}
           COMPILER: ${{ matrix.compiler }}
-        if: ${{ matrix.compiler }} == 'gcc' &&  ${{ matrix.detail }} ! == '-nopch'
+        if: ${{ matrix.compiler }} == 'gcc' &&  ${{ matrix.detail }} != '-nopch'
         run: |
           if [ ${{ matrix.platform }} = x86 ]; then 
               docker pull quriouspixel/pcsx2:18.04-386
