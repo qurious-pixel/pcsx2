@@ -3,7 +3,9 @@
 branch=`echo ${GITHUB_REF##*/}`
 
 echo "Working Directory: $GITHUB_WORKSPACE"
-cd $GITHUB_WORKSPACE/
+#cd $GITHUB_WORKSPACE/
+PWD
+
 
 mkdir build
 cd build
