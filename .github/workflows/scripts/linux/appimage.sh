@@ -15,27 +15,26 @@ else
 	ARCH="x86_64"
 fi
 
-BUILDBIN=$GITHUB_WORKSPACE/bin/
+BUILDBIN=/pcsx2/bin/
 BINFILE=PCSX2-$ARCH.AppImage
-CXX=g++-10
+CXX=g++-8
 
 cd /tmp
 	curl -sLO "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-$ARCH.AppImage"
 	chmod a+x linuxdeploy*.AppImage
 ./linuxdeploy-$ARCH.AppImage --appimage-extract
-cd $GITHUB_WORKSPACE
+cd /pcsx2
 mkdir -p squashfs-root/usr/bin
 ls -al $BUILDBIN
 cp -P "$BUILDBIN"/PCSX2 $GITHUB_WORKSPACE/squashfs-root/usr/bin/
-patchelf --set-rpath /tmp/PCSX2 $GITHUB_WORKSPACE/squashfs-root/usr/bin/PCSX2
+patchelf --set-rpath /tmp/PCSX2 /pcsx2/squashfs-root/usr/bin/PCSX2
 
 pwd
-ls -al
-echo $GITHUB_WORKSPACE
+realpath . && ls -al .
 
 cp ./pcsx2/gui/Resources/AppIcon64.png ./squashfs-root/pcsx2.svg
 cp ./linux_various/PCSX2.desktop.in ./squashfs-root/pcsx2.desktop 
-sed -i -e s#Categories=@PCSX2_MENU_CATEGORIES@#Categories=Game;Emulator;#g ./squashfs-root/pcsx2.desktop
+sed -i -e 's|Categories=@PCSX2_MENU_CATEGORIES@|Categories=Game;Emulator;|g' ./squashfs-root/pcsx2.desktop
 curl -sL https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-$APPARCH -o ./squashfs-root/runtime
 mkdir -p squashfs-root/usr/share/applications && cp ./squashfs-root/pcsx2.desktop ./squashfs-root/usr/share/applications
 mkdir -p squashfs-root/usr/share/icons && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/icons
@@ -43,7 +42,7 @@ mkdir -p squashfs-root/usr/share/icons/hicolor/scalable/apps && cp ./squashfs-ro
 mkdir -p squashfs-root/usr/share/pixmaps && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/pixmaps
 #mkdir -p squashfs-root/usr/optional/ ; mkdir -p squashfs-root/usr/optional/libstdc++/
 mkdir -p squashfs-root/usr/lib/
-cp ./.github/workflows/scripts/linux/AppRun $GITHUB_WORKSPACE/squashfs-root/AppRun
+cp ./.github/workflows/scripts/linux/AppRun /pcsx2/squashfs-root/AppRun
 curl -sL "https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-$APPARCH" -o $GITHUB_WORKSPACE/squashfs-root/AppRun-patched
 chmod a+x ./squashfs-root/AppRun
 chmod a+x ./squashfs-root/runtime
@@ -66,9 +65,9 @@ cp ./bin/GameIndex.yaml $GITHUB_WORKSPACE/squashfs-root/usr/bin/GameIndex.yaml
 export OUTPUT=PCSX2-$ARCH.AppImage
 /tmp/linuxdeploy-$ARCH.AppImage --appdir=$GITHUB_WORKSPACE/squashfs-root/ -d $GITHUB_WORKSPACE/squashfs-root/PCSX2.desktop -i $GITHUB_WORKSPACE/squashfs-root/pcsx2.svg --output appimage
 
-mkdir $GITHUB_WORKSPACE/artifacts/
+mkdir /pcsx2/artifacts/
 mkdir -p ./artifacts/
-mv PCSX2-$ARCH.AppImage* $GITHUB_WORKSPACE/artifacts
+mv PCSX2-$ARCH.AppImage* /pcsx2/artifacts
 chmod -R 777 ./artifacts
 cd ./artifacts
 ls -al .
