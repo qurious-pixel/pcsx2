@@ -14,16 +14,11 @@ else
 fi
 
 ###############
-realpath . && ls -al .
-realpath /pcsx2 && ls -al /pcsx2
-realpath /pcsx2/build && ls -al /pcsx2/build
-realpath /pcsx2/build/bin && ls -al /pcsx2/build/bin
 realpath /pcsx2/build/pcsx2 && ls -al /pcsx2/build/pcsx2
-
 ###############
 
 
-BUILDBIN=/pcsx2/build/pcsx2/bin
+BUILDBIN=/pcsx2/build/pcsx2
 BINFILE=PCSX2-$ARCH.AppImage
 CXX=g++-8
 
@@ -74,7 +69,7 @@ export OUTPUT=PCSX2-$ARCH.AppImage
 /tmp/linuxdeploy-$ARCH.AppImage --appdir=/pcsx2/squashfs-root/ -d /pcsx2/squashfs-root/PCSX2.desktop -i /pcsx2/squashfs-root/pcsx2.svg --output appimage
 
 mkdir /pcsx2/artifacts/
-mkdir -p ./artifacts/
+#mkdir -p ./artifacts/
 mv PCSX2-$ARCH.AppImage* /pcsx2/artifacts
 chmod -R 777 ./artifacts
 cd ./artifacts
