@@ -32,14 +32,14 @@ ls -al $BUILDBIN
 cp -P "$BUILDBIN"/PCSX2 /pcsx2/squashfs-root/usr/bin/
 patchelf --set-rpath /tmp/PCSX2 /pcsx2/squashfs-root/usr/bin/PCSX2
 
-cp ./pcsx2/gui/Resources/AppIcon64.png ./squashfs-root/pcsx2.svg
-cp ./linux_various/PCSX2.desktop.in ./squashfs-root/pcsx2.desktop 
-sed -i -e 's|Categories=@PCSX2_MENU_CATEGORIES@|Categories=Game;Emulator;|g' ./squashfs-root/pcsx2.desktop
+cp ./pcsx2/gui/Resources/AppIcon64.png ./squashfs-root/PCSX2.png
+cp ./linux_various/PCSX2.desktop.in ./squashfs-root/PCSX2.desktop 
+sed -i -e 's|Categories=@PCSX2_MENU_CATEGORIES@|Categories=Game;Emulator;|g' ./squashfs-root/PCSX2.desktop
 curl -sL https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-$APPARCH -o ./squashfs-root/runtime
-mkdir -p squashfs-root/usr/share/applications && cp ./squashfs-root/pcsx2.desktop ./squashfs-root/usr/share/applications
-mkdir -p squashfs-root/usr/share/icons && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/icons
-mkdir -p squashfs-root/usr/share/icons/hicolor/scalable/apps && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/icons/hicolor/scalable/apps
-mkdir -p squashfs-root/usr/share/pixmaps && cp ./squashfs-root/pcsx2.svg ./squashfs-root/usr/share/pixmaps
+mkdir -p squashfs-root/usr/share/applications && cp ./squashfs-root/PCSX2.desktop ./squashfs-root/usr/share/applications
+mkdir -p squashfs-root/usr/share/icons && cp ./squashfs-root/PCSX2.png ./squashfs-root/usr/share/icons
+mkdir -p squashfs-root/usr/share/icons/hicolor/scalable/apps && cp ./squashfs-root/PCSX2.png ./squashfs-root/usr/share/icons/hicolor/scalable/apps
+mkdir -p squashfs-root/usr/share/pixmaps && cp ./squashfs-root/PCSX2.png ./squashfs-root/usr/share/pixmaps
 #mkdir -p squashfs-root/usr/optional/ ; mkdir -p squashfs-root/usr/optional/libstdc++/
 mkdir -p squashfs-root/usr/lib/
 cp ./.github/workflows/scripts/linux/AppRun /pcsx2/squashfs-root/AppRun
@@ -63,7 +63,7 @@ for i in "${arr[@]}"; do patchelf --set-rpath /tmp/PCSX2 "$i"; done
 #patchelf --set-rpath /tmp/PCSX2 /pcsx2/squashfs-root/usr/lib/libSDL2-2.0.so.0
 cp ./bin/GameIndex.yaml /pcsx2/squashfs-root/usr/bin/GameIndex.yaml
 export OUTPUT=PCSX2-$ARCH.AppImage
-/tmp/squashfs-root/AppRun --appdir=/pcsx2/squashfs-root/ -d /pcsx2/squashfs-root/pcsx2.desktop -i /pcsx2/squashfs-root/pcsx2.svg --output appimage
+/tmp/squashfs-root/AppRun --appdir=/pcsx2/squashfs-root/ -d /pcsx2/squashfs-root/PCSX2.desktop -i /pcsx2/squashfs-root/PCSX2.png --output appimage
 
 mkdir /pcsx2/artifacts/
 #mkdir -p ./artifacts/
