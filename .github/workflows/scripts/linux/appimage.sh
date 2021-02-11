@@ -32,9 +32,6 @@ ls -al $BUILDBIN
 cp -P "$BUILDBIN"/PCSX2 /pcsx2/squashfs-root/usr/bin/
 patchelf --set-rpath /tmp/PCSX2 /pcsx2/squashfs-root/usr/bin/PCSX2
 
-pwd
-realpath . && ls -al .
-
 cp ./pcsx2/gui/Resources/AppIcon64.png ./squashfs-root/pcsx2.svg
 cp ./linux_various/PCSX2.desktop.in ./squashfs-root/pcsx2.desktop 
 sed -i -e 's|Categories=@PCSX2_MENU_CATEGORIES@|Categories=Game;Emulator;|g' ./squashfs-root/pcsx2.desktop
@@ -60,7 +57,7 @@ echo $GITHUB_RUN_ID > /pcsx2/squashfs-root/version.txt
 #	cp $LIBARCH/libSDL2-2.0.so.0 /pcsx2/squashfs-root/usr/lib/
 #	cp $LIBARCH/libsndio.so.6.1 /pcsx2/squashfs-root/usr/lib/
 mkdir -p /pcsx2/squashfs-root/usr/bin/plugins
-find $BUILDBIN/plugins -iname '*.so' -exec cp {} /pcsx2/squashfs-root/usr/bin/plugins \;
+find $BUILDBIN/../plugins -iname '*.so' -exec cp {} /pcsx2/squashfs-root/usr/bin/plugins \;
 arr=( $(ls -d /pcsx2/squashfs-root/usr/bin/plugins/* ) )
 for i in "${arr[@]}"; do patchelf --set-rpath /tmp/PCSX2 "$i"; done
 #patchelf --set-rpath /tmp/PCSX2 /pcsx2/squashfs-root/usr/lib/libSDL2-2.0.so.0
