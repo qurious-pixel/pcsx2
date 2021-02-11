@@ -7,6 +7,7 @@ realpath . && ls -al .
 
 mkdir build
 cd build
+
 cmake ..                                        \
     -DCMAKE_C_COMPILER=/usr/lib/ccache/gcc      \
     -DCMAKE_CXX_COMPILER=/usr/lib/ccache/g++    \
@@ -18,6 +19,7 @@ cmake ..                                        \
     -DCMAKE_INSTALL_LIBDIR="/tmp/"              \          
     #-DCMAKE_INSTALL_DATADIR="/tmp/"            \
     -G Ninja
+
 ninja
 
 
