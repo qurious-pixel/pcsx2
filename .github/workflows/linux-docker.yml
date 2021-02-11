@@ -110,16 +110,16 @@ jobs:
           COMPILER: ${{ matrix.compiler }}
         run: ./.github/workflows/scripts/linux/install-packages.sh
 
-      - name: Generate CMake
-        env:
-          PLATFORM: ${{ matrix.platform }}
-          COMPILER: ${{ matrix.compiler }}
-          ADDITIONAL_CMAKE_ARGS: ${{ matrix.cmakeflags }}
-        run: ./.github/workflows/scripts/linux/generate-cmake.sh
+      #- name: Generate CMake
+      #  env:
+      #    PLATFORM: ${{ matrix.platform }}
+      #    COMPILER: ${{ matrix.compiler }}
+      #    ADDITIONAL_CMAKE_ARGS: ${{ matrix.cmakeflags }}
+      #  run: ./.github/workflows/scripts/linux/generate-cmake.sh
 
-      - name: Build PCSX2
-        working-directory: ./build
-        run: ../.github/workflows/scripts/linux/compile.sh
+      #- name: Build PCSX2
+      #  working-directory: ./build
+      #  run: ../.github/workflows/scripts/linux/compile.sh
 
       - name: Build AppImage
         env:
