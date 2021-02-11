@@ -136,7 +136,7 @@ jobs:
         env:
           PLATFORM: ${{ matrix.platform }}
           COMPILER: ${{ matrix.compiler }}
-        if: ${{ matrix.compiler }} == 'gcc' &&  ${{ matrix.detail }} != '-nopch'
+        if: ${{ matrix.compiler }} == 'gcc' || ${{ matrix.detail }} != '-nopch'
         run: |
           if [ ${{ matrix.platform }} = x86 ]; then 
               docker pull quriouspixel/pcsx2:18.04-386
