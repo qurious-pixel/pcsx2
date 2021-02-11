@@ -126,10 +126,12 @@ jobs:
           PLATFORM: ${{ matrix.platform }}
           COMPILER: ${{ matrix.compiler }}
           ADDITIONAL_CMAKE_ARGS: ${{ matrix.cmakeflags }}
+        if: ${{ matrix.detail != '-appimage' }}
         run: ./.github/workflows/scripts/linux/generate-cmake.sh
 
       - name: Build PCSX2
         working-directory: ./build
+        if: ${{ matrix.detail != '-appimage' }}
         run: ../.github/workflows/scripts/linux/compile.sh
 
       - name: Build AppImage
