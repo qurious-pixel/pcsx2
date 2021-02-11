@@ -7,7 +7,7 @@ realpath . && ls -al .
 
 mkdir build
 cd build
-cmake .. 
+cmake ..                                        \
     -DCMAKE_C_COMPILER=/usr/lib/ccache/gcc      \
     -DCMAKE_CXX_COMPILER=/usr/lib/ccache/g++    \
     -DCMAKE_BUILD_TYPE=Release                  \
