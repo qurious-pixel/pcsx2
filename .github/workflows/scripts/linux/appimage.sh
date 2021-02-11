@@ -13,6 +13,16 @@ else
 	ARCH="x86_64"
 fi
 
+###############
+realpath . && ls -al .
+realpath /pcsx2 && ls -al /pcsx2
+realpath /pcsx2/build && ls -al /pcsx2/build
+realpath /pcsx2/build/bin && ls -al /pcsx2/build/bin
+realpath /pcsx2/build/pcsx2 && ls -al /pcsx2/build/pcsx2
+
+###############
+
+
 BUILDBIN=/pcsx2/build/pcsx2/bin
 BINFILE=PCSX2-$ARCH.AppImage
 CXX=g++-8
