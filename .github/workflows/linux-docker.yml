@@ -31,33 +31,33 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          #- os: ubuntu-20.04
-          #  platform: x86
-          #  compiler: gcc
-          #  experimental: false
-          #- os: ubuntu-20.04
-          #  platform: x64
-          #  compiler: gcc
-          #  experimental: false
-          #- os: ubuntu-20.04
-          #  platform: x86
-          #  compiler: clang
-          #  # Need to disable PCH until cmake 3.17
-          #  # (PCH conflicts with ccache, fixed by https://gitlab.kitware.com/cmake/cmake/-/merge_requests/4400)
-          #  cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
-          #  detail: -nopch
-          #  experimental: false
-          #- os: ubuntu-20.04
-          #  platform: x86
-          #  compiler: gcc
-          #  cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
-          #  detail: -nopch
-          #  experimental: false
-          #- os: ubuntu-18.04
-          #  platform: x86
-          #  compiler: gcc
-          #  detail: -appimage
-          #  experimental: false
+          - os: ubuntu-20.04
+            platform: x86
+            compiler: gcc
+            experimental: false
+          - os: ubuntu-20.04
+            platform: x64
+            compiler: gcc
+            experimental: false
+          - os: ubuntu-20.04
+            platform: x86
+            compiler: clang
+            # Need to disable PCH until cmake 3.17
+            # (PCH conflicts with ccache, fixed by https://gitlab.kitware.com/cmake/cmake/-/merge_requests/4400)
+            cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
+            detail: -nopch
+            experimental: false
+          - os: ubuntu-20.04
+            platform: x86
+            compiler: gcc
+            cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
+            detail: -nopch
+            experimental: false
+          - os: ubuntu-18.04
+            platform: x86
+            compiler: gcc
+            detail: -appimage
+            experimental: false
           - os: ubuntu-18.04
             platform: x64
             compiler: gcc
@@ -121,16 +121,16 @@ jobs:
         if: ${{ matrix.detail != '-appimage' }}
         run: ./.github/workflows/scripts/linux/install-packages.sh
 
-      #- name: Generate CMake
-      #  env:
-      #    PLATFORM: ${{ matrix.platform }}
-      #    COMPILER: ${{ matrix.compiler }}
-      #    ADDITIONAL_CMAKE_ARGS: ${{ matrix.cmakeflags }}
-      #  run: ./.github/workflows/scripts/linux/generate-cmake.sh
+      - name: Generate CMake
+        env:
+          PLATFORM: ${{ matrix.platform }}
+          COMPILER: ${{ matrix.compiler }}
+          ADDITIONAL_CMAKE_ARGS: ${{ matrix.cmakeflags }}
+        run: ./.github/workflows/scripts/linux/generate-cmake.sh
 
-      #- name: Build PCSX2
-      #  working-directory: ./build
-      #  run: ../.github/workflows/scripts/linux/compile.sh
+      - name: Build PCSX2
+        working-directory: ./build
+        run: ../.github/workflows/scripts/linux/compile.sh
 
       - name: Build AppImage
         env:
