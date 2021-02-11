@@ -11,10 +11,10 @@ cmake ..                                        \
     -DCMAKE_C_COMPILER=/usr/lib/ccache/gcc      \
     -DCMAKE_CXX_COMPILER=/usr/lib/ccache/g++    \
     -DCMAKE_BUILD_TYPE=Release                  \
-    -DPACKAGE_MODE=TRUE                         \      
+    -DPACKAGE_MODE=TRUE                         \
     -DXDG_STD=TRUE                              \
     -DDISABLE_ADVANCE_SIMD=TRUE                 \
-    -DCMAKE_INSTALL_LIBDIR="/tmp/"              \          
+    -DCMAKE_INSTALL_LIBDIR="/tmp/"              \
     -G Ninja
     
     #-DGTK3_API=TRUE                            \
