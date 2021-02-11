@@ -5,7 +5,7 @@ name: Linux Build
 on:
   push:
     branches:
-      - master
+      - docker
     paths-ignore:
       - .gitignore
       - "**/*.md"
@@ -120,3 +120,24 @@ jobs:
       - name: Build PCSX2
         working-directory: ./build
         run: ../.github/workflows/scripts/linux/compile.sh
+
+      - name: Build AppImage
+        env:
+          PLATFORM: ${{ matrix.platform }}
+          COMPILER: ${{ matrix.compiler }}
+        if: ${{ matrix.compiler }} == 'gcc' &&  ${{ matrix.detail }} ! == '-nopch'
+        run: |
+          if [${{ matrix.platform }} == 'x86']; then 
+              docker pull quriouspixel/pcsx2:18.04-386
+              docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$HOME/.ccache":/root/.ccache quriouspixel/pcsx2:18.04-386 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
+          else
+              docker pull quriouspixel/pcsx2:18.04
+              docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$HOME/.ccache":/root/.ccache quriouspixel/pcsx2:18.04 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
+        continue-on-error: true
+        
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        continue-on-error: true
+        with:
+          name: PCSX2-linux-${{ matrix.platform }}-${{ matrix.compiler }}
+          path: artifacts
