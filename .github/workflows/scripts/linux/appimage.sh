@@ -27,7 +27,7 @@ cd /tmp
 	chmod a+x linuxdeploy*.AppImage
 ./linuxdeploy-$ARCH.AppImage --appimage-extract
 	mv /tmp/squashfs-root/usr/bin/patchelf /tmp/squashfs-root/usr/bin/patchelf.orig
-	cp /usr/bin/patchelf /tmp/squashfs-root/usr/bin/patchelf
+	cp /usr/local/bin/patchelf /tmp/squashfs-root/usr/bin/patchelf
 cd /pcsx2
 mkdir -p squashfs-root/usr/bin
 ls -al $BUILDBIN
