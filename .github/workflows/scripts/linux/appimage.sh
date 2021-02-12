@@ -26,6 +26,8 @@ cd /tmp
 	curl -sLO "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-$ARCH.AppImage"
 	chmod a+x linuxdeploy*.AppImage
 ./linuxdeploy-$ARCH.AppImage --appimage-extract
+	mv /tmp/squashfs-root/usr/bin/patchelf /tmp/squashfs-root/usr/bin/patchelf.orig
+	cp /usr/bin/patchelf /tmp/squashfs-root/usr/bin/patchelf
 cd /pcsx2
 mkdir -p squashfs-root/usr/bin
 ls -al $BUILDBIN
