@@ -63,7 +63,7 @@ find $BUILDBIN/../plugins -iname '*.so' -exec cp {} /pcsx2/squashfs-root/usr/bin
 arr=( $(ls -d /pcsx2/squashfs-root/usr/bin/plugins/* ) )
 for i in "${arr[@]}"; do patchelf --set-rpath /tmp/PCSX2 "$i"; done
 #patchelf --set-rpath /tmp/PCSX2 /pcsx2/squashfs-root/usr/lib/libSDL2-2.0.so.0
-cp ./bin/GameIndex.yaml /pcsx2/squashfs-root/usr/bin/GameIndex.yaml
+cp ./bin/GameIndex.yaml /pcsx2/squashfs-root/usr/bin/plugins/GameIndex.yaml
 export OUTPUT=PCSX2-$ARCH.AppImage
 /tmp/squashfs-root/AppRun --appdir=/pcsx2/squashfs-root/ -d /pcsx2/squashfs-root/PCSX2.desktop -i /pcsx2/squashfs-root/PCSX2.png --output appimage
 
