@@ -1,0 +1,84 @@
+FROM ubuntu:18.04
+LABEL maintainer="PCSX2"
+WORKDIR /tmp
+
+ENV GCCVER=8
+ENV GCC_BINARY=gcc-${GCCVER}
+ENV GXX_BINARY=g++-${GCCVER}
+
+RUN \
+    apt-get update -y && \
+    apt-get install -y curl software-properties-common apt-transport-https apt-utils && \
+    add-apt-repository -y ppa:ubuntu-toolchain-r/test && \
+    DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y full-upgrade && \
+    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
+    $GCC_BINARY $GXX_BINARY \
+    build-essential \
+    ccache \
+    cmake \
+    curl \
+    dialog \
+    dpkg \
+    fuse \
+    gettext \
+    git \
+    libaio-dev \
+    libasound2-dev \
+    libasound2-dev \
+    libbz2-dev \
+    libcggl \
+    libegl1-mesa-dev \
+    libgl1-mesa-dev \
+    libgles2-mesa-dev \
+    libglew-dev \
+    libglvnd-dev \
+    libgtk-3-dev \
+    libgtk2.0-dev \
+    libjack-jackd2-dev \
+    libjpeg-dev \
+    liblzma-dev \
+    liblzma5 \
+    libpcap0.8-dev \
+    libpng++-dev \
+    libpng-dev \
+    libportaudiocpp0 \
+    libsamplerate0-dev \
+    libsdl1.2-dev \
+    libsdl2-dev \
+    libsoundtouch-dev \
+    libwxgtk3.0-dev \
+    libwxgtk3.0-gtk3-dev \
+    libxext-dev \
+    libxml2-dev \
+    libxml2-dev \
+    make \
+    ninja-build \
+    nvidia-cg-toolkit \
+    portaudio19-dev \
+    wget \
+    x11-common \
+    zenity \
+    zlib1g-dev \
+    apt-get clean autoclean && apt-get autoremove --yes && rm -rf /var/lib/apt /var/lib/cache /var/lib/log /var/lib/apt/lists/*
+    
+ENV CMAKEVER=3.20.3
+RUN \
+	curl -sSfLO https://cmake.org/files/v${CMAKEVER%.*}/cmake-${CMAKEVER}-linux-x86_64.sh && \
+	sh cmake-${CMAKEVER}-linux-x86_64.sh --prefix=/usr --skip-license && \
+	rm ./cmake*.sh && \
+	cmake --version
+
+RUN\
+	curl -sSfLO https://github.com/NixOS/patchelf/releases/download/0.12/patchelf-0.12.tar.bz2 && \
+	tar xvf patchelf-0.12.tar.bz2 && \
+	cd patchelf-0.12*/ && \
+	./configure && \
+	make && make install
+
+RUN \
+	update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${GCCVER} 10 && \
+	update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-${GCCVER} 10 && \
+	gcc --version && \
+	g++ --version 
+
+  
