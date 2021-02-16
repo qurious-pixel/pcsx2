@@ -5,7 +5,7 @@ name: Linux Build
 on:
   push:
     branches:
-      - master
+      - docker
     paths-ignore:
       - .gitignore
       - "**/*.md"
@@ -53,6 +53,16 @@ jobs:
             cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
             detail: -nopch
             experimental: false
+          - os: ubuntu-18.04
+            platform: x86
+            compiler: gcc
+            detail: -appimage
+            experimental: false
+          - os: ubuntu-18.04
+            platform: x64
+            compiler: gcc
+            experimental: false
+            detail: -appimage 
 
     name: ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}
     runs-on: ${{ matrix.os }}
@@ -108,6 +118,7 @@ jobs:
         env:
           PLATFORM: ${{ matrix.platform }}
           COMPILER: ${{ matrix.compiler }}
+        if: ${{ matrix.detail != '-appimage' }}
         run: ./.github/workflows/scripts/linux/install-packages.sh
 
       - name: Generate CMake
@@ -115,8 +126,32 @@ jobs:
           PLATFORM: ${{ matrix.platform }}
           COMPILER: ${{ matrix.compiler }}
           ADDITIONAL_CMAKE_ARGS: ${{ matrix.cmakeflags }}
+        if: ${{ matrix.detail != '-appimage' }}
         run: ./.github/workflows/scripts/linux/generate-cmake.sh
 
       - name: Build PCSX2
         working-directory: ./build
+        if: ${{ matrix.detail != '-appimage' }}
         run: ../.github/workflows/scripts/linux/compile.sh
+
+      - name: Build AppImage
+        env:
+          PLATFORM: ${{ matrix.platform }}
+          COMPILER: ${{ matrix.compiler }}
+        if: ${{ matrix.detail == '-appimage' }}
+        run: |
+          if [ ${{ matrix.platform }} = x86 ]; then 
+              docker pull quriouspixel/pcsx2:18.04-386
+              docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$GITHUB_WORKSPACE/.ccache":/root/.ccache quriouspixel/pcsx2:18.04-386 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
+          else
+              docker pull quriouspixel/pcsx2:18.04
+              docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$GITHUB_WORKSPACE/.ccache":/root/.ccache quriouspixel/pcsx2:18.04 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
+          fi   
+        continue-on-error: true
+        
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        continue-on-error: true
+        with:
+          name: PCSX2-linux-${{ matrix.platform }}-${{ matrix.compiler }}
+          path: artifacts
