@@ -5,15 +5,7 @@ branch=`echo ${GITHUB_REF##*/}`
 BUILDBIN=/pcsx2/appimage/pcsx2/build/pcsx2
 BINFILE=PCSX2-x86_64.AppImage
 LOG_FILE=$HOME/curl.log
-CXX=g++-10
-
-# QT 5.14.2
-# source /opt/qt514/bin/qt514-env.sh
-QT_BASE_DIR=/opt/qt514
-export QTDIR=$QT_BASE_DIR
-export PATH=$QT_BASE_DIR/bin:$PATH
-export LD_LIBRARY_PATH=$QT_BASE_DIR/lib/x86_64-linux-gnu:$QT_BASE_DIR/lib:$LD_LIBRARY_PATH
-export PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
+CXX=g++-8
 
 cd /tmp
 	curl -sLO "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
@@ -53,9 +45,7 @@ printf "#include <bits/stdc++.h>\nint main(){std::make_exception_ptr(0);std::pmr
 
 echo $GITHUB_RUN_ID > $HOME/squashfs-root/version.txt
 
-unset QT_PLUGIN_PATH
 unset LD_LIBRARY_PATH
-unset QTDIR
 
 # /tmp/squashfs-root/AppRun $HOME/squashfs-root/usr/bin/pcsx2 -appimage -unsupported-allow-new-glibc -no-copy-copyright-files -no-translations -bundle-non-qt-libs
 /tmp/squashfs-root/AppRun $HOME/squashfs-root/usr/bin/PCSX2 -unsupported-allow-new-glibc -no-copy-copyright-files -no-translations -bundle-non-qt-libs
