@@ -16,16 +16,11 @@ mkdir appimage && cd appimage
 #git clone --single-branch --branch x86_64-support https://github.com/beaumanvienna/pcsx2.git
 git clone --recursive https://github.com/PCSX2/pcsx2.git
 cd pcsx2/
-#git submodule update --init --recursive
 
-	update-alternatives --list gcc 
-	update-alternatives --list g++
-	apt update
-	apt install -y gcc-9 g++-9
-	update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 11 
-	update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 11 
-	gcc --version 
-	g++ --version 
+# ADD CUSTOM MAPPING TO GAMECONTROLLERDB
+echo -e '\n# Custom
+
+050000004c050000e60c000000810000,DualSense,a:b0,b:b1,x:b3,y:b2,back:b8,guide:b10,start:b9,leftstick:b11,rightstick:b12,leftshoulder:b4,rightshoulder:b5,dpup:h0.1,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,leftx:a0,lefty:a1,rightx:a3,righty:a4,lefttrigger:a2,righttrigger:a5,platform:Linux,' >> ./pcsx2/PAD/Linux/res/game_controller_db.txt
 
 
 mkdir build
