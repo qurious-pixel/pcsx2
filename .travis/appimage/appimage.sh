@@ -4,7 +4,6 @@ branch=`echo ${GITHUB_REF##*/}`
 
 BUILDBIN=/pcsx2/appimage/pcsx2/build/pcsx2
 BINFILE=PCSX2-x86_64.AppImage
-LOG_FILE=$HOME/curl.log
 CXX=g++-8
 
 cd /tmp
@@ -32,16 +31,11 @@ cp /usr/share/zenity/zenity.ui ./squashfs-root/usr/share/zenity
 cp /usr/bin/zenity ./squashfs-root/usr/bin/
 curl -sL "https://raw.githubusercontent.com/qurious-pixel/pcsx2/$branch/.travis/appimage/update.sh" -o $HOME/squashfs-root/update.sh
 curl -sL "https://raw.githubusercontent.com/qurious-pixel/pcsx2/$branch/.travis/appimage/AppRun" -o $HOME/squashfs-root/AppRun
-curl -sL "https://github.com/RPCS3/AppImageKit-checkrt/releases/download/continuous2/AppRun-patched-x86_64" -o $HOME/squashfs-root/AppRun-patched
-curl -sL "https://github.com/RPCS3/AppImageKit-checkrt/releases/download/continuous2/exec-x86_64.so" -o $HOME/squashfs-root/usr/optional/exec.so
+curl -sL "https://github.com/AppImage/AppImageKit/releases/download/12/AppRun-x86_64" -o $HOME/squashfs-root/AppRun-patched
 chmod a+x ./squashfs-root/AppRun
 chmod a+x ./squashfs-root/runtime
 chmod a+x ./squashfs-root/AppRun-patched
 chmod a+x ./squashfs-root/update.sh
-#cp /tmp/libssl.so.47 /tmp/libcrypto.so.45 /usr/lib/x86_64-linux-gnu/
-cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 squashfs-root/usr/optional/libstdc++/
-printf "#include <bits/stdc++.h>\nint main(){std::make_exception_ptr(0);std::pmr::get_default_resource();}" | $CXX -x c++ -std=c++2a -o $HOME/squashfs-root/usr/optional/checker -
-
 
 echo $GITHUB_RUN_ID > $HOME/squashfs-root/version.txt
 
@@ -75,4 +69,3 @@ cp "$BUILDBIN"/PCSX2 /pcsx2/artifacts/
 chmod -R 777 /pcsx2/artifacts
 cd /pcsx2/artifacts
 ls -al /pcsx2/artifacts/
-#curl --upload-file PCSX2 https://transfersh.com/PCSX2
