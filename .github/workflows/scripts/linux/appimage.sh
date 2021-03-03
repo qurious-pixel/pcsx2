@@ -69,8 +69,8 @@ export OUTPUT=$name.AppImage
 /tmp/squashfs-root/AppRun --appdir=/pcsx2/squashfs-root/ -d /pcsx2/squashfs-root/PCSX2.desktop -i /pcsx2/squashfs-root/PCSX2.png --output appimage
 
 mkdir /pcsx2/artifacts/
-#mkdir -p ./artifacts/
-mv $name.AppImage* /pcsx2/artifacts
+ls -al .
+mv $name.AppImage /pcsx2/artifacts && mv $name.AppImage.zsync /pcsx2/artifacts
 chmod -R 777 ./artifacts
 cd ./artifacts
 ls -al .
