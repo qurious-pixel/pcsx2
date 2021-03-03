@@ -40,7 +40,7 @@ jobs:
             platform: x64
             compiler: gcc
             experimental: true
-            detail: -appimage 
+            detail: -appimage
 
     name: ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}
     runs-on: ${{ matrix.os }}
@@ -116,21 +116,21 @@ jobs:
           TRIMMED_ARTIFACT_NAME=$(printf "%.199s]" "$ARTIFACT_NAME")
           echo "name=$TRIMMED_ARTIFACT_NAME"
           echo "##[set-output name=name;]${TRIMMED_ARTIFACT_NAME}"
-          
+
       - name: Build AppImage
         env:
           PLATFORM: ${{ matrix.platform }}
           COMPILER: ${{ matrix.compiler }}
           name: ${{ steps.artifact-metadata.outputs.name }}
         run: |
-          if [ ${{ matrix.platform }} = x86 ]; then 
+          if [ ${{ matrix.platform }} = x86 ]; then
               docker pull quriouspixel/pcsx2:18.04-386
               docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$GITHUB_WORKSPACE/.ccache":/root/.ccache quriouspixel/pcsx2:18.04-386 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
           else
               docker pull quriouspixel/pcsx2:18.04
               docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$GITHUB_WORKSPACE/.ccache":/root/.ccache quriouspixel/pcsx2:18.04 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
-          fi   
-        
+          fi
+
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
