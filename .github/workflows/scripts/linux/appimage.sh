@@ -29,6 +29,7 @@ patchelf --set-rpath /tmp/PCSX2 /pcsx2/squashfs-root/usr/bin/PCSX2
 cp ./pcsx2/gui/Resources/AppIcon64.png ./squashfs-root/PCSX2.png
 cp ./linux_various/PCSX2.desktop.in ./squashfs-root/PCSX2.desktop 
 sed -i -e 's|Categories=@PCSX2_MENU_CATEGORIES@|Categories=Game;Emulator;|g' ./squashfs-root/PCSX2.desktop
+sed -i -e 's|__GL_THREADED_OPTIMIZATIONS=1|__GL_THREADED_OPTIMIZATIONS=0|g' ./squashfs-root/PCSX2.desktop
 curl -sSfL https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-$APPARCH -o ./squashfs-root/runtime
 mkdir -p squashfs-root/usr/share/applications && cp ./squashfs-root/PCSX2.desktop ./squashfs-root/usr/share/applications
 mkdir -p squashfs-root/usr/share/icons && cp ./squashfs-root/PCSX2.png ./squashfs-root/usr/share/icons
