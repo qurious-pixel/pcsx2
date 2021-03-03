@@ -13,13 +13,8 @@ else
 	ARCH="x86_64"
 fi
 
-###############
-realpath /pcsx2/build/pcsx2 && ls -al /pcsx2/build/pcsx2
-###############
-
 
 BUILDBIN=/pcsx2/build/pcsx2
-BINFILE=PCSX2-$ARCH.AppImage
 CXX=g++-8
 
 cd /tmp
@@ -64,12 +59,13 @@ arr=( $(ls -d /pcsx2/squashfs-root/usr/bin/plugins/* ) )
 for i in "${arr[@]}"; do patchelf --set-rpath /tmp/PCSX2 "$i"; done
 #patchelf --set-rpath /tmp/PCSX2 /pcsx2/squashfs-root/usr/lib/libSDL2-2.0.so.0
 cp ./bin/GameIndex.yaml /pcsx2/squashfs-root/usr/bin/plugins/GameIndex.yaml
-export OUTPUT=PCSX2-$ARCH.AppImage
+export UPD_INFO="gh-releases-zsync|PCSX2|pcsx2|latest|$name.AppImage.zsync"
+export OUTPUT=$name.AppImage
 /tmp/squashfs-root/AppRun --appdir=/pcsx2/squashfs-root/ -d /pcsx2/squashfs-root/PCSX2.desktop -i /pcsx2/squashfs-root/PCSX2.png --output appimage
 
 mkdir /pcsx2/artifacts/
-#mkdir -p ./artifacts/
-mv PCSX2-$ARCH.AppImage* /pcsx2/artifacts
+ls -al .
+mv $name.AppImage /pcsx2/artifacts && mv $name.AppImage.zsync /pcsx2/artifacts
 chmod -R 777 ./artifacts
 cd ./artifacts
 ls -al .
