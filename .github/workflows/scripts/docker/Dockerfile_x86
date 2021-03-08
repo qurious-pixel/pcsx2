@@ -1,5 +1,6 @@
 FROM i386/ubuntu:18.04
-MAINTAINER PCSX2
+LABEL maintainer="PCSX2"
+WORKDIR /tmp
 
 ENV GCCVER=8
 ENV GCC_BINARY=gcc-${GCCVER}
@@ -72,7 +73,8 @@ RUN \
     make \
     cmake \
     git \
-    ninja-build 
+    ninja-build \
+    apt-get clean autoclean && apt-get autoremove --yes && rm -rf /var/lib/apt /var/lib/cache /var/lib/log /var/lib/apt/lists/*
     
 #ENV CMAKEVER=3.18.4
 #RUN \
@@ -83,7 +85,6 @@ RUN \
 #	cmake --version
 
 RUN\
-	cd /tmp && \
 	curl -sLO https://github.com/NixOS/patchelf/releases/download/0.12/patchelf-0.12.tar.bz2 && \
 	tar xvf patchelf-0.12.tar.bz2 && \
 	cd patchelf-0.12*/ && \
@@ -108,4 +109,3 @@ RUN \
 	gcc --version && \
 	g++ --version 
   
-RUN 	apt-get clean autoclean && apt-get autoremove --yes && rm -rf /var/lib/apt /var/lib/cache /var/lib/log

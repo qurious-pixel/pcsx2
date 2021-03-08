@@ -1,9 +1,6 @@
 #!/bin/bash -ex
 
-branch=`echo ${GITHUB_REF##*/}`
-
 cd /pcsx2
-realpath . && ls -al .
 
 mkdir build && cd build || exit 1
 
