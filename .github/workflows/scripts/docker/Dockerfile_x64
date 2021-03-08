@@ -81,4 +81,3 @@ RUN \
 	gcc --version && \
 	g++ --version 
 
-  
