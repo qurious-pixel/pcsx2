@@ -69,3 +69,9 @@ jobs:
       - name: Build PCSX2
         working-directory: ./build
         run: make -j2 # macOS doesn't use make install
+              
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: PCSX2-MacOS-11
+          path: ${{ github.workspace }}/build/pcsx2/PCSX2.app
