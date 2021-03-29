@@ -52,7 +52,7 @@ export OUTPUT=$name.AppImage
 
 mkdir /pcsx2/artifacts/
 ls -al .
-mv "$name.AppImage" /pcsx2/artifacts && mkdir /pcsx2/artifacts/"$name.AppImage.config"
+mv "$name.AppImage" /pcsx2/artifacts # && mkdir /pcsx2/artifacts/"$name.AppImage.config"
 chmod -R 777 ./artifacts
 cd ./artifacts
 ls -al .
