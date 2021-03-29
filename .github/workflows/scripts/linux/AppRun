@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export LD_LIBRARY_PATH="/tmp/PCSX2:$APPDIR/usr/lib:$LD_LIBRARY_PATH"
-BINARY_NAME=$(basename "ARGV0")
+BINARY_NAME=$(basename "$ARGV0")
 if [[ ! -e "$PWD/$BINARY_NAME.config" ]]; then
         mkdir "$PWD/$BINARY_NAME.config"
 fi       
