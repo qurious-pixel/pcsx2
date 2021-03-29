@@ -394,8 +394,11 @@ void GSShaderDlg::OnInit()
 
 	// External FX shader
 	CheckDlgButton(m_hWnd, IDC_SHADER_FX, theApp.GetConfigB("shaderfx"));
-	SendMessage(GetDlgItem(m_hWnd, IDC_SHADER_FX_EDIT), WM_SETTEXT, 0, (LPARAM)theApp.GetConfigS("shaderfx_glsl").c_str());
-	SendMessage(GetDlgItem(m_hWnd, IDC_SHADER_FX_CONF_EDIT), WM_SETTEXT, 0, (LPARAM)theApp.GetConfigS("shaderfx_conf").c_str());
+
+	std::wstring filename = convert_utf8_to_utf16(theApp.GetConfigS("shaderfx_glsl"));
+	SendMessage(GetDlgItem(m_hWnd, IDC_SHADER_FX_EDIT), WM_SETTEXT, 0, (LPARAM)filename.c_str());
+	filename = convert_utf8_to_utf16(theApp.GetConfigS("shaderfx_conf"));
+	SendMessage(GetDlgItem(m_hWnd, IDC_SHADER_FX_CONF_EDIT), WM_SETTEXT, 0, (LPARAM)filename.c_str());
 
 	// FXAA shader
 	CheckDlgButton(m_hWnd, IDC_FXAA, theApp.GetConfigB("fxaa"));
@@ -421,13 +424,13 @@ void GSShaderDlg::UpdateControls()
 	SendMessage(GetDlgItem(m_hWnd, IDC_BRIGHTNESS_SLIDER), TBM_SETPOS, TRUE, m_brightness);
 	SendMessage(GetDlgItem(m_hWnd, IDC_CONTRAST_SLIDER), TBM_SETPOS, TRUE, m_contrast);
 
-	char text[8] = {0};
+	wchar_t text[8] = {0};
 
-	sprintf(text, "%d", m_saturation);
+	wprintf(text, "%d", m_saturation);
 	SetDlgItemText(m_hWnd, IDC_SATURATION_VALUE, text);
-	sprintf(text, "%d", m_brightness);
+	wprintf(text, "%d", m_brightness);
 	SetDlgItemText(m_hWnd, IDC_BRIGHTNESS_VALUE, text);
-	sprintf(text, "%d", m_contrast);
+	wprintf(text, "%d", m_contrast);
 	SetDlgItemText(m_hWnd, IDC_CONTRAST_VALUE, text);
 
 	// Shader Settings
@@ -458,29 +461,29 @@ bool GSShaderDlg::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		if((HWND)lParam == GetDlgItem(m_hWnd, IDC_SATURATION_SLIDER)) 
 		{
-			char text[8] = {0};
+			wchar_t text[8] = {0};
 
 			m_saturation = (int)SendMessage(GetDlgItem(m_hWnd, IDC_SATURATION_SLIDER),TBM_GETPOS,0,0);
 
-			sprintf(text, "%d", m_saturation);
+			wprintf(text, "%d", m_saturation);
 			SetDlgItemText(m_hWnd, IDC_SATURATION_VALUE, text);
 		}
 		else if((HWND)lParam == GetDlgItem(m_hWnd, IDC_BRIGHTNESS_SLIDER)) 
 		{
-			char text[8] = {0};
+			wchar_t text[8] = {0};
 
 			m_brightness = (int)SendMessage(GetDlgItem(m_hWnd, IDC_BRIGHTNESS_SLIDER),TBM_GETPOS,0,0);
 
-			sprintf(text, "%d", m_brightness);
+			wprintf(text, "%d", m_brightness);
 			SetDlgItemText(m_hWnd, IDC_BRIGHTNESS_VALUE, text);
 		}
 		else if((HWND)lParam == GetDlgItem(m_hWnd, IDC_CONTRAST_SLIDER)) 
 		{
-			char text[8] = {0};
+			wchar_t text[8] = {0};
 
 			m_contrast = (int)SendMessage(GetDlgItem(m_hWnd, IDC_CONTRAST_SLIDER),TBM_GETPOS,0,0);
 
-			sprintf(text, "%d", m_contrast);
+			wprintf(text, "%d", m_contrast);
 			SetDlgItemText(m_hWnd, IDC_CONTRAST_VALUE, text);
 		}
 	} break;
@@ -518,12 +521,14 @@ bool GSShaderDlg::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 			const int shader_fx_length = (int)SendMessage(GetDlgItem(m_hWnd, IDC_SHADER_FX_EDIT), WM_GETTEXTLENGTH, 0, 0);
 			const int shader_fx_conf_length = (int)SendMessage(GetDlgItem(m_hWnd, IDC_SHADER_FX_CONF_EDIT), WM_GETTEXTLENGTH, 0, 0);
 			const int length = std::max(shader_fx_length, shader_fx_conf_length) + 1;
-			std::unique_ptr<char[]> buffer(new char[length]);
+			std::unique_ptr<wchar_t[]> buffer = std::make_unique<wchar_t[]>(length);
 
 			SendMessage(GetDlgItem(m_hWnd, IDC_SHADER_FX_EDIT), WM_GETTEXT, (WPARAM)length, (LPARAM)buffer.get());
-			theApp.SetConfig("shaderfx_glsl", buffer.get()); // Not really glsl only ;)
+			std::string output = convert_utf16_to_utf8(buffer.get());
+			theApp.SetConfig("shaderfx_glsl", output.c_str()); // Not really glsl only ;)
 			SendMessage(GetDlgItem(m_hWnd, IDC_SHADER_FX_CONF_EDIT), WM_GETTEXT, (WPARAM)length, (LPARAM)buffer.get());
-			theApp.SetConfig("shaderfx_conf", buffer.get());
+			output = convert_utf16_to_utf8(buffer.get());
+			theApp.SetConfig("shaderfx_conf", output.c_str());
 
 			EndDialog(m_hWnd, id);
 		} break;
@@ -535,12 +540,12 @@ bool GSShaderDlg::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case IDC_SHADER_FX_BUTTON:
 			if (HIWORD(wParam) == BN_CLICKED)
-				OpenFileDialog(IDC_SHADER_FX_EDIT, "Select External Shader");
+				OpenFileDialog(IDC_SHADER_FX_EDIT, L"Select External Shader");
 			break;
 
 		case IDC_SHADER_FX_CONF_BUTTON:
 			if (HIWORD(wParam) == BN_CLICKED)
-				OpenFileDialog(IDC_SHADER_FX_CONF_EDIT, "Select External Shader Config");
+				OpenFileDialog(IDC_SHADER_FX_CONF_EDIT, L"Select External Shader Config");
 			break;
 
 		case IDCANCEL:
@@ -855,17 +860,17 @@ void GSOSDDlg::UpdateControls()
 	SendMessage(GetDlgItem(m_hWnd, IDC_OSD_COLOR_GREEN_SLIDER), TBM_SETPOS, TRUE, m_color.g);
 	SendMessage(GetDlgItem(m_hWnd, IDC_OSD_COLOR_BLUE_SLIDER), TBM_SETPOS, TRUE, m_color.b);
 
-	char text[8] = { 0 };
-	sprintf(text, "%d", m_color.a);
+	wchar_t text[8] = { 0 };
+	wprintf(text, "%d", m_color.a);
 	SetDlgItemText(m_hWnd, IDC_OSD_OPACITY_AMOUNT, text);
 
-	sprintf(text, "%d", m_color.r);
+	wprintf(text, "%d", m_color.r);
 	SetDlgItemText(m_hWnd, IDC_OSD_COLOR_RED_AMOUNT, text);
 
-	sprintf(text, "%d", m_color.g);
+	wprintf(text, "%d", m_color.g);
 	SetDlgItemText(m_hWnd, IDC_OSD_COLOR_GREEN_AMOUNT, text);
 
-	sprintf(text, "%d", m_color.b);
+	wprintf(text, "%d", m_color.b);
 	SetDlgItemText(m_hWnd, IDC_OSD_COLOR_BLUE_AMOUNT, text);
 
 	const bool monitor_enabled = IsDlgButtonChecked(m_hWnd, IDC_OSD_MONITOR) == BST_CHECKED;
@@ -912,38 +917,38 @@ bool GSOSDDlg::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		if ((HWND)lParam == GetDlgItem(m_hWnd, IDC_OSD_OPACITY_SLIDER))
 		{
-			char text[8] = { 0 };
+			wchar_t text[8] = { 0 };
 
 			m_color.a = (int)SendMessage(GetDlgItem(m_hWnd, IDC_OSD_OPACITY_SLIDER), TBM_GETPOS, 0, 0);
 
-			sprintf(text, "%d", m_color.a);
+			wprintf(text, "%d", m_color.a);
 			SetDlgItemText(m_hWnd, IDC_OSD_OPACITY_AMOUNT, text);
 		}
 		else if ((HWND)lParam == GetDlgItem(m_hWnd, IDC_OSD_COLOR_RED_SLIDER))
 		{
-			char text[8] = { 0 };
+			wchar_t text[8] = { 0 };
 
 			m_color.r = (int)SendMessage(GetDlgItem(m_hWnd, IDC_OSD_COLOR_RED_SLIDER), TBM_GETPOS, 0, 0);
 
-			sprintf(text, "%d", m_color.r);
+			wprintf(text, "%d", m_color.r);
 			SetDlgItemText(m_hWnd, IDC_OSD_COLOR_RED_AMOUNT, text);
 		}
 		else if ((HWND)lParam == GetDlgItem(m_hWnd, IDC_OSD_COLOR_GREEN_SLIDER))
 		{
-			char text[8] = { 0 };
+			wchar_t text[8] = { 0 };
 
 			m_color.g = (int)SendMessage(GetDlgItem(m_hWnd, IDC_OSD_COLOR_GREEN_SLIDER), TBM_GETPOS, 0, 0);
 
-			sprintf(text, "%d", m_color.g);
+			wprintf(text, "%d", m_color.g);
 			SetDlgItemText(m_hWnd, IDC_OSD_COLOR_GREEN_AMOUNT, text);
 		}
 		else if ((HWND)lParam == GetDlgItem(m_hWnd, IDC_OSD_COLOR_BLUE_SLIDER))
 		{
-			char text[8] = { 0 };
+			wchar_t text[8] = { 0 };
 
 			m_color.b = (int)SendMessage(GetDlgItem(m_hWnd, IDC_OSD_COLOR_BLUE_SLIDER), TBM_GETPOS, 0, 0);
 
-			sprintf(text, "%d", m_color.b);
+			wprintf(text, "%d", m_color.b);
 			SetDlgItemText(m_hWnd, IDC_OSD_COLOR_BLUE_AMOUNT, text);
 		}
 	} break;

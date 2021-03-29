@@ -37,9 +37,8 @@
 
 void GSCaptureDlg::InvalidFile()
 {
-	char tmp[512];
-	sprintf_s(tmp, "GSdx couldn't open file for capturing: %s.\nCapture aborted.", m_filename.c_str());
-	MessageBox(GetActiveWindow(), tmp, "GSdx System Message", MB_OK | MB_SETFOREGROUND);
+	const std::wstring message = L"GSdx couldn't open file for capturing: " + m_filename + L".\nCapture aborted.";
+	MessageBox(GetActiveWindow(), message.c_str(), L"GSdx System Message", MB_OK | MB_SETFOREGROUND);
 }
 
 GSCaptureDlg::GSCaptureDlg()
@@ -47,7 +46,7 @@ GSCaptureDlg::GSCaptureDlg()
 {
 	m_width = theApp.GetConfigI("CaptureWidth");
 	m_height = theApp.GetConfigI("CaptureHeight");
-	m_filename = theApp.GetConfigS("CaptureFileName");
+	m_filename = convert_utf8_to_utf16(theApp.GetConfigS("CaptureFileName"));
 }
 
 int GSCaptureDlg::GetSelCodec(Codec& c)
@@ -169,7 +168,7 @@ bool GSCaptureDlg::OnCommand(HWND hWnd, UINT id, UINT code)
 	{
 		if (code == BN_CLICKED)
 		{
-			char buff[MAX_PATH] = { 0 };
+			wchar_t buff[MAX_PATH] = { 0 };
 
 			OPENFILENAME ofn;
 			memset(&ofn, 0, sizeof(ofn));
@@ -178,10 +177,10 @@ bool GSCaptureDlg::OnCommand(HWND hWnd, UINT id, UINT code)
 			ofn.hwndOwner = m_hWnd;
 			ofn.lpstrFile = buff;
 			ofn.nMaxFile = countof(buff);
-			ofn.lpstrFilter = "Avi files (*.avi)\0*.avi\0";
+			ofn.lpstrFilter = L"Avi files (*.avi)\0*.avi\0";
 			ofn.Flags = OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
 
-			strcpy(ofn.lpstrFile, m_filename.c_str());
+			wcscpy(ofn.lpstrFile, m_filename.c_str());
 			if (GetSaveFileName(&ofn))
 			{
 				m_filename = ofn.lpstrFile;
@@ -246,7 +245,7 @@ bool GSCaptureDlg::OnCommand(HWND hWnd, UINT id, UINT code)
 
 		theApp.SetConfig("CaptureWidth", m_width);
 		theApp.SetConfig("CaptureHeight", m_height);
-		theApp.SetConfig("CaptureFileName", m_filename.c_str());
+		theApp.SetConfig("CaptureFileName", convert_utf16_to_utf8(m_filename).c_str());
 
 		if (ris != 2)
 			theApp.SetConfig("CaptureVideoCodecDisplayName", c.DisplayName);
