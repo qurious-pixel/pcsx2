@@ -62,3 +62,4 @@ mv "$name.AppImage" /pcsx2/artifacts # && mv "$name.AppImage.zsync" /pcsx2/artif
 chmod -R 777 ./artifacts
 cd ./artifacts
 ls -al .
+
