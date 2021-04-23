@@ -11,7 +11,7 @@ cmake ..                                        \
     -DPACKAGE_MODE=TRUE                         \
     -DXDG_STD=TRUE                              \
     -DDISABLE_ADVANCE_SIMD=TRUE                 \
-    -DCMAKE_BUILD_PO=FALSE                      \
+    -DCMAKE_BUILD_PO=TRUE                       \
     -DCMAKE_INSTALL_LIBDIR="/tmp/"              \
     -DCMAKE_INSTALL_DATADIR="/tmp/"             \
     -G Ninja
