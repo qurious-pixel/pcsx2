@@ -45,7 +45,7 @@ mkdir -p /pcsx2/squashfs-root/usr/bin/plugins
 mkdir -p /pcsx2/squashfs-root/usr/bin/vm
 find / -iname libOpenGL.so.0
 cp /usr/lib/$ARCH-linux-gnu/libOpenGL.so.0 /pcsx2/squashfs-root/usr/bin/vm/
-ls -al /pcsx2/build/pcsx2 && ls -al /pcsx2/build/locale
+ls -al /pcsx2/build/common && ls -al /pcsx2/build/locales
 cp -r /pcsx2/bin/Langs /pcsx2/squashfs-root/usr/bin/
 find $BUILDBIN/../plugins -iname '*.so' -exec cp {} /pcsx2/squashfs-root/usr/bin/plugins \;
 arr=( $(ls -d /pcsx2/squashfs-root/usr/bin/plugins/* ) )
