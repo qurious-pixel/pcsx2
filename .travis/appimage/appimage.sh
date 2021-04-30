@@ -14,7 +14,8 @@ cd /tmp
 ./linuxdeployqt-continuous-x86_64.AppImage --appimage-extract
 cd $HOME
 mkdir -p squashfs-root/usr/bin
-ls -al $BUILDBIN/../
+#ls -al $BUILDBIN/
+ls -al /pcsx2/appimage/pcsx2/build/
 cp -P "$BUILDBIN"/PCSX2 $HOME/squashfs-root/usr/bin/
 patchelf --set-rpath /tmp/PCSX2LIBS $HOME/squashfs-root/usr/bin/PCSX2
 
