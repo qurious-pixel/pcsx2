@@ -13,8 +13,8 @@ ln -s /home/pcsx2/.conan /root
 cd /pcsx2
 
 mkdir appimage && cd appimage
-#git clone --single-branch --branch x86_64-support https://github.com/beaumanvienna/pcsx2.git
-git clone --recursive https://github.com/PCSX2/pcsx2.git
+git clone --single-branch --branch gs-merge https://github.com/PCSX2/pcsx2.git
+#git clone --recursive https://github.com/PCSX2/pcsx2.git
 cd pcsx2/
 
 # ADD CUSTOM MAPPING TO GAMECONTROLLERDB
