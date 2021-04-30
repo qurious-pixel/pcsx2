@@ -8,8 +8,8 @@ export PATH=$QT_BASE_DIR/bin:$PATH
 export LD_LIBRARY_PATH=$QT_BASE_DIR/lib/x86_64-linux-gnu:$QT_BASE_DIR/lib:$LD_LIBRARY_PATH
 export PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
 
-sudo apt update
-sudo apt install libfmt-dev
+apt update
+apt install libfmt-dev
 
 ln -s /home/pcsx2/.conan /root
 
