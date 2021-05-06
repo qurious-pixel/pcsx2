@@ -16,7 +16,7 @@ ln -s /home/pcsx2/.conan /root
 cd /pcsx2
 
 mkdir appimage && cd appimage
-git clone --recursive --single-branch --branch gs-merge https://github.com/PCSX2/pcsx2.git
+git clone --recursive --single-branch --branch master https://github.com/PCSX2/pcsx2.git
 #git clone --recursive https://github.com/PCSX2/pcsx2.git
 cd pcsx2/
 
@@ -28,7 +28,7 @@ echo -e '\n# Custom
 
 mkdir build
 cd build
-cmake .. -G Ninja -DCMAKE_C_COMPILER=/usr/lib/ccache/gcc -DCMAKE_CXX_COMPILER=/usr/lib/ccache/g++ -DCMAKE_BUILD_TYPE=Release -DPACKAGE_MODE=TRUE -DGTK3_API=TRUE -DDISABLE_ADVANCE_SIMD=TRUE -DXDG_STD=TRUE -DCMAKE_INSTALL_LIBDIR="/tmp/" -DCMAKE_INSTALL_DATADIR="/tmp/"
+cmake .. -G Ninja -DCMAKE_C_COMPILER=/usr/lib/ccache/gcc -DCMAKE_CXX_COMPILER=/usr/lib/ccache/g++ -DCMAKE_BUILD_TYPE=Release -DPACKAGE_MODE=TRUE -DGTK3_API=TRUE -DDISABLE_ADVANCE_SIMD=TRUE -DXDG_STD=TRUE -DCMAKE_INSTALL_LIBDIR="/tmp/" -DCMAKE_INSTALL_DATADIR="/tmp/" -DOpenGL_GL_PREFERENCE="LEGACY"
 #\ -DDISABLE_ADVANCE_SIMD=TRUE -DGSDX_LEGACY=TRUE -DGTK2_API=TRUE -DPLUGIN_DIR= -DGAMEINDEX_DIR= -DEGL_API=TRUE 
 
 ninja
