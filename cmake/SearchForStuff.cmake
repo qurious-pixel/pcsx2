@@ -16,7 +16,7 @@ find_package(LibLZMA)
 
 # Using find_package OpenGL without either setting your opengl preference to GLVND or LEGACY
 # is deprecated as of cmake 3.11.
-set(OpenGL_GL_PREFERENCE GLVND)
+set(OpenGL_GL_PREFERENCE LEGACY)
 find_package(OpenGL)
 find_package(PNG)
 find_package(Vtune)
