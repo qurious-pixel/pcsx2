@@ -230,7 +230,7 @@ set(GSdxFinalSources
 
 set(GSdxFinalLibs
     ${X11_LIBRARIES}
-    ${OPENGL_LIBRARIES}
+    OpenGL::GL ## ${OPENGL_LIBRARIES}
     ${EGL_LIBRARIES}
     ${X11_XCB_LIBRARIES}
     ${GTK2_LIBRARIES}
