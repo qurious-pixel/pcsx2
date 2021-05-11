@@ -16,7 +16,7 @@ ln -s /home/pcsx2/.conan /root
 cd /pcsx2
 
 mkdir appimage && cd appimage
-git clone --recursive --single-branch --branch master https://github.com/PCSX2/pcsx2.git
+git clone --recursive --single-branch --branch gs-merge https://github.com/PCSX2/pcsx2.git
 #git clone --recursive https://github.com/PCSX2/pcsx2.git
 cd pcsx2/
 
