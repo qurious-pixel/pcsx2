@@ -51,7 +51,7 @@ export PATH=$(readlink -f /tmp/squashfs-root/usr/bin/):$PATH
 	#cp /usr/lib/x86_64-linux-gnu/libsndio.so.6.1 $HOME/squashfs-root/usr/lib/
 #mv /tmp/update/AppImageUpdate $HOME/squashfs-root/usr/bin/
 #mv /tmp/update/* $HOME/squashfs-root/usr/lib/
-mkdir -p $HOME/squashfs-root/usr/lib/plugins
+mkdir -p $HOME/squashfs-root/usr/bin/plugins
 cp -r /pcsx2/appimage/pcsx2/bin/Langs $HOME/squashfs-root/usr/bin/
 #find $BUILDBIN/../plugins -iname '*.so' -exec cp {} $HOME/squashfs-root/usr/lib/plugins \;
 #arr=( $(ls -d $HOME/squashfs-root/usr/lib/plugins/* ) )
