@@ -2,7 +2,7 @@
 
 export LD_LIBRARY_PATH="/tmp/PCSX2:$APPDIR/usr/lib:$LD_LIBRARY_PATH"
 
-#ln -sf $APPDIR/usr/lib/plugins /tmp/PCSX2 
+ln -sf $APPDIR/usr/lib/plugins /tmp/PCSX2 
 mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && cp $APPDIR/pcsx2.svg $HOME/.local/share/icons/hicolor/scalable/apps
 
 #GITVER=`wget -qO- https://www.github.com/qurious-pixel/pcsx2/releases/tag/continuous | grep -o -P 'runs/.{0,9}' | cut -d '/' -f 2 | awk '!x[$0]++'`
@@ -16,4 +16,4 @@ mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && cp $APPDIR/pcsx2.svg 
 #	$APPDIR/update.sh
 #fi
 
-#unlink /tmp/PCSX2
+unlink /tmp/PCSX2
