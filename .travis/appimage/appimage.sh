@@ -60,7 +60,8 @@ export PATH=$(readlink -f /tmp/squashfs-root/usr/bin/):$PATH
 #mkdir -p $HOME/squashfs-root/usr/lib/updater
 #mv $HOME/squashfs-root/usr/lib/libcurl.so.4 $HOME/squashfs-root/usr/lib/updater
 curl -sL "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/GameIndex.yaml" -o $HOME/squashfs-root/usr/bin/GameIndex.yaml
-#/tmp/squashfs-root/usr/bin/appimagetool $HOME/squashfs-root -u "gh-releases-zsync|qurious-pixel|pcsx2|continuous|PCSX2-x86_64.AppImage.zsync"
+/tmp/squashfs-root/usr/bin/appimagetool $HOME/squashfs-root 
+# UpdatePATH -u "gh-releases-zsync|qurious-pixel|pcsx2|continuous|PCSX2-x86_64.AppImage.zsync"
 
 mkdir $HOME/artifacts/
 mkdir -p /pcsx2/artifacts/
