@@ -51,7 +51,8 @@ export PATH=$(readlink -f /tmp/squashfs-root/usr/bin/):$PATH
 	#cp /usr/lib/x86_64-linux-gnu/libsndio.so.6.1 $HOME/squashfs-root/usr/lib/
 #mv /tmp/update/AppImageUpdate $HOME/squashfs-root/usr/bin/
 #mv /tmp/update/* $HOME/squashfs-root/usr/lib/
-#mkdir -p $HOME/squashfs-root/usr/lib/plugins
+mkdir -p $HOME/squashfs-root/usr/lib/plugins
+cp -r /pcsx2/appimage/pcsx2/bin/Langs $HOME/squashfs-root/usr/bin/
 #find $BUILDBIN/../plugins -iname '*.so' -exec cp {} $HOME/squashfs-root/usr/lib/plugins \;
 #arr=( $(ls -d $HOME/squashfs-root/usr/lib/plugins/* ) )
 #for i in "${arr[@]}"; do patchelf --set-rpath /tmp/PCSX2 "$i"; done
@@ -59,7 +60,7 @@ export PATH=$(readlink -f /tmp/squashfs-root/usr/bin/):$PATH
 #patchelf --set-rpath ../lib $HOME/squashfs-root/usr/lib/libsndio.so.6.1
 #mkdir -p $HOME/squashfs-root/usr/lib/updater
 #mv $HOME/squashfs-root/usr/lib/libcurl.so.4 $HOME/squashfs-root/usr/lib/updater
-curl -sL "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/GameIndex.yaml" -o $HOME/squashfs-root/usr/bin/GameIndex.yaml
+curl -sL "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/GameIndex.yaml" -o $HOME/squashfs-root/usr/bin/plugins/GameIndex.yaml
 /tmp/squashfs-root/usr/bin/appimagetool $HOME/squashfs-root 
 # UpdatePATH -u "gh-releases-zsync|qurious-pixel|pcsx2|continuous|PCSX2-x86_64.AppImage.zsync"
 
