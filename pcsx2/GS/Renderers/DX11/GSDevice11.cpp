@@ -232,11 +232,11 @@ bool GSDevice11::Create(const std::shared_ptr<GSWnd>& wnd)
 	// convert
 
 	D3D11_INPUT_ELEMENT_DESC il_convert[] =
-	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0},
-	};
+		{
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		};
 
 	ShaderMacro sm_model(m_shader.model);
 
@@ -734,10 +734,14 @@ void GSDevice11::StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture*
 
 	uint8 write_mask = 0;
 
-	if (red)   write_mask |= D3D11_COLOR_WRITE_ENABLE_RED;
-	if (green) write_mask |= D3D11_COLOR_WRITE_ENABLE_GREEN;
-	if (blue)  write_mask |= D3D11_COLOR_WRITE_ENABLE_BLUE;
-	if (alpha) write_mask |= D3D11_COLOR_WRITE_ENABLE_ALPHA;
+	if (red)
+		write_mask |= D3D11_COLOR_WRITE_ENABLE_RED;
+	if (green)
+		write_mask |= D3D11_COLOR_WRITE_ENABLE_GREEN;
+	if (blue)
+		write_mask |= D3D11_COLOR_WRITE_ENABLE_BLUE;
+	if (alpha)
+		write_mask |= D3D11_COLOR_WRITE_ENABLE_ALPHA;
 
 	bd.RenderTarget[0].RenderTargetWriteMask = write_mask;
 
@@ -754,8 +758,7 @@ void GSDevice11::StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture*
 		return;
 	}
 
-	bool draw_in_depth = (ps == m_convert.ps[ShaderConvert_RGBA8_TO_FLOAT32] || ps == m_convert.ps[ShaderConvert_RGBA8_TO_FLOAT24]
-	                   || ps == m_convert.ps[ShaderConvert_RGBA8_TO_FLOAT16] || ps == m_convert.ps[ShaderConvert_RGB5A1_TO_FLOAT16]);
+	bool draw_in_depth = (ps == m_convert.ps[ShaderConvert_RGBA8_TO_FLOAT32] || ps == m_convert.ps[ShaderConvert_RGBA8_TO_FLOAT24] || ps == m_convert.ps[ShaderConvert_RGBA8_TO_FLOAT16] || ps == m_convert.ps[ShaderConvert_RGB5A1_TO_FLOAT16]);
 
 	BeginScene();
 
@@ -784,12 +787,12 @@ void GSDevice11::StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture*
 	float bottom = 1.0f - dRect.w * 2 / ds.y;
 
 	GSVertexPT1 vertices[] =
-	{
-		{GSVector4(left, top, 0.5f, 1.0f), GSVector2(sRect.x, sRect.y)},
-		{GSVector4(right, top, 0.5f, 1.0f), GSVector2(sRect.z, sRect.y)},
-		{GSVector4(left, bottom, 0.5f, 1.0f), GSVector2(sRect.x, sRect.w)},
-		{GSVector4(right, bottom, 0.5f, 1.0f), GSVector2(sRect.z, sRect.w)},
-	};
+		{
+			{GSVector4(left, top, 0.5f, 1.0f), GSVector2(sRect.x, sRect.y)},
+			{GSVector4(right, top, 0.5f, 1.0f), GSVector2(sRect.z, sRect.y)},
+			{GSVector4(left, bottom, 0.5f, 1.0f), GSVector2(sRect.x, sRect.w)},
+			{GSVector4(right, bottom, 0.5f, 1.0f), GSVector2(sRect.z, sRect.w)},
+		};
 
 
 
@@ -962,7 +965,7 @@ void GSDevice11::DoExternalFX(GSTexture* sTex, GSTexture* dTex)
 }
 
 // This shouldn't be necessary, we have some bug corrupting memory
-// and for some reason isolating this code makes the plugin not crash
+// and for some reason isolating this code makes the subcomponent not crash
 void GSDevice11::InitFXAA()
 {
 	if (!FXAA_Compiled)
@@ -1368,8 +1371,10 @@ void GSDevice11::OMSetRenderTargets(GSTexture* rt, GSTexture* ds, const GSVector
 	if (!rt && !ds)
 		throw GSRecoverableError();
 
-	if (rt) rtv = *(GSTexture11*)rt;
-	if (ds) dsv = *(GSTexture11*)ds;
+	if (rt)
+		rtv = *(GSTexture11*)rt;
+	if (ds)
+		dsv = *(GSTexture11*)ds;
 
 	if (m_state.rt_view != rtv || m_state.dsv != dsv)
 	{
@@ -1511,25 +1516,46 @@ uint16 GSDevice11::ConvertBlendEnum(uint16 generic)
 {
 	switch (generic)
 	{
-		case SRC_COLOR:       return D3D11_BLEND_SRC_COLOR;
-		case INV_SRC_COLOR:   return D3D11_BLEND_INV_SRC_COLOR;
-		case DST_COLOR:       return D3D11_BLEND_DEST_COLOR;
-		case INV_DST_COLOR:   return D3D11_BLEND_INV_DEST_COLOR;
-		case SRC1_COLOR:      return D3D11_BLEND_SRC1_COLOR;
-		case INV_SRC1_COLOR:  return D3D11_BLEND_INV_SRC1_COLOR;
-		case SRC_ALPHA:       return D3D11_BLEND_SRC_ALPHA;
-		case INV_SRC_ALPHA:   return D3D11_BLEND_INV_SRC_ALPHA;
-		case DST_ALPHA:       return D3D11_BLEND_DEST_ALPHA;
-		case INV_DST_ALPHA:   return D3D11_BLEND_INV_DEST_ALPHA;
-		case SRC1_ALPHA:      return D3D11_BLEND_SRC1_ALPHA;
-		case INV_SRC1_ALPHA:  return D3D11_BLEND_INV_SRC1_ALPHA;
-		case CONST_COLOR:     return D3D11_BLEND_BLEND_FACTOR;
-		case INV_CONST_COLOR: return D3D11_BLEND_INV_BLEND_FACTOR;
-		case CONST_ONE:       return D3D11_BLEND_ONE;
-		case CONST_ZERO:      return D3D11_BLEND_ZERO;
-		case OP_ADD:          return D3D11_BLEND_OP_ADD;
-		case OP_SUBTRACT:     return D3D11_BLEND_OP_SUBTRACT;
-		case OP_REV_SUBTRACT: return D3D11_BLEND_OP_REV_SUBTRACT;
-		default:              ASSERT(0); return 0;
+		case SRC_COLOR:
+			return D3D11_BLEND_SRC_COLOR;
+		case INV_SRC_COLOR:
+			return D3D11_BLEND_INV_SRC_COLOR;
+		case DST_COLOR:
+			return D3D11_BLEND_DEST_COLOR;
+		case INV_DST_COLOR:
+			return D3D11_BLEND_INV_DEST_COLOR;
+		case SRC1_COLOR:
+			return D3D11_BLEND_SRC1_COLOR;
+		case INV_SRC1_COLOR:
+			return D3D11_BLEND_INV_SRC1_COLOR;
+		case SRC_ALPHA:
+			return D3D11_BLEND_SRC_ALPHA;
+		case INV_SRC_ALPHA:
+			return D3D11_BLEND_INV_SRC_ALPHA;
+		case DST_ALPHA:
+			return D3D11_BLEND_DEST_ALPHA;
+		case INV_DST_ALPHA:
+			return D3D11_BLEND_INV_DEST_ALPHA;
+		case SRC1_ALPHA:
+			return D3D11_BLEND_SRC1_ALPHA;
+		case INV_SRC1_ALPHA:
+			return D3D11_BLEND_INV_SRC1_ALPHA;
+		case CONST_COLOR:
+			return D3D11_BLEND_BLEND_FACTOR;
+		case INV_CONST_COLOR:
+			return D3D11_BLEND_INV_BLEND_FACTOR;
+		case CONST_ONE:
+			return D3D11_BLEND_ONE;
+		case CONST_ZERO:
+			return D3D11_BLEND_ZERO;
+		case OP_ADD:
+			return D3D11_BLEND_OP_ADD;
+		case OP_SUBTRACT:
+			return D3D11_BLEND_OP_SUBTRACT;
+		case OP_REV_SUBTRACT:
+			return D3D11_BLEND_OP_REV_SUBTRACT;
+		default:
+			ASSERT(0);
+			return 0;
 	}
 }

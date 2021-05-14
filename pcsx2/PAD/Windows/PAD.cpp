@@ -472,7 +472,7 @@ void Update(unsigned int port, unsigned int slot)
 		return;
 	}
 
-// Lock prior to timecheck code to avoid pesky race conditions.
+	// Lock prior to timecheck code to avoid pesky race conditions.
 	std::lock_guard<std::mutex> lock(updateLock);
 
 	static unsigned int LastCheck = 0;
@@ -882,17 +882,17 @@ s32 PADinit()
 // Note to self:  Has to be a define for the sizeof() to work right.
 // Note to self 2: All are the same size, anyways, except for longer full DS2 response
 //   and shorter digital mode response.
-#define SET_RESULT(a)                             \
-	{                                             \
+#define SET_RESULT(a) \
+	{ \
 		memcpy(query.response + 2, a, sizeof(a)); \
-		query.numBytes = 2 + sizeof(a);           \
+		query.numBytes = 2 + sizeof(a); \
 	}
 
-#define SET_FINAL_RESULT(a)                       \
-	{                                             \
+#define SET_FINAL_RESULT(a) \
+	{ \
 		memcpy(query.response + 2, a, sizeof(a)); \
-		query.numBytes = 2 + sizeof(a);           \
-		query.queryDone = 1;                      \
+		query.numBytes = 2 + sizeof(a); \
+		query.queryDone = 1; \
 	}
 
 static const u8 ConfigExit[7] = {0x5A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
@@ -909,7 +909,7 @@ static const u8 queryModelDS2[7] = {0x5A, 0x03, 0x02, 0x00, 0x02, 0x01, 0x00};
 static const u8 queryModelDS1[7] = {0x5A, 0x01, 0x02, 0x00, 0x02, 0x01, 0x00};
 
 static const u8 queryAct[2][7] = {{0x5A, 0x00, 0x00, 0x01, 0x02, 0x00, 0x0A},
-								  {0x5A, 0x00, 0x00, 0x01, 0x01, 0x01, 0x14}};
+	{0x5A, 0x00, 0x00, 0x01, 0x01, 0x01, 0x14}};
 
 static const u8 queryComb[7] = {0x5A, 0x00, 0x00, 0x02, 0x00, 0x01, 0x00};
 
@@ -990,7 +990,7 @@ void PADconfigure()
 	ScopedCoreThreadPause paused_core;
 	Configure();
 	paused_core.AllowResume();
-	if(tmp != nullptr)
+	if (tmp != nullptr)
 		PADopen(tmp);
 }
 
@@ -1015,12 +1015,12 @@ s32 PADopen(void* pDsp)
 		{
 			openCount = 0;
 			MessageBoxA(GetActiveWindow(),
-						"Invalid Window handle passed to PAD.\n"
-						"\n"
-						"Either your emulator or gs plugin is buggy,\n"
-						"Despite the fact the emulator is about to\n"
-						"blame PAD for failing to initialize.",
-						"Non-PAD Error", MB_OK | MB_ICONERROR);
+				"Invalid Window handle passed to PAD.\n"
+				"\n"
+				"Your emulator is buggy,\n"
+				"Despite the fact the emulator is about to\n"
+				"blame PAD for failing to initialize.",
+				"Non-PAD Error", MB_OK | MB_ICONERROR);
 			return -1;
 		}
 		hWndTop = GetAncestor(hWnd, GA_ROOT);
@@ -1226,9 +1226,9 @@ u8 PADpoll(u8 value)
 						query.response[3] = b1;
 						query.response[4] = b2;
 						query.response[5] = Cap((sum->sticks[1].horiz + 255) / 2); // Swivel
-						query.response[6] = (unsigned char)sum->buttons[10];       // I
-						query.response[7] = (unsigned char)sum->buttons[11];       // II
-						query.response[8] = (unsigned char)sum->buttons[6];        // L
+						query.response[6] = (unsigned char)sum->buttons[10]; // I
+						query.response[7] = (unsigned char)sum->buttons[11]; // II
+						query.response[8] = (unsigned char)sum->buttons[6]; // L
 
 						query.numBytes = 9;
 						query.lastByte = 1;
@@ -1269,9 +1269,9 @@ u8 PADpoll(u8 value)
 					if (pad->mode != MODE_DIGITAL)
 					{
 						query.response[5] = Cap((sum->sticks[0].horiz + 255) / 2); // Right stick: left & right
-						query.response[6] = Cap((sum->sticks[0].vert + 255) / 2);  // Right stick: up & down
+						query.response[6] = Cap((sum->sticks[0].vert + 255) / 2); // Right stick: up & down
 						query.response[7] = Cap((sum->sticks[1].horiz + 255) / 2); // Left stick: left & right
-						query.response[8] = Cap((sum->sticks[1].vert + 255) / 2);  // Left stick: up & down
+						query.response[8] = Cap((sum->sticks[1].vert + 255) / 2); // Left stick: up & down
 
 						query.numBytes = 9;
 						if (pad->mode != MODE_ANALOG && !pad->config)
@@ -1281,13 +1281,13 @@ u8 PADpoll(u8 value)
 							//query.response[4] &= pad->mask[1];
 
 							// No need to cap these, already done int CapSum().
-							query.response[9] = (unsigned char)sum->buttons[13];  // D-pad right
+							query.response[9] = (unsigned char)sum->buttons[13]; // D-pad right
 							query.response[10] = (unsigned char)sum->buttons[15]; // D-pad left
 							query.response[11] = (unsigned char)sum->buttons[12]; // D-pad up
 							query.response[12] = (unsigned char)sum->buttons[14]; // D-pad down
 
-							query.response[13] = (unsigned char)sum->buttons[8];  // Triangle
-							query.response[14] = (unsigned char)sum->buttons[9];  // Circle
+							query.response[13] = (unsigned char)sum->buttons[8]; // Triangle
+							query.response[14] = (unsigned char)sum->buttons[9]; // Circle
 							query.response[15] = (unsigned char)sum->buttons[10]; // Cross
 							query.response[16] = (unsigned char)sum->buttons[11]; // Square
 
@@ -1480,7 +1480,7 @@ u8 PADpoll(u8 value)
 				break;
 			// SET_DS2_NATIVE_MODE
 			case 0x4F:
-				if (query.lastByte >2 && query.lastByte < 6)
+				if (query.lastByte > 2 && query.lastByte < 6)
 				{
 					pad->umask[query.lastByte - 3] = value;
 				}
@@ -1524,7 +1524,7 @@ keyEvent* PADkeyEvent()
 		// mouse/kb capture. In practice, WindowsMessagingMouse::Deactivate is called from PADclose, but doesn't
 		// manage to release the mouse, maybe due to the thread from which it's called or some
 		// state or somehow being too late.
-		// This explicitly triggers inactivity (releasing mouse/kb hooks) before PCSX2 starts to close the plugins.
+		// This explicitly triggers inactivity (releasing mouse/kb hooks) before PCSX2 starts to close subcomponents.
 		// Regardless, the mouse/kb hooks will get re-enabled on resume if required without need for further hacks.
 
 		PrepareActivityState(false);
@@ -1554,14 +1554,12 @@ keyEvent* PADkeyEvent()
 	return &ev;
 }
 
-struct PadPluginFreezeData
+struct PadFreezeData
 {
 	char format[8];
 	// Currently all different versions are incompatible.
 	// May split into major/minor with some compatibility rules.
 	u32 version;
-	// So when loading, know which plugin's settings I'm loading.
-	// Not a big deal.  Use a static variable when saving to figure it out.
 	u8 port;
 	// active slot for port
 	u8 slot[2];
@@ -1579,13 +1577,13 @@ s32 PADfreeze(int mode, freezeData* data)
 
 	if (mode == FREEZE_SIZE)
 	{
-		data->size = sizeof(PadPluginFreezeData);
+		data->size = sizeof(PadFreezeData);
 	}
 	else if (mode == FREEZE_LOAD)
 	{
-		PadPluginFreezeData& pdata = *(PadPluginFreezeData*)(data->data);
+		PadFreezeData& pdata = *(PadFreezeData*)(data->data);
 		StopVibrate();
-		if (data->size != sizeof(PadPluginFreezeData) ||
+		if (data->size != sizeof(PadFreezeData) ||
 			pdata.version != PAD_SAVE_STATE_VERSION ||
 			strcmp(pdata.format, "PadMode"))
 			return 0;
@@ -1622,9 +1620,9 @@ s32 PADfreeze(int mode, freezeData* data)
 	}
 	else if (mode == FREEZE_SAVE)
 	{
-		if (data->size != sizeof(PadPluginFreezeData))
+		if (data->size != sizeof(PadFreezeData))
 			return 0;
-		PadPluginFreezeData& pdata = *(PadPluginFreezeData*)(data->data);
+		PadFreezeData& pdata = *(PadFreezeData*)(data->data);
 
 
 		// Tales of the Abyss - pad fix
@@ -1697,11 +1695,6 @@ void PADDoFreezeIn(pxInputStream& infp)
 			Console.Indent().Warning("Warning: No data for PAD found. Status may be unpredictable.");
 
 		return;
-
-		// Note: Size mismatch check could also be done here on loading, but
-		// some plugins may have built-in version support for non-native formats or
-		// older versions of a different size... or could give different sizes depending
-		// on the status of the plugin when loading, so let's ignore it.
 	}
 
 	ScopedAlloc<s8> data(fP.size);
