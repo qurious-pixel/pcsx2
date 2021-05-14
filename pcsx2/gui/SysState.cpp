@@ -87,7 +87,7 @@ void MemorySavestateEntry::FreezeIn(pxInputStream& reader) const
 	if (entrySize < expectedSize)
 	{
 		Console.WriteLn(Color_Yellow, " '%s' is incomplete (expected 0x%x bytes, loading only 0x%x bytes)",
-						WX_STR(GetFilename()), expectedSize, entrySize);
+			WX_STR(GetFilename()), expectedSize, entrySize);
 	}
 
 	uint copylen = std::min(entrySize, expectedSize);
@@ -279,7 +279,7 @@ public:
 	void FreezeIn(pxInputStream& reader) const { return GSDoFreezeIn(reader); }
 	void FreezeOut(SaveStateBase& writer) const
 	{
-		freezeData fP = {0, NULL};
+		GSFreezeData fP = {0, NULL};
 		if (GSfreeze(FREEZE_SIZE, &fP) == 0)
 		{
 			const int size = fP.size;
@@ -291,7 +291,6 @@ public:
 	}
 	bool IsRequired() const { return true; }
 };
-
 
 
 
@@ -629,7 +628,7 @@ protected:
 		{
 			throw Exception::SaveStateLoadError(m_filename)
 				.SetDiagMsg(pxsFmt(L"Savestate file does not contain '%s'",
-								   !foundVersion ? EntryFilename_StateVersion : EntryFilename_InternalStructures))
+					!foundVersion ? EntryFilename_StateVersion : EntryFilename_InternalStructures))
 				.SetUserMsg(_("This file is not a valid PCSX2 savestate.  See the logfile for details."));
 		}
 
