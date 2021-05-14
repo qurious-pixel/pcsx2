@@ -160,10 +160,10 @@ As the name says, speedhacks are hacks to make things faster. They will speed up
 ### Question 25: What are all these EE/IOP and VU options
 The PS2 EE, IOP and VU processors are substantially different from a PC CPU and require different rounding and clamping modes to do math accurately. Most games work fine on the default options, but some games might need a different setting. You can check the [PCSX2 Wiki](https://wiki.pcsx2.net/Category:Games) to see if your game needs an alternate setting, or check the [PCSX2 Forums](https://forums.pcsx2.net/) to see if anyone else has posted about it there. 
 
-### Question 27: Why is my sound garbled up
+### Question 26: Why is my sound garbled up
 PCSX2's default audio playback mode is Timestretch, which will attempt to stretch sounds out when the emulator is unable to play at full speed, to fill the gaps in the sound playback and prevent even harsher stutters. If you are unable to get the game running at full speed or an acceptable speed where timestretching does not ruin the sound, you can try changing from Timestretch to Async, but this may break games.
 
-### Question 28: Is my controller supported
+### Question 27: Is my controller supported
 For Windows users running LilyPad, PCSX2 will ship with XInput bindings already created. This will automatically work with an Xbox One controller or any other XInput controller. Bindings can easily be made for DirectInput controllers, such as Xbox 360 controllers. PS3, PS4, or Switch Pro controllers should be set up using a compatibility software, such as Steam's Big Picture mode. 
 
 For Linux users running OnePad, PCSX2 will automatically detect and bind controls to any recognizable controller. If your controller is not automatically detected, you can try using Onepad Legacy to manually bind controls for it. 
