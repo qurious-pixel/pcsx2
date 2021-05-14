@@ -38,7 +38,7 @@ cmake ..                                        \
 -DOpenGL_GL_PREFERENCE="LEGACY"                 \
 -DOPENGL_opengl_LIBRARY=""                      \
 -DCMAKE_INSTALL_DATADIR="/tmp/"                 \
--DCMAKE_INSTALL_DOCDIR="/tmp"
+-DCMAKE_INSTALL_DOCDIR="/tmp/PCSX2"
 #\ -DDISABLE_ADVANCE_SIMD=TRUE -DGSDX_LEGACY=TRUE -DGTK2_API=TRUE -DPLUGIN_DIR= -DGAMEINDEX_DIR= -DEGL_API=TRUE -DGTK3_API=TRUE  -DCMAKE_INSTALL_LIBDIR="/tmp/" -DCMAKE_INSTALL_DATADIR="/tmp/"
 
 ninja
