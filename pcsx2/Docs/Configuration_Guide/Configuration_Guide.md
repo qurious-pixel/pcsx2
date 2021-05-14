@@ -22,17 +22,6 @@ You may choose to change the UI language of PCSX2 here.
 
 *Note: Translations may not be accurate or actively maintained by translators. If you find translation issues and want to fix them yourself, please get into contact with the PCSX2 team by opening a [thread on the PCSX2 forums](https://forums.pcsx2.net/) or an [issue on GitHub](https://github.com/PCSX2/pcsx2/issues).*
 
-### Plugin Selection
-Most users running on a modern PC will be able to continue normally here without changing any settings.
-
-If you try to continue with setup and you get a warning that the GS plugin failed to load or was incompatible, change the GS plugin from the default AVX2 option to the SSE4.1 option. If the same issue occurs, change the GS plugin from SSE4.1 to SSE2. If the issue persists, your PC may be severely outdated and we recommend asking for help on the [PCSX2 Forums](https://forum.pcsx2.net).
-
-If you have a custom plugin, you may wish to add it to the default plugin folder. Hit the "Open in Explorer" button to jump straight to the plugin folder.
-
-If you are an advanced user or developer, you may wish to change the plugin directory. Uncheck the "Use default setting" box to do so.
-
-![PCSX2_First_Time_Configuration_plugins.png](PCSX2_First_Time_Configuration_plugins.png)
-
 ### BIOS Selection
 PCSX2 will now ask you to provide your PS2's BIOS dump. Use the "Open in Explorer" button to open the BIOS folder, and drop your BIOS files inside. Then use the "Refresh List" button to show your BIOS in the list. Click it, then hit Finish.
 
@@ -54,31 +43,31 @@ Want some general ideas to try that are not specific to a game? Here are some mo
 *Note: For some of these issues, multiple solutions are given one after the other. Before moving from one solution to the next, **undo the previous solution**. Stacking multiple fixes on top of each other is usually unnecessary and likely to introduce new issues.*
 
 #### Grid-like pattern on screen
-Usually this is due to upscaling, which can cause sprites and 2D textures to misalign. Any fixes will be found in the GSdx Advanced Settings and Hacks:
-`Config > Video (GS) > Plugin Settings > Advanced Settings and Hacks`
+Usually this is due to upscaling, which can cause sprites and 2D textures to misalign. Any fixes will be found in the GS Advanced Settings and Hacks:
+`Config > Graphical Settings > Advanced Settings and Hacks`
 First try the two Round Sprite modes, Half and Full. Then try Align Sprite or Merge Sprite. Then try the Half Pixel Offset modes. If all else fails, consider using the Texture Offsets.
 
 #### Outlines on shapes or models are improperly sized/aligned
-Usually this is because of an upscaling hack known formerly as Unscale Point and Line. This is now enabled by default because the overwhelming majority of games work nicely with it or need it. Navigate to the GSdx Advanced Settings and Hacks:
-`Config > Video (GS) > Plugin Settings > Advanced Settings and Hacks`
+Usually this is because of an upscaling hack known formerly as Unscale Point and Line. This is now enabled by default because the overwhelming majority of games work nicely with it or need it. Navigate to the GS Advanced Settings and Hacks:
+`Config > Graphical Settings > Advanced Settings and Hacks`
 Check the Disable Safe Features box.
 
 #### Ghosting and bloom misalignment
-Upscaling can cause some screen elements, usually but not always bloom effects, to misalign. Navigate to the GSdx Advanced Settings and Hacks:
-`Config > Video (GS) > Plugin Settings > Advanced Settings and Hacks`
+Upscaling can cause some screen elements, usually but not always bloom effects, to misalign. Navigate to the GS Advanced Settings and Hacks:
+`Config > Graphical Settings > Advanced Settings and Hacks`
 Try the various Half Pixel Offset modes. The further down the list you go, the more aggressive the hack gets. Once you find a mode that properly fixes the ghosting/misalignment, do not push it further. Also note in some games, the further you upscale, the worse the ghosting/misalignment gets. In some of these games, Half Pixel Offset may mitigate the issue, but not be able to fully resolve it.
 
 #### Flickering or improper lightning
-Sometimes a game uses blending for lighting effects and needs more accuracy for blending to work correctly. Navigate to the GSdx Plugin Settings:
-`Config > Video (GS) > Plugin Settings`
+Sometimes a game uses blending for lighting effects and needs more accuracy for blending to work correctly. Navigate to the Graphical Settings:
+`Config > Graphical Settings`
 Increment Blending Accuracy until the problem goes away. Note, higher Blending Accuracy substantially increases performance requirements.
 
 #### Flickering or improperly shaped shadows
 This can either be a GS or VU problem so solutions will vary wildly by game. 
 
 ##### GS
-Navigate to the GSdx Advanced Settings and Hacks:
-`Config > Video (GS) > Plugin Settings > Advanced Settings and Hacks`
+Navigate to the GS Advanced Settings and Hacks:
+`Config > Graphical Settings > Advanced Settings and Hacks`
 Try checking Disable Safe Features.
 
 ##### VU
@@ -108,5 +97,5 @@ Try different combinations of VU0/VU1 Advanced Recompiler Options. Only change o
 There are some known issues with specific games that are programming level issues rather than configuration level; please check the [PCSX2 Wiki](https://wiki.pcsx2.net/Main_Page) if these solutions do not help.
 
 #### Colored vertical bands appear on screen
-This is an old issue that is believed to be resolved, but there may still be a game or two that this has not been reported on yet. Unfortunately, this is a programming problem and not a configuration problem. If you encounter this, please submit a [bug report on the forums](https://forums.pcsx2.net/Forum-Bug-reporting) or an [issue on GitHub](https://github.com/PCSX2/pcsx2/issues). To remove the color banding, switch GSdx to a Software Renderer using the F9 key or by going in to your GSdx Plugin Settings:
-`Config > Video (GS) > Plugin Settings > Renderer`
+This is an old issue that is believed to be resolved, but there may still be a game or two that this has not been reported on yet. Unfortunately, this is a programming problem and not a configuration problem. If you encounter this, please submit a [bug report on the forums](https://forums.pcsx2.net/Forum-Bug-reporting) or an [issue on GitHub](https://github.com/PCSX2/pcsx2/issues). To remove the color banding, switch GS to a Software Renderer using the F9 key or by going in to your GS Settings:
+`Config > Graphical Settings > Renderer`

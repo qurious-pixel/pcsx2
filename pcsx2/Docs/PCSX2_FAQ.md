@@ -53,7 +53,7 @@ After dumping your PlayStation 2 console's BIOS, you may launch PCSX2, step thro
 ### Question 6: How many CPU cores can PCSX2 use
 By default, PCSX2 uses two cores for emulation. Enabling the MTVU speedhack allows the PS2's VU1 coprocessor to run on a third core, which is safe for most games.
 
-Software rendering in GSdx can be set to use as many or as few rendering threads as desired. We recommend using no more than 8, or the number of cores (including hyperthreads) that your CPU has, whichever is the lower number.
+Software rendering in GS can be set to use as many or as few rendering threads as desired. We recommend using no more than 8, or the number of cores (including hyperthreads) that your CPU has, whichever is the lower number.
 
 <div class="page"/> <!-- Because PDFs are terrible -->
 
@@ -105,8 +105,7 @@ If you are using an ISO image:
 If you are using a disc:
 
 1) Click the CDVD menu
-2) Check that "Plugin" mode is selected.
-3) Click "Plugin Menu", then "Plugin Settings". Verify your disc drive shows up in the menu.
+3) Click "Disc" and then Drive Selector. Verify your disc drive shows up in the menu.
 4) Click the System menu, then Boot CDVD.
 
 ### Question 17: What is the difference between Full and Fast boot
@@ -160,14 +159,6 @@ As the name says, speedhacks are hacks to make things faster. They will speed up
 
 ### Question 25: What are all these EE/IOP and VU options
 The PS2 EE, IOP and VU processors are substantially different from a PC CPU and require different rounding and clamping modes to do math accurately. Most games work fine on the default options, but some games might need a different setting. You can check the [PCSX2 Wiki](https://wiki.pcsx2.net/Category:Games) to see if your game needs an alternate setting, or check the [PCSX2 Forums](https://forums.pcsx2.net/) to see if anyone else has posted about it there. 
-
-### Question 26: What are PCSX2 plugins
-PCSX2 uses a plugin framework for various sections of the emulator. A plugin is a small, incomplete piece of software that, when plugged in to another piece of software, provides some sort of additional function. PCSX2 uses plugins for:
-*   Video (GSdx)
-*   Controls (Lilypad for Windows, OnePad for Linux)
-*   USB (No plugin included)
-
-Each plugin will have its own Plugin Settings menu, and can be found under the Config menu.
 
 ### Question 27: Why is my sound garbled up
 PCSX2's default audio playback mode is Timestretch, which will attempt to stretch sounds out when the emulator is unable to play at full speed, to fill the gaps in the sound playback and prevent even harsher stutters. If you are unable to get the game running at full speed or an acceptable speed where timestretching does not ruin the sound, you can try changing from Timestretch to Async, but this may break games.
