@@ -53,6 +53,8 @@ export PATH=$(readlink -f /tmp/squashfs-root/usr/bin/):$PATH
 #mv /tmp/update/* $HOME/squashfs-root/usr/lib/
 mkdir -p $HOME/squashfs-root/usr/bin/plugins
 cp -r /pcsx2/appimage/pcsx2/bin/Langs $HOME/squashfs-root/usr/bin/
+cp /pcsx2/appimage/pcsx2/bin/docs/{Configuration_Guide.pdf,PCSX2_FAQ.pdf} $HOME/squashfs-root/usr/bin/plugins
+cp /pcsx2/appimage/pcsx2/bin/cheats_ws.zip $HOME/squashfs-root/usr/bin/plugins
 #find $BUILDBIN/../plugins -iname '*.so' -exec cp {} $HOME/squashfs-root/usr/lib/plugins \;
 #arr=( $(ls -d $HOME/squashfs-root/usr/lib/plugins/* ) )
 #for i in "${arr[@]}"; do patchelf --set-rpath /tmp/PCSX2 "$i"; done
