@@ -40,7 +40,7 @@ jobs:
             ls -al artifacts/
             wget -c https://github.com/tcnksm/ghr/releases/download/v0.13.0/ghr_v0.13.0_linux_amd64.tar.gz
             tar xfv ghr_v0.13.0_linux_amd64.tar.gz      
-            ghr_v0.13.0_linux_amd64/ghr -recreate -n 'GS-Merge' -b "GitHub https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" gsmerge artifacts/
+            ghr_v0.13.0_linux_amd64/ghr -recreate -n 'GS-Merge fdc56e7 ' -b "GitHub https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" fdc56e7 artifacts/
     
         env:
           DEFAULT_BRANCH: appimage
