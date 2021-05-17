@@ -19,7 +19,7 @@ mkdir appimage && cd appimage
 git clone --recursive --single-branch --branch gs-merge https://github.com/PCSX2/pcsx2.git
 #git clone --recursive https://github.com/PCSX2/pcsx2.git
 cd pcsx2/
-git reset --hard 17d211881e5c981100fd034952a02d8f84db29ff
+git reset --hard ff3af8be1876630dc2bca8202e628263de67eb67
 
 # ADD CUSTOM MAPPING TO GAMECONTROLLERDB
 echo -e '\n# Custom
