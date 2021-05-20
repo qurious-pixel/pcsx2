@@ -16,10 +16,10 @@ ln -s /home/pcsx2/.conan /root
 cd /pcsx2
 
 mkdir appimage && cd appimage
-git clone --recursive --single-branch --branch gs-merge https://github.com/PCSX2/pcsx2.git
+git clone --recursive --single-branch --branch DEV9-SparseHDD https://github.com/TheLastRar/pcsx2.git
 #git clone --recursive https://github.com/PCSX2/pcsx2.git
 cd pcsx2/
-git reset --hard 13ed5f45e8c80119e77d7f55a164a37f6ce87aa1
+#git reset --hard 13ed5f45e8c80119e77d7f55a164a37f6ce87aa1
 
 # ADD CUSTOM MAPPING TO GAMECONTROLLERDB
 echo -e '\n# Custom
