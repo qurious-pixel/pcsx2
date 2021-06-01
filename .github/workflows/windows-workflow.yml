@@ -77,7 +77,7 @@ jobs:
           vs-version: 16.7
 
       - name: Build PCSX2
-        run: msbuild "buildbot.xml" /m /v:n /t:ReleaseAll:Clean /p:Platform=${{ matrix.platform }}
+        run: msbuild "PCSX2_suite.sln" /m /v:n /t:ReleaseAll:Clean /p:Platform=${{ matrix.platform }}
 
       - name: Prepare Artifact Metadata
         id: artifact-metadata
