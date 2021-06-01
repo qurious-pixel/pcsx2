@@ -5,7 +5,7 @@ name: Windows Build
 on:
   push:
     branches:
-      - master
+      - master-2
     paths-ignore:
       - .gitignore
       - "**/*.md"
@@ -53,7 +53,7 @@ jobs:
 
       - name: Cache Submodules
         id: cache-submodules
-        uses: actions/cache@v2.1.4
+        uses: actions/cache@v2.1.6
         with:
           key: submodules-${{ hashFiles('./.gitmodules') }}
           path: |
@@ -114,10 +114,10 @@ jobs:
           mv !("${{ steps.artifact-metadata.outputs.name }}") "${{ steps.artifact-metadata.outputs.name }}"
           shopt -u dotglob
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
-        continue-on-error: true
-        with:
-          name: ${{ steps.artifact-metadata.outputs.name }}
-          path: bin
-          retention-days: 30 # https://docs.github.com/en/free-pro-team@latest/actions/reference/usage-limits-billing-and-administration#artifact-and-log-retention-policy
+      #- name: Upload artifact
+      #  uses: actions/upload-artifact@v2
+      #  continue-on-error: true
+      #  with:
+      #    name: ${{ steps.artifact-metadata.outputs.name }}
+      #    path: bin
+      #    retention-days: 30 # https://docs.github.com/en/free-pro-team@latest/actions/reference/usage-limits-billing-and-administration#artifact-and-log-retention-policy
