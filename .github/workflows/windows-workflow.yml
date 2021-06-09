@@ -5,7 +5,7 @@ name: Windows Build
 on:
   push:
     branches:
-      - master
+      - ms-build
     paths-ignore:
       - .gitignore
       - "**/*.md"
