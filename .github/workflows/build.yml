@@ -44,9 +44,6 @@ jobs:
       - name: Run AppImage
         run:  echo "Success!"
       - name: Upload build
-        env:
-          BRANCH: ${{ env.BRANCH }}
-          COMMIT: ${{ env.COMMIT }}
         run: |
             ls -al artifacts/
             wget -c https://github.com/tcnksm/ghr/releases/download/v0.13.0/ghr_v0.13.0_linux_amd64.tar.gz
@@ -56,3 +53,5 @@ jobs:
         env:
           DEFAULT_BRANCH: git-variables
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ env.BRANCH }}
+          COMMIT: ${{ env.COMMIT }}
