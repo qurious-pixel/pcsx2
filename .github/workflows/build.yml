@@ -11,7 +11,10 @@ jobs:
   appimage:
     name: build bundled as appimage
     runs-on: ubuntu-latest
-
+    env:
+      BRANCH: gs-merge
+      REPO: https://github.com/PCSX2/pcsx2
+      COMMIT: 388db199d7673e7265198034b18f5c5c6038c785
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -28,21 +31,19 @@ jobs:
           key: build-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
           restore-keys: |
             build-ccache-
-      - name: Set Environment Variables
-        run: |
-          echo "BRANCH=gs-merge" >> $GITHUB_ENV
-          echo "REPO='https://github.com/PCSX2/pcsx2'" >> $GITHUB_ENV
-          echo "COMMIT=388db199d7673e7265198034b18f5c5c6038c785" >> $GITHUB_ENV
+      #- name: Set Environment Variables
+       # run: |
+        #  echo "BRANCH=gs-merge" >> $GITHUB_ENV
+         # echo "REPO='https://github.com/PCSX2/pcsx2'" >> $GITHUB_ENV
+          #echo "COMMIT=388db199d7673e7265198034b18f5c5c6038c785" >> $GITHUB_ENV
 
       - name: Docker build
-        env:
-          BRANCH: ${{ env.BRANCH }}
-          REPO: ${{ env.REPO }}"
-          COMMIT: ${{ env.COMMIT }}
+        #env:
+        #  BRANCH: ${{ env.BRANCH }}
+        #  REPO: ${{ env.REPO }}"
+        #  COMMIT: ${{ env.COMMIT }}
         run: |
               echo Branch $BRANCH
-              export myBRANCH=$BRANCH
-              echo myB $myBRANCH
               mkdir -p "$HOME/.ccache"
               docker pull quriouspixel/pcsx2:18.04
               docker run -u root --env-file .travis/appimage/travis-ci.env -v $(pwd):/pcsx2 -v "$HOME/.ccache":/root/.ccache quriouspixel/pcsx2:18.04 /bin/bash /pcsx2/.travis/appimage/docker.sh
