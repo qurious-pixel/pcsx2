@@ -34,8 +34,11 @@ jobs:
           echo "REPO='https://github.com/PCSX2/pcsx2'" >> $GITHUB_ENV
           echo "COMMIT=388db199d7673e7265198034b18f5c5c6038c785" >> $GITHUB_ENV
       - name: Docker build
+        env:
+          BRANCH: ${{ env.BRANCH }}
+          REPO: ${{ env.REPO }}"
+          COMMIT: ${{ env.COMMIT }}
         run: |
-              echo "${{ env.BRANCH }}"
               mkdir -p "$HOME/.ccache"
               docker pull quriouspixel/pcsx2:18.04
               docker run -u root --env-file .travis/appimage/travis-ci.env -v $(pwd):/pcsx2 -v "$HOME/.ccache":/root/.ccache quriouspixel/pcsx2:18.04 /bin/bash /pcsx2/.travis/appimage/docker.sh
@@ -51,3 +54,5 @@ jobs:
         env:
           DEFAULT_BRANCH: git-variables
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ env.BRANCH }}
+          COMMIT: ${{ env.COMMIT }}
