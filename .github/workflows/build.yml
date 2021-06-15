@@ -5,16 +5,15 @@ on:
   schedule:
     - cron: "0 0 * * 3" 
 
-  
+env:
+  BRANCH: gs-merge
+  REPO: https://github.com/PCSX2/pcsx2
+  COMMIT: 94111610c34e51b2200744ed02433d350cbd3d42  
 
 jobs:
   appimage:
     name: build bundled as appimage
     runs-on: ubuntu-latest
-    env:
-      BRANCH: gs-merge
-      REPO: https://github.com/PCSX2/pcsx2
-      COMMIT: 94111610c34e51b2200744ed02433d350cbd3d42
 
     steps:
       - name: Checkout code
@@ -33,10 +32,6 @@ jobs:
           restore-keys: |
             build-ccache-
       - name: Docker build
-        env:
-          BRANCH: ${{ env.BRANCH }}
-          REPO: ${{ env.REPO }}
-          COMMIT: ${{ env.COMMIT }}
         run: |
               mkdir -p "$HOME/.ccache"
               docker pull quriouspixel/pcsx2:18.04
@@ -53,5 +48,3 @@ jobs:
         env:
           DEFAULT_BRANCH: git-variables
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: ${{ env.BRANCH }}
-          COMMIT: ${{ env.COMMIT }}
