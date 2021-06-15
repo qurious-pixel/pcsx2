@@ -1,9 +1,9 @@
 #!/bin/bash -ex
 
 branch=`echo ${GITHUB_REF##*/}`
-BRANCH=${BRANCH}
-REPO=${REPO}
-COMMIT=${COMMIT}
+#BRANCH=${BRANCH}
+#REPO=${REPO}
+#COMMIT=${COMMIT}
 
 QT_BASE_DIR=/opt/qt514
 export QTDIR=$QT_BASE_DIR
@@ -23,6 +23,7 @@ echo "Branch: $BRANCH"
 echo "Repo  : $REPO"
 echo "Commit: $COMMIT"
 echo "${BRANCH}"
+echo "$myBRANCH"
 git clone --recursive --single-branch --branch $BRANCH $REPO.git
 #git clone --recursive https://github.com/PCSX2/pcsx2.git
 cd pcsx2/
