@@ -33,6 +33,10 @@ jobs:
           restore-keys: |
             build-ccache-
       - name: Docker build
+        env:
+          BRANCH: ${{ env.BRANCH }}
+          REPO: ${{ env.REPO }}
+          COMMIT: ${{ env.COMMIT }}
         run: |
               mkdir -p "$HOME/.ccache"
               docker pull quriouspixel/pcsx2:18.04
@@ -40,6 +44,9 @@ jobs:
       - name: Run AppImage
         run:  echo "Success!"
       - name: Upload build
+        env:
+          BRANCH: ${{ env.BRANCH }}
+          COMMIT: ${{ env.COMMIT }}
         run: |
             ls -al artifacts/
             wget -c https://github.com/tcnksm/ghr/releases/download/v0.13.0/ghr_v0.13.0_linux_amd64.tar.gz
