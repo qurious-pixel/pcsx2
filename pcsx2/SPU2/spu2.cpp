@@ -97,7 +97,7 @@ void SPU2writeDMA4Mem(u16* pMem, u32 size) // size now in 16bit units
 void SPU2interruptDMA4()
 {
 	FileLog("[%10d] SPU2 interruptDMA4\n", Cycles);
-	if(Cores[0].DmaMode)
+	if (Cores[0].DmaMode)
 		Cores[0].Regs.STATX |= 0x80;
 	Cores[0].Regs.STATX &= ~0x400;
 	Cores[0].TSA = Cores[0].ActiveTSA;
@@ -596,49 +596,4 @@ s32 SPU2freeze(int mode, freezeData* data)
 
 	// technically unreachable, but kills a warning:
 	return 0;
-}
-
-void SPU2DoFreezeOut(void* dest)
-{
-	ScopedLock lock(mtx_SPU2Status);
-
-	freezeData fP = {0, (s8*)dest};
-	if (SPU2freeze(FREEZE_SIZE, &fP) != 0)
-		return;
-	if (!fP.size)
-		return;
-
-	Console.Indent().WriteLn("Saving SPU2");
-
-	if (SPU2freeze(FREEZE_SAVE, &fP) != 0)
-		throw std::runtime_error(" * SPU2: Error saving state!\n");
-}
-
-
-void SPU2DoFreezeIn(pxInputStream& infp)
-{
-	ScopedLock lock(mtx_SPU2Status);
-
-	freezeData fP = {0, nullptr};
-	if (SPU2freeze(FREEZE_SIZE, &fP) != 0)
-		fP.size = 0;
-
-	Console.Indent().WriteLn("Loading SPU2");
-
-	if (!infp.IsOk() || !infp.Length())
-	{
-		// no state data to read, but SPU2 expects some state data?
-		// Issue a warning to console...
-		if (fP.size != 0)
-			Console.Indent().Warning("Warning: No data for SPU2 found. Status may be unpredictable.");
-
-		return;
-	}
-
-	ScopedAlloc<s8> data(fP.size);
-	fP.data = data.GetPtr();
-
-	infp.Read(fP.data, fP.size);
-	if (SPU2freeze(FREEZE_LOAD, &fP) != 0)
-		throw std::runtime_error(" * SPU2: Error loading state!\n");
 }
