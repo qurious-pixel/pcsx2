@@ -44,8 +44,8 @@ jobs:
               export myBRANCH=$BRANCH
               echo myB $myBRANCH
               mkdir -p "$HOME/.ccache"
-              #docker pull quriouspixel/pcsx2:18.04
-              #docker run -u root --env-file .travis/appimage/travis-ci.env -v $(pwd):/pcsx2 -v "$HOME/.ccache":/root/.ccache quriouspixel/pcsx2:18.04 /bin/bash /pcsx2/.travis/appimage/docker.sh
+              docker pull quriouspixel/pcsx2:18.04
+              docker run -u root --env-file .travis/appimage/travis-ci.env -v $(pwd):/pcsx2 -v "$HOME/.ccache":/root/.ccache quriouspixel/pcsx2:18.04 /bin/bash /pcsx2/.travis/appimage/docker.sh
       - name: Run AppImage
         run:  echo "Success!"
       - name: Upload build
