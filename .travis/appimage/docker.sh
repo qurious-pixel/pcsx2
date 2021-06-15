@@ -24,6 +24,8 @@ echo "Repo  : $REPO"
 echo "Commit: $COMMIT"
 echo "${BRANCH}"
 echo "$myBRANCH"
+echo myB ${{ env.myBRANCH }}
+echo myB2 ${myBRANCH}
 git clone --recursive --single-branch --branch $BRANCH $REPO.git
 #git clone --recursive https://github.com/PCSX2/pcsx2.git
 cd pcsx2/
