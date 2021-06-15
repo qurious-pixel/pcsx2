@@ -34,10 +34,10 @@ jobs:
           echo "REPO='https://github.com/PCSX2/pcsx2'" >> $GITHUB_ENV
           echo "COMMIT=388db199d7673e7265198034b18f5c5c6038c785" >> $GITHUB_ENV
       - name: Docker build
-        env:
-          BRANCH: ${{ env.BRANCH }}
-          REPO: ${{ env.REPO }}"
-          COMMIT: ${{ env.COMMIT }}
+        #env:
+          #BRANCH: ${{ env.BRANCH }}
+          #REPO: ${{ env.REPO }}"
+          #COMMIT: ${{ env.COMMIT }}
         run: |
               mkdir -p "$HOME/.ccache"
               docker pull quriouspixel/pcsx2:18.04
