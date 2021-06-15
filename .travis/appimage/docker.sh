@@ -19,8 +19,7 @@ mkdir appimage && cd appimage
 echo "Branch: $BRANCH"
 echo "Repo  : $REPO"
 echo "Commit: $COMMIT"
-echo "Branch: ${{ env.BRANCH }}"
-git clone --recursive --single-branch --branch ${{ env.BRANCH }}" ${{ env.REPO }}".git
+git clone --recursive --single-branch --branch $BRANCH $REPO.git
 #git clone --recursive https://github.com/PCSX2/pcsx2.git
 cd pcsx2/
 git reset --hard $COMMIT
