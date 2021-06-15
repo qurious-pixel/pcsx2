@@ -5,10 +5,7 @@ on:
   schedule:
     - cron: "0 0 * * 3" 
 
-env:
-  BRANCH: gs-merge
-  REPO: https://github.com/PCSX2/pcsx2
-  COMMIT: 94111610c34e51b2200744ed02433d350cbd3d42  
+ 
 
 jobs:
   appimage:
@@ -31,6 +28,11 @@ jobs:
           key: build-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
           restore-keys: |
             build-ccache-
+      - name: Set Environment Variables
+        run: |
+          echo "::set-env name=BRANCH::gs-merge"
+          echo "::set-env name=REPO::'https://github.com/PCSX2/pcsx2'"
+          echo "::set-env name=COMMIT::388db199d7673e7265198034b18f5c5c6038c785"
       - name: Docker build
         run: |
               mkdir -p "$HOME/.ccache"
