@@ -1,9 +1,9 @@
 #!/bin/bash -ex
 
 branch=`echo ${GITHUB_REF##*/}`
-#BRANCH=${BRANCH}
-#REPO=${REPO}
-#COMMIT=${COMMIT}
+echo Branch: ${BRANCH}
+echo Repo: ${REPO}
+echo Commit: ${COMMIT}
 
 QT_BASE_DIR=/opt/qt514
 export QTDIR=$QT_BASE_DIR
@@ -19,13 +19,6 @@ ln -s /home/pcsx2/.conan /root
 cd /pcsx2
 
 mkdir appimage && cd appimage
-echo "Branch: $BRANCH"
-echo "Repo  : $REPO"
-echo "Commit: $COMMIT"
-echo "${BRANCH}"
-echo "$myBRANCH"
-echo myB ${{ env.myBRANCH }}
-echo myB2 ${myBRANCH}
 git clone --recursive --single-branch --branch $BRANCH $REPO.git
 #git clone --recursive https://github.com/PCSX2/pcsx2.git
 cd pcsx2/
