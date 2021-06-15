@@ -30,12 +30,13 @@ jobs:
             build-ccache-
       - name: Set Environment Variables
         run: |
-          echo "{BRANCH}={gs-merge}" >> $GITHUB_ENV
+          echo "BRANCH=gs-merge" >> $GITHUB_ENV
           echo "REPO='https://github.com/PCSX2/pcsx2'" >> $GITHUB_ENV
           echo "COMMIT=388db199d7673e7265198034b18f5c5c6038c785" >> $GITHUB_ENV
-          echo $BRANCH
-          echo $REPO
-          echo $COMMIT
+          echo $GITHUB_ENV
+          echo Branch $BRANCH
+          echo Branch ${BRANCH}
+          echo Branch ${{ env.BRANCH }}
       - name: Docker build
         #env:
           #BRANCH: ${{ env.BRANCH }}
