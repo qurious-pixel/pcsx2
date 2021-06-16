@@ -75,7 +75,7 @@ jobs:
           # Set to 'true' to retain the .pdb / .exp / .lib, etc files which can be useful for repro'ing issues that only occur in the compiled .exe
           RetainDebuggingArtifacts: ${{ github.event.inputs.retainDebugArtifacts == 'true' }}
         run: |
-          sed '4,6d' buildbot.xml > buildbot.xml.tmp && mv buildbot.xml.tmp buildbot.xml
+          #sed '4,6d' buildbot.xml > buildbot.xml.tmp && mv buildbot.xml.tmp buildbot.xml
           msbuild "buildbot.xml" /m /v:n /t:ReleaseAll /p:Platform=${{ matrix.platform }}
 
       - name: Prepare Artifact Metadata
