@@ -15,7 +15,7 @@
 
 #include "PrecompiledHeader.h"
 #include "BiosDebugData.h"
-#include "../Memory.h"
+#include "Memory.h"
 
 std::vector<EEThread> getEEThreads()
 {
@@ -29,7 +29,7 @@ std::vector<EEThread> getEEThreads()
 	{
 		EEThread thread;
 
-		EEInternalThread* internal = (EEInternalThread*) PSM(start+tid*sizeof(EEInternalThread));
+		EEInternalThread* internal = static_cast<EEInternalThread*>(PSM(start + tid * sizeof(EEInternalThread)));
 		if (internal->status != THS_BAD)
 		{
 			thread.tid = tid;

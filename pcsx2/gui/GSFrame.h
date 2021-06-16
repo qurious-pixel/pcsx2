@@ -56,8 +56,10 @@ public:
 	void DirectKeyCommand( wxKeyEvent& evt );
 	void DirectKeyCommand( const KeyAcceleratorCode& kac );
 	void InitDefaultAccelerators();
+	wxString GetAssociatedKeyCode(const char* id);
 #ifndef DISABLE_RECORDING
 	void InitRecordingAccelerators();
+	void RemoveRecordingAccelerators();
 #endif
 
 protected:
@@ -85,7 +87,6 @@ protected:
 class GSFrame : public wxFrame
 	, public EventListener_AppStatus
 	, public EventListener_CoreThread
-	, public EventListener_Plugins
 {
 	typedef wxFrame _parent;
 
@@ -105,6 +106,7 @@ public:
 	bool Show( bool shown=true );
 
 	bool ShowFullScreen(bool show, bool updateConfig = true);
+	void UpdateTitleUpdateFreq();
 
 protected:
 	void OnCloseWindow( wxCloseEvent& evt );
@@ -117,7 +119,6 @@ protected:
 	void CoreThread_OnResumed();
 	void CoreThread_OnSuspended();
 	void CoreThread_OnStopped();
-	void CorePlugins_OnShutdown();
 };
 
 // --------------------------------------------------------------------------------------

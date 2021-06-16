@@ -1,6 +1,3 @@
-### TODO
-# Hardcode GAMEINDEX_DIR, if default is fine for everybody
-
 ### Select the build type
 # Use Release/Devel/Debug      : -DCMAKE_BUILD_TYPE=Release|Devel|Debug
 # Enable/disable the stripping : -DCMAKE_BUILD_STRIP=TRUE|FALSE
@@ -10,11 +7,6 @@
 # control C flags             : -DUSER_CMAKE_C_FLAGS="cflags"
 # control C++ flags           : -DUSER_CMAKE_CXX_FLAGS="cxxflags"
 # control link flags          : -DUSER_CMAKE_LD_FLAGS="ldflags"
-
-### Packaging options
-# Plugin installation path    : -DPLUGIN_DIR="/usr/lib/pcsx2"
-# GL Shader installation path : -DGLSL_SHADER_DIR="/usr/share/games/pcsx2"
-# Game DB installation path   : -DGAMEINDEX_DIR="/usr/share/games/pcsx2"
 #-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
@@ -22,6 +14,7 @@
 #-------------------------------------------------------------------------------
 option(DISABLE_BUILD_DATE "Disable including the binary compile date")
 option(ENABLE_TESTS "Enables building the unit tests" ON)
+option(USE_SYSTEM_YAML "Uses a system version of yaml, if found")
 
 if(DISABLE_BUILD_DATE OR openSUSE)
     message(STATUS "Disabling the inclusion of the binary compile date.")
@@ -33,7 +26,6 @@ option(USE_VTUNE "Plug VTUNE to profile GSdx JIT.")
 #-------------------------------------------------------------------------------
 # Graphical option
 #-------------------------------------------------------------------------------
-option(OPENCL_API "Add OpenCL support on GSdx")
 option(REBUILD_SHADER "Rebuild GLSL/CG shader (developer option)")
 option(BUILD_REPLAY_LOADERS "Build GS replayer to ease testing (developer option)")
 
@@ -43,35 +35,19 @@ option(BUILD_REPLAY_LOADERS "Build GS replayer to ease testing (developer option
 option(PACKAGE_MODE "Use this option to ease packaging of PCSX2 (developer/distribution option)")
 option(DISABLE_CHEATS_ZIP "Disable including the cheats_ws.zip file")
 option(DISABLE_PCSX2_WRAPPER "Disable including the PCSX2-linux.sh file")
+option(DISABLE_SETCAP "Do not set files capabilities")
 option(XDG_STD "Use XDG standard path instead of the standard PCSX2 path")
-option(EXTRA_PLUGINS "Build various 'extra' plugins")
-option(PORTAUDIO_API "Build portaudio support on spu2x" ON)
-option(SDL2_API "Use SDL2 on spu2x and onepad (wxWidget mustn't be built with SDL1.2 support" ON)
-option(GTK3_API "Use GTK3 api (experimental/wxWidget must be built with GTK3 support)")
+option(PORTAUDIO_API "Build portaudio support on SPU2" ON)
+option(SDL2_API "Use SDL2 on SPU2 and PAD Linux (wxWidget mustn't be built with SDL1.2 support" ON)
+option(GTK2_API "Use GTK2 api (legacy)")
 
 if(PACKAGE_MODE)
-    if(NOT DEFINED PLUGIN_DIR)
-        set(PLUGIN_DIR "${CMAKE_INSTALL_PREFIX}/lib/games/PCSX2")
-    endif()
-
-    if(NOT DEFINED GAMEINDEX_DIR)
-        set(GAMEINDEX_DIR "${CMAKE_INSTALL_PREFIX}/share/games/PCSX2")
-    endif()
-
-    if(NOT DEFINED BIN_DIR)
-        set(BIN_DIR "${CMAKE_INSTALL_PREFIX}/bin")
-    endif()
-
-    if(NOT DEFINED DOC_DIR)
-        set(DOC_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/PCSX2")
-    endif()
-
-    if(NOT DEFINED MAN_DIR)
-        set(MAN_DIR "${CMAKE_INSTALL_PREFIX}/share/man")
-    endif()
-
     # Compile all source codes with those defines
-    add_definitions(-DPLUGIN_DIR_COMPILATION=${PLUGIN_DIR} -DGAMEINDEX_DIR_COMPILATION=${GAMEINDEX_DIR} -DDOC_DIR_COMPILATION=${DOC_DIR})
+    add_definitions(
+        -DPLUGIN_DIR_COMPILATION=${CMAKE_INSTALL_FULL_LIBDIR}/PCSX2
+        -DGAMEINDEX_DIR_COMPILATION=${CMAKE_INSTALL_FULL_DATADIR}/PCSX2
+        -DDOC_DIR_COMPILATION=${CMAKE_INSTALL_FULL_DOCDIR}
+    )
 endif()
 
 if(APPLE)
@@ -102,11 +78,7 @@ endif()
 #-------------------------------------------------------------------------------
 option(BUILTIN_GS           "Disable support of GS plugin (developer option)")
 option(BUILTIN_PAD          "Disable support of PAD plugin (developer option)")
-option(BUILTIN_SPU2         "Disable support of SPU2 plugin (developer option)")
 option(BUILTIN_USB          "Disable support of USB plugin (developer option)")
-option(BUILTIN_FW           "Disable support of FW plugin (developer option)")
-option(BUILTIN_DEV9         "Disable support of DEV9 plugin (developer option)")
-option(BUILTIN_CDVD         "Disable support of CDVD plugin (developer option)")
 
 set(PLUGIN_SUPPORT "")
 if(BUILTIN_GS)
@@ -115,20 +87,8 @@ endif()
 if(BUILTIN_PAD)
     set(PLUGIN_SUPPORT "${PLUGIN_SUPPORT} -DBUILTIN_PAD_PLUGIN")
 endif()
-if(BUILTIN_SPU2)
-    set(PLUGIN_SUPPORT "${PLUGIN_SUPPORT} -DBUILTIN_SPU2_PLUGIN")
-endif()
 if(BUILTIN_USB)
     set(PLUGIN_SUPPORT "${PLUGIN_SUPPORT} -DBUILTIN_USB_PLUGIN")
-endif()
-if(BUILTIN_FW)
-    set(PLUGIN_SUPPORT "${PLUGIN_SUPPORT} -DBUILTIN_FW_PLUGIN")
-endif()
-if(BUILTIN_DEV)
-    set(PLUGIN_SUPPORT "${PLUGIN_SUPPORT} -DBUILTIN_DEV_PLUGIN")
-endif()
-if(BUILTIN_CDVD)
-    set(PLUGIN_SUPPORT "${PLUGIN_SUPPORT} -DBUILTIN_CDVD_PLUGIN")
 endif()
 
 #-------------------------------------------------------------------------------
@@ -191,15 +151,15 @@ if(${PCSX2_TARGET_ARCHITECTURES} MATCHES "i386")
     if(NOT DEFINED ARCH_FLAG)
         if (DISABLE_ADVANCE_SIMD)
             if (USE_ICC)
-                set(ARCH_FLAG "-msse2")
+                set(ARCH_FLAG "-msse2 -msse4.1")
             else()
-                set(ARCH_FLAG "-msse -msse2 -mfxsr -mxsave -march=i686")
+                set(ARCH_FLAG "-msse -msse2 -msse4.1 -mfxsr -march=i686")
             endif()
         else()
             # AVX requires some fix of the ABI (mangling) (default 2)
             # Note: V6 requires GCC 4.7
             #set(ARCH_FLAG "-march=native -fabi-version=6")
-            set(ARCH_FLAG "-mfxsr -mxsave -march=native")
+            set(ARCH_FLAG "-mfxsr -march=native")
         endif()
     endif()
 
@@ -214,9 +174,9 @@ elseif(${PCSX2_TARGET_ARCHITECTURES} MATCHES "x86_64")
     if(NOT DEFINED ARCH_FLAG)
         if (DISABLE_ADVANCE_SIMD)
             if (USE_ICC)
-                set(ARCH_FLAG "-msse2")
+                set(ARCH_FLAG "-msse2 -msse4.1")
             else()
-                set(ARCH_FLAG "-msse -msse2 -mfxsr")
+                set(ARCH_FLAG "-msse -msse2 -msse4.1 -mfxsr")
             endif()
         else()
             #set(ARCH_FLAG "-march=native -fabi-version=6")
@@ -281,7 +241,7 @@ option(USE_PGO_OPTIMIZE "Enable PGO optimization (use profile)")
 
 # Note1: Builtin strcmp/memcmp was proved to be slower on Mesa than stdlib version.
 # Note2: float operation SSE is impacted by the PCSX2 SSE configuration. In particular, flush to zero denormal.
-set(COMMON_FLAG "-pipe -fvisibility=hidden -pthread -fno-builtin-strcmp -fno-builtin-memcmp -mfpmath=sse")
+set(COMMON_FLAG "-pipe -fvisibility=hidden -pthread -fno-builtin-strcmp -fno-builtin-memcmp -mfpmath=sse -fno-operator-names")
 
 if(USE_VTUNE)
     set(COMMON_FLAG "${COMMON_FLAG} -DENABLE_VTUNE")
@@ -301,10 +261,24 @@ endif()
 # -Wno-unused-function: warn for function not used in release build
 # -Wno-unused-value: lots of warning for this kind of statements "0 && ...". There are used to disable some parts of code in release/dev build.
 # -Wno-overloaded-virtual: Gives a fair number of warnings under clang over in the wxwidget gui section of the code.
-set(DEFAULT_WARNINGS "-Wall -Wextra -Wno-attributes -Wno-unused-function -Wno-unused-parameter -Wno-missing-field-initializers -Wno-overloaded-virtual")
+# -Wno-deprecated-declarations: The USB plugins dialogs are written in straight gtk 2, which gives a million deprecated warnings. Suppress them until we can deal with them.
+# -Wno-format*: Yeah, these need to be taken care of, but...
+# -Wno-stringop-truncation: Who comes up with these compiler warnings, anyways?
+# -Wno-stringop-overflow: Probably the same people as this one...
+
+set(DEFAULT_WARNINGS "-Wall -Wextra -Wno-attributes -Wno-unused-function -Wno-unused-parameter -Wno-missing-field-initializers -Wno-deprecated-declarations -Wno-format -Wno-format-security -Wno-overloaded-virtual")
 if (NOT USE_ICC)
     set(DEFAULT_WARNINGS "${DEFAULT_WARNINGS} -Wno-unused-value ")
 endif()
+
+if (USE_CLANG)
+    set(DEFAULT_WARNINGS "${DEFAULT_WARNINGS} -Wno-overloaded-virtual ")
+endif()
+
+if (USE_GCC)
+set(DEFAULT_WARNINGS "${DEFAULT_WARNINGS}  -Wno-stringop-truncation  -Wno-stringop-overflow ")
+endif()
+
 
 # -Wstrict-aliasing=n: to fix one day aliasing issue. n=1/2/3
 if (USE_ICC)
@@ -390,9 +364,10 @@ if(USE_CLANG)
 endif()
 
 # Note: -DGTK_DISABLE_DEPRECATED can be used to test a build without gtk deprecated feature. It could be useful to port to a newer API
-set(DEFAULT_GCC_FLAG "${ARCH_FLAG} ${COMMON_FLAG} ${DEFAULT_WARNINGS} ${AGGRESSIVE_WARNING} ${HARDENING_FLAG} ${DEBUG_FLAG} ${ASAN_FLAG} ${OPTIMIZATION_FLAG} ${LTO_FLAGS} ${PGO_FLAGS} ${PLUGIN_SUPPORT}")
+# Disabling the hardening flags for the moment, as they spam quite a bit. ${HARDENING_FLAG}
+set(DEFAULT_GCC_FLAG "${ARCH_FLAG} ${COMMON_FLAG} ${DEFAULT_WARNINGS} ${AGGRESSIVE_WARNING} ${DEBUG_FLAG} ${ASAN_FLAG} ${OPTIMIZATION_FLAG} ${LTO_FLAGS} ${PGO_FLAGS} ${PLUGIN_SUPPORT}")
 # c++ only flags
-set(DEFAULT_CPP_FLAG "${DEFAULT_GCC_FLAG} -std=c++11 -Wno-invalid-offsetof")
+set(DEFAULT_CPP_FLAG "${DEFAULT_GCC_FLAG} -Wno-invalid-offsetof")
 
 #-------------------------------------------------------------------------------
 # Allow user to set some default flags
@@ -436,20 +411,17 @@ endif()
 string(STRIP "${CMAKE_CXX_FLAGS} ${DEFAULT_CPP_FLAG}" CMAKE_CXX_FLAGS)
 
 #-------------------------------------------------------------------------------
-# Too much user/packager use experimental flags as release flags
-#-------------------------------------------------------------------------------
-if(CMAKE_BUILD_TYPE MATCHES "Release" OR PACKAGE_MODE)
-    if (GTK3_API)
-        message(WARNING "GTK3 is highly experimental besides it requires a wxWidget built with __WXGTK3__ support !!!")
-    endif()
-endif()
-
-
-#-------------------------------------------------------------------------------
 # MacOS-specific things
 #-------------------------------------------------------------------------------
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
+
+if (APPLE AND ${CMAKE_OSX_DEPLOYMENT_TARGET} VERSION_LESS 10.14)
+    # Older versions of the macOS stdlib don't have operator new(size_t, align_val_t)
+    # Disable use of them with this flag
+    # Not great, but also no worse that what we were getting before we turned on C++17
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-aligned-allocation")
+endif()
 
 # CMake defaults the suffix for modules to .so on macOS but wx tells us that the
 # extension is .dylib (so that's what we search for)

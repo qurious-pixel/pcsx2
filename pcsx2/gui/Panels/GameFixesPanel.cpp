@@ -41,10 +41,6 @@ Panels::GameFixesPanel::GameFixesPanel( wxWindow* parent )
 			_("Games that need this hack to boot:\n * Star Ocean 3\n * Radiata Stories\n * Valkyrie Profile 2")
 		},
 		{
-			_("FPU Compare Hack - For Digimon Rumble Arena 2."),
-			wxEmptyString
-		},
-		{
 			_("FPU Multiply Hack - For Tales of Destiny."),
 			wxEmptyString
 		},
@@ -75,8 +71,8 @@ Panels::GameFixesPanel::GameFixesPanel( wxWindow* parent )
 			)
 		},
 		{
-			_("Ignore DMAC writes when it is busy."),
-			pxEt( L"Known to affect following games:\n * Mana Khemia 1 (Going \"off campus\")\n"
+			_("Handle DMAC writes when it is busy."),
+			pxEt( L"Known to affect following games:\n * Mana Khemia 1 (Going \"off campus\"), Metal Saga (Intro FMV), Pilot Down Behind Enemy Lines\n"
 			)
 		},
 		{
@@ -93,10 +89,6 @@ Panels::GameFixesPanel::GameFixesPanel( wxWindow* parent )
 			wxEmptyString
 		},
 		{
-			_("Switch to GSdx software rendering when an FMV plays"),
-			wxEmptyString
-		},
-		{
 			_("Preload TLB hack to avoid tlb miss on Goemon"),
 			wxEmptyString
 		},
@@ -104,9 +96,13 @@ Panels::GameFixesPanel::GameFixesPanel( wxWindow* parent )
 			_("VU I bit Hack avoid constant recompilation (Scarface The World Is Yours)"),
 			wxEmptyString
 		},
-        {
+		{
 			_("VU I bit Hack avoid constant recompilation (Crash Tag Team Racing)"),
-             wxEmptyString
+			wxEmptyString
+		},
+		{
+			_("VU0 Kickstart to avoid sync problems with VU1"),
+			wxEmptyString
 		}
 	};
 

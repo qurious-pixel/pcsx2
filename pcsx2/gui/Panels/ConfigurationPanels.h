@@ -268,8 +268,7 @@ namespace Panels
 	protected:
 		// Exclusive mode is currently not used (true for svn r4399).
 		// PCSX2 has partial infrastructure for it:
-		//  - The plugin APIs have GSsetExclusive.
-		//  - GSdx seem to support it (it supports the API and has implementation), but I don't know if it ever got called.
+		//  - GS seem to support it (it supports the API and has implementation), but I don't know if it ever got called.
 		//  - BUT, the configuration (AppConfig, and specifically GSWindowOptions) do NOT seem to have a place to store this value,
 		//    and PCSX2's code doesn't seem to use this API anywhere. So, no exclusive mode for now.
 		//    - avih
@@ -303,6 +302,7 @@ namespace Panels
 	{
 	protected:
 		pxCheckBox*			m_check_SynchronousGS;
+		wxSpinCtrl*			m_spinner_VsyncQueue;
 		wxButton*			m_restore_defaults;
 		FrameSkipPanel*		m_span;
 		FramelimiterPanel*	m_fpan;
@@ -325,6 +325,7 @@ namespace Panels
 	class SpeedHacksPanel : public BaseApplicableConfigPanel_SpecificConfig
 	{
 	protected:
+		wxBoxSizer* m_sizer;
 		wxFlexGridSizer* s_table;
 
 		pxCheckBox*		m_check_Enable;
@@ -342,6 +343,7 @@ namespace Panels
 		pxCheckBox*		m_check_fastCDVD;
 		pxCheckBox*		m_check_vuFlagHack;
 		pxCheckBox*		m_check_vuThread;
+		pxCheckBox*		m_check_vu1Instant;
 
 	public:
 		virtual ~SpeedHacksPanel() = default;
@@ -356,12 +358,12 @@ namespace Panels
 		const wxChar* GetEECycleSkipSliderMsg( int val );
 		void SetEEcycleSliderMsg();
 		void SetVUcycleSliderMsg();
-		void TrigLayout();
 
 		void OnEnable_Toggled( wxCommandEvent& evt );
 		void Defaults_Click( wxCommandEvent& evt );
 		void EECycleRate_Scroll(wxScrollEvent &event);
 		void VUCycleRate_Scroll(wxScrollEvent &event);
+		void VUThread_Enable ( wxCommandEvent& evt );
 	};
 
 	// --------------------------------------------------------------------------------------
@@ -464,128 +466,4 @@ namespace Panels
 		virtual void DoRefresh();
 		virtual bool ValidateEnumerationStatus();
 	};
-
-	// --------------------------------------------------------------------------------------
-	//  PluginSelectorPanel
-	// --------------------------------------------------------------------------------------
-	class PluginSelectorPanel: public BaseSelectorPanel,
-		public EventListener_Plugins
-	{
-	protected:
-		// ----------------------------------------------------------------------------
-		class EnumeratedPluginInfo
-		{
-		public:
-			uint PassedTest;		// msk specifying which plugin types passed the mask test.
-			uint TypeMask;			// indicates which combo boxes it should be listed in
-			wxString Name;			// string to be pasted into the combo box
-			wxString Version[PluginId_Count];
-
-			EnumeratedPluginInfo()
-			{
-				PassedTest	= 0;
-				TypeMask	= 0;
-			}
-		};
-
-		// ----------------------------------------------------------------------------
-		class EnumThread : public Threading::pxThread
-		{
-		public:
-			std::vector<EnumeratedPluginInfo> Results;		// array of plugin results.
-
-		protected:
-			PluginSelectorPanel&	m_master;
-			ScopedBusyCursor		m_hourglass;
-		public:
-			virtual ~EnumThread()
-			{
-				try {
-					pxThread::Cancel();
-				}
-				DESTRUCTOR_CATCHALL
-			}
-
-			EnumThread( PluginSelectorPanel& master );
-			void DoNextPlugin( int evtidx );
-
-		protected:
-			void ExecuteTaskInThread();
-		};
-
-		// ----------------------------------------------------------------------------
-		// This panel contains all of the plugin combo boxes.  We stick them
-		// on a panel together so that we can hide/show the whole mess easily.
-		class ComboBoxPanel : public wxPanelWithHelpers
-		{
-		protected:
-			wxComboBox*		m_combobox[PluginId_Count];
-			wxButton*		m_configbutton[PluginId_Count];
-			DirPickerPanel& m_FolderPicker;
-
-		public:
-			ComboBoxPanel( PluginSelectorPanel* parent );
-			wxComboBox& Get( PluginsEnum_t pid ) { return *m_combobox[pid]; }
-			wxButton& GetConfigButton( PluginsEnum_t pid ) { return *m_configbutton[pid]; }
-			wxDirName GetPluginsPath() const { return m_FolderPicker.GetPath(); }
-			DirPickerPanel& GetDirPicker() { return m_FolderPicker; }
-			void Reset();
-
-		};
-
-		// ----------------------------------------------------------------------------
-		class StatusPanel : public wxPanelWithHelpers
-		{
-		protected:
-			wxGauge&		m_gauge;
-			wxStaticText&	m_label;
-			int				m_progress;
-
-		public:
-			StatusPanel( wxWindow* parent );
-
-			void SetGaugeLength( int len );
-			void AdvanceProgress( const wxString& msg );
-			void Reset();
-		};
-
-	// ------------------------------------------------------------------------
-	//  PluginSelectorPanel Members
-
-	protected:
-		StatusPanel*	m_StatusPanel;
-		ComboBoxPanel*	m_ComponentBoxes;
-		bool			m_Canceled;
-
-		std::unique_ptr<wxArrayString>	m_FileList;	// list of potential plugin files
-		std::unique_ptr<EnumThread>		m_EnumeratorThread;
-
-	public:
-		virtual ~PluginSelectorPanel();
-		PluginSelectorPanel( wxWindow* parent );
-
-		void CancelRefresh();		// used from destructor, stays non-virtual
-		void Apply();
-
-	protected:
-		void DispatchEvent( const PluginEventType& evt );
-
-		void OnConfigure_Clicked( wxCommandEvent& evt );
-		void OnShowStatusBar( wxCommandEvent& evt );
-		void OnPluginSelected( wxCommandEvent& evt );
-
-		virtual void OnProgress( wxCommandEvent& evt );
-		virtual void OnEnumComplete( wxCommandEvent& evt );
-
-		virtual void AppStatusEvent_OnSettingsApplied();
-
-		virtual void DoRefresh();
-		virtual bool ValidateEnumerationStatus();
-
-		int FileCount() const { return m_FileList->Count(); }
-		const wxString& GetFilename( int i ) const { return (*m_FileList)[i]; }
-
-		friend class EnumThread;
-	};
-}
-
+} // namespace Panels

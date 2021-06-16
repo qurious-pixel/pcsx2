@@ -32,7 +32,7 @@
 #include "CDVD/CDVD.h"
 #include "Elfheader.h"
 
-#include "../DebugTools/Breakpoints.h"
+#include "DebugTools/Breakpoints.h"
 #include "Patch.h"
 
 #if !PCSX2_SEH
@@ -113,6 +113,7 @@ static u32 dumplog = 0;
 static void iBranchTest(u32 newpc = 0xffffffff);
 static void ClearRecLUT(BASEBLOCK* base, int count);
 static u32 scaleblockcycles();
+static void recExitExecution();
 
 void _eeFlushAllUnused()
 {
@@ -336,6 +337,11 @@ static DynGenFunc* DispatchPageReset    = NULL;
 static void recEventTest()
 {
 	_cpuEventTest_Shared();
+
+	if (iopBreakpoint) {
+		iopBreakpoint = false;
+		recExitExecution();
+	}
 }
 
 // The address for all cleared blocks.  It recompiles the current pc and then
@@ -502,8 +508,8 @@ static void recReserve()
 {
 	// Hardware Requirements Check...
 
-	if ( !x86caps.hasStreamingSIMD2Extensions )
-		recThrowHardwareDeficiency( L"SSE2" );
+	if ( !x86caps.hasStreamingSIMD4Extensions )
+		recThrowHardwareDeficiency( L"SSE4" );
 
 	recReserveCache();
 }
@@ -841,9 +847,9 @@ void recClear(u32 addr, u32 size)
 		if (pexblock->startpc >= addr && pexblock->startpc < addr + size * 4
 		 || pexblock->startpc < addr && blockend > addr) {
 			if( !IsDevBuild )
-				Console.Error( "Impossible block clearing failure" );
+				Console.Error( "[EE] Impossible block clearing failure" );
 			else
-				pxFailDev( "Impossible block clearing failure" );
+				pxFailDev( "[EE] Impossible block clearing failure" );
 		}
 	}
 
@@ -1027,6 +1033,31 @@ static u32 scaleblockcycles()
 
 	return scaled;
 }
+u32 scaleblockcycles_clear()
+{
+	u32 scaled = scaleblockcycles_calculation();
+
+#if 0 // Enable this to get some runtime statistics about the scaling result in practice
+	static u32 scaled_overall = 0, unscaled_overall = 0;
+	if (g_resetEeScalingStats)
+	{
+		scaled_overall = unscaled_overall = 0;
+		g_resetEeScalingStats = false;
+	}
+	u32 unscaled = DEFAULT_SCALED_BLOCKS();
+	if (!unscaled) unscaled = 1;
+
+	scaled_overall += scaled;
+	unscaled_overall += unscaled;
+	float ratio = static_cast<float>(unscaled_overall) / scaled_overall;
+
+	DevCon.WriteLn(L"Unscaled overall: %d,  scaled overall: %d,  relative EE clock speed: %d %%",
+		unscaled_overall, scaled_overall, static_cast<int>(100 * ratio));
+#endif
+	s_nBlockCycles &= 0x7;
+
+	return scaled;
+}
 
 // Generates dynarec code for Event tests followed by a block dispatch (branch).
 // Parameters:
@@ -1142,21 +1173,21 @@ int cop2flags(u32 code)
 void dynarecCheckBreakpoint()
 {
 	u32 pc = cpuRegs.pc;
- 	if (CBreakPoints::CheckSkipFirst(pc) != 0)
+ 	if (CBreakPoints::CheckSkipFirst(BREAKPOINT_EE, pc) != 0)
 		return;
 
 	int bpFlags = isBreakpointNeeded(pc);
 	bool hit = false;
 	//check breakpoint at current pc
 	if (bpFlags & 1) {
-		auto cond = CBreakPoints::GetBreakPointCondition(pc);
+		auto cond = CBreakPoints::GetBreakPointCondition(BREAKPOINT_EE, pc);
 		if (cond == NULL || cond->Evaluate()) {
 			hit = true;
 		}
 	}
 	//check breakpoint in delay slot
 	if (bpFlags & 2) {
-		auto cond = CBreakPoints::GetBreakPointCondition(pc + 4);
+		auto cond = CBreakPoints::GetBreakPointCondition(BREAKPOINT_EE, pc + 4);
 		if (cond == NULL || cond->Evaluate())
 			hit = true;
 	}
@@ -1172,7 +1203,7 @@ void dynarecCheckBreakpoint()
 void dynarecMemcheck()
 {
 	u32 pc = cpuRegs.pc;
- 	if (CBreakPoints::CheckSkipFirst(pc) != 0)
+ 	if (CBreakPoints::CheckSkipFirst(BREAKPOINT_EE, pc) != 0)
 		return;
 
 	CBreakPoints::SetBreakpointTriggered(true);
@@ -1199,7 +1230,7 @@ void recMemcheck(u32 op, u32 bits, bool store)
 	if (bits == 128)
 		xAND(ecx, ~0x0F);
 
-	xFastCall((void*)standardizeBreakpointAddress, ecx);
+	xFastCall((void*)standardizeBreakpointAddressEE, ecx);
 	xMOV(ecx,eax);
 	xMOV(edx,eax);
 	xADD(edx,bits/8);
@@ -1210,6 +1241,8 @@ void recMemcheck(u32 op, u32 bits, bool store)
 	auto checks = CBreakPoints::GetMemChecks();
 	for (size_t i = 0; i < checks.size(); i++)
 	{
+		if (checks[i].cpu != BREAKPOINT_EE)
+			continue;
 		if (checks[i].result == 0)
 			continue;
 		if ((checks[i].cond & MEMCHECK_WRITE) == 0 && store)
@@ -1219,11 +1252,11 @@ void recMemcheck(u32 op, u32 bits, bool store)
 
 		// logic: memAddress < bpEnd && bpStart < memAddress+memSize
 
-		xMOV(eax,standardizeBreakpointAddress(checks[i].end));
+		xMOV(eax,standardizeBreakpointAddress(BREAKPOINT_EE, checks[i].end));
 		xCMP(ecx,eax);				// address < end
 		xForwardJGE8 next1;			// if address >= end then goto next1
 
-		xMOV(eax,standardizeBreakpointAddress(checks[i].start));
+		xMOV(eax,standardizeBreakpointAddress(BREAKPOINT_EE, checks[i].start));
 		xCMP(eax,edx);				// start < address+size
 		xForwardJGE8 next2;			// if start >= address+size then goto next2
 
@@ -1818,7 +1851,7 @@ static void __fastcall recRecompile( const u32 startpc )
 
 			case 2: // J
 			case 3: // JAL
-				s_branchTo = _Target_ << 2 | (i + 4) & 0xf0000000;
+				s_branchTo = _InstrucTarget_ << 2 | (i + 4) & 0xf0000000;
 				s_nEndBlock = i + 8;
 				goto StartRecomp;
 
