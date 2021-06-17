@@ -59,7 +59,9 @@ jobs:
           DEFAULT_BRANCH: git-variables
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload artifact
+        env:
+          ARTNAME: "$BRANCH-$(echo $COMMIT | cut -c 1-7)"
         uses: actions/upload-artifact@v2
         with:
-          name: "$BRANCH-$(echo $COMMIT | cut -c 1-7)"
+          name: ${ARTNAME}
           path: artifacts
