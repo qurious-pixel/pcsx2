@@ -55,7 +55,11 @@ jobs:
             wget -c https://github.com/tcnksm/ghr/releases/download/v0.13.0/ghr_v0.13.0_linux_amd64.tar.gz
             tar xfv ghr_v0.13.0_linux_amd64.tar.gz      
             ghr_v0.13.0_linux_amd64/ghr -recreate -n "$BRANCH $(echo $COMMIT | cut -c 1-7)"  -b "GitHub https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" pcsx2-repo artifacts/
-    
         env:
           DEFAULT_BRANCH: git-variables
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: "$BRANCH-$(echo $COMMIT | cut -c 1-7)"
+          path: artifacts
