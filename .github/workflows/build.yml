@@ -12,9 +12,9 @@ jobs:
     name: build bundled as appimage
     runs-on: ubuntu-latest
     env:
-      BRANCH: gs-merge
+      BRANCH: master
       REPO: https://github.com/PCSX2/pcsx2
-      COMMIT: 530aaeb79b9bb7075be0a38a077c5bd8722dd32e
+      COMMIT: 3d3749d982cbb85274ddd043080a206853ed80e8
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -63,5 +63,5 @@ jobs:
           ARTNAME: "$BRANCH-$(echo $COMMIT | cut -c 1-7)"
         uses: actions/upload-artifact@v2
         with:
-          name: ${ARTNAME}
+          name: PCSX2-${{ env.ARTNAME }}
           path: artifacts
