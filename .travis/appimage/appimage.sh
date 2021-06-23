@@ -49,7 +49,7 @@ cp -r /pcsx2/appimage/pcsx2/bin/Langs $HOME/squashfs-root/usr/bin/
 cp /pcsx2/appimage/pcsx2/bin/docs/{Configuration_Guide.pdf,PCSX2_FAQ.pdf} $HOME/squashfs-root/usr/bin/plugins
 cp /pcsx2/appimage/pcsx2/bin/cheats_ws.zip $HOME/squashfs-root/usr/bin/plugins
 if [[ -e "$BUILDPATH/plugins" ]]; then
-	find $BUILDPATH/plugins -iname '*.so' -exec cp {} $HOME/squashfs-root/usr/lib/plugins \;
+	find $BUILDPATH/plugins -iname '*.so' -exec cp {} $HOME/squashfs-root/usr/bin/plugins \;
 fi
 curl -sL "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/GameIndex.yaml" -o $HOME/squashfs-root/usr/bin/plugins/GameIndex.yaml
 /tmp/squashfs-root/usr/bin/appimagetool $HOME/squashfs-root 
