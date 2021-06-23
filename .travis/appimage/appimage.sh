@@ -1,4 +1,6 @@
-#!/bin/bash -ex
+#!/bin/bash 
+
+set -ex
 
 branch=`echo ${GITHUB_REF##*/}`
 
@@ -13,7 +15,9 @@ cd /tmp
 cd $HOME
 mkdir -p squashfs-root/usr/bin
 #ls -al $BUILDBIN/
-ls -al /pcsx2/appimage/pcsx2/build/{bin,plugins}
+	set +e
+	ls -al /pcsx2/appimage/pcsx2/build/{bin,plugins}
+	set -e
 cp -P "$BUILDBIN"/PCSX2 $HOME/squashfs-root/usr/bin/
 patchelf --set-rpath /tmp/PCSX2LIBS $HOME/squashfs-root/usr/bin/PCSX2
 
