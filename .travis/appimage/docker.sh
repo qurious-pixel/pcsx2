@@ -36,7 +36,8 @@ cmake ..                                        \
 -G Ninja                                        \
 -DCMAKE_C_COMPILER=/usr/lib/ccache/gcc          \
 -DCMAKE_CXX_COMPILER=/usr/lib/ccache/g++        \
--DCMAKE_BUILD_TYPE=Debug -DPACKAGE_MODE=TRUE    \
+-DCMAKE_BUILD_TYPE=Release                      \
+-DPACKAGE_MODE=TRUE                             \
 -DDISABLE_ADVANCE_SIMD=TRUE                     \
 -DXDG_STD=TRUE                                  \
 -DOpenGL_GL_PREFERENCE="LEGACY"                 \
