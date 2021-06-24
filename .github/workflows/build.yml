@@ -11,7 +11,7 @@ jobs:
     env:
       BRANCH: master
       REPO: https://github.com/PCSX2/pcsx2
-      COMMIT: 08dc979968bca66e0debb39ed9fb8a355a21cb4e
+      COMMIT: 3d3749d982cbb85274ddd043080a206853ed80e8
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
