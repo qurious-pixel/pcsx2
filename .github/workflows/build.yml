@@ -9,9 +9,9 @@ jobs:
     name: build bundled as appimage
     runs-on: ubuntu-latest
     env:
-      BRANCH: master
+      BRANCH: gs-merge
       REPO: https://github.com/PCSX2/pcsx2
-      COMMIT: 3d3749d982cbb85274ddd043080a206853ed80e8
+      COMMIT: f4d023eaf5aefaa9e56b8a6703199524c3ff883f
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
