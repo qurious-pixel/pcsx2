@@ -11,7 +11,7 @@ jobs:
     env:
       BRANCH: gs-merge
       REPO: https://github.com/PCSX2/pcsx2
-      COMMIT: f4d023eaf5aefaa9e56b8a6703199524c3ff883f
+      COMMIT: e4aee8282ca7da6a277166ecafe36e267abda87d
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
