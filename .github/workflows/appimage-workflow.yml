@@ -5,7 +5,7 @@ name: AppImage Build
 on:
   push:
     branches:
-      - master
+      - z-app-test
     paths-ignore:
       - .gitignore
       - "**/*.md"
@@ -62,7 +62,7 @@ jobs:
 
       - name: Cache Submodules
         id: cache-submodules
-        uses: actions/cache@v2.1.4
+        uses: actions/cache@v2.1.6
         with:
           key: submodules-${{ hashFiles('./.gitmodules') }}
           path: |
