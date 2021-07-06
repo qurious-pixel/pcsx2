@@ -60,17 +60,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Cache Submodules
-        id: cache-submodules
+      - name: ccache cache files
         uses: actions/cache@v2.1.6
         with:
-          key: submodules-${{ hashFiles('./.gitmodules') }}
-          path: |
-            ./.git/modules/
-            ./3rdparty/fmt
-            ./3rdparty/xz
-            ./3rdparty/yaml-cpp
-            ./3rdparty/gtest
+          path: .ccache
+          key: ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
+          restore-keys: |
+            ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}-ccache-
 
       - name: Checkout Submodules
         if: steps.cache-submodules.outputs.cache-hit != 'true'
