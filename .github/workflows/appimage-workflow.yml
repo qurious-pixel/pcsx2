@@ -119,6 +119,7 @@ jobs:
         run: |
           if [ ${{ matrix.platform }} = x86 ]; then
             PKGARCH=i386
+            sudo dpkg --add-architecture i386
           else
             PKGARCH=amd64
           fi
@@ -147,9 +148,9 @@ jobs:
           COMPILER: ${{ matrix.compiler }}
           name: ${{ steps.artifact-metadata.outputs.name }}
         run: |
-          cd /pcsx2
+          cd pcsx2
           mkdir build && cd build
-          cmake ..                                        \
+          cmake ..                                    \
           -DCMAKE_C_COMPILER=/usr/lib/ccache/gcc      \
           -DCMAKE_CXX_COMPILER=/usr/lib/ccache/g++    \
           -DCMAKE_BUILD_TYPE=Release                  \
