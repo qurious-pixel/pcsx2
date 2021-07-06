@@ -36,11 +36,11 @@ jobs:
             compiler: gcc
             detail: -appimage
             experimental: true
-          #- os: ubuntu-18.04
-          #  platform: x64
-          #  compiler: gcc
-          #  experimental: true
-          #  detail: -appimage
+          - os: ubuntu-18.04
+            platform: x64
+            compiler: gcc
+            experimental: true
+            detail: -appimage
 
     name: ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}
     runs-on: ${{ matrix.os }}
@@ -212,8 +212,8 @@ jobs:
           mkdir -p squashfs-root/usr/share/icons/hicolor/scalable/apps && cp ./squashfs-root/PCSX2.png ./squashfs-root/usr/share/icons/hicolor/scalable/apps
           mkdir -p squashfs-root/usr/share/pixmaps && cp ./squashfs-root/PCSX2.png ./squashfs-root/usr/share/pixmaps
           mkdir -p squashfs-root/usr/lib/
-          cp ./.github/workflows/scripts/linux/AppRun /pcsx2/squashfs-root/AppRun
-          curl -sSfL "https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-$APPARCH" -o /pcsx2/squashfs-root/AppRun-patched
+          cp ./.github/workflows/scripts/linux/AppRun $GITHUB_WORKSPACE/squashfs-root/AppRun
+          curl -sSfL "https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-$APPARCH" -o $GITHUB_WORKSPACE/squashfs-root/AppRun-patched
           chmod a+x ./squashfs-root/AppRun
           chmod a+x ./squashfs-root/runtime
           chmod a+x ./squashfs-root/AppRun-patched
