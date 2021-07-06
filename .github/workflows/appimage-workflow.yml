@@ -60,17 +60,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Cache Submodules
-        id: cache-submodules
+      - name: ccache cache files
         uses: actions/cache@v2.1.6
         with:
-          key: submodules-${{ hashFiles('./.gitmodules') }}
-          path: |
-            ./.git/modules/
-            ./3rdparty/fmt
-            ./3rdparty/xz
-            ./3rdparty/yaml-cpp
-            ./3rdparty/gtest
+          path: .ccache
+          key: ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
+          restore-keys: |
+            ${{ matrix.os }}-${{ matrix.platform }}-${{ matrix.compiler }}${{ matrix.detail }}-ccache-
 
       - name: Checkout Submodules
         if: steps.cache-submodules.outputs.cache-hit != 'true'
@@ -117,19 +113,57 @@ jobs:
           echo "name=$TRIMMED_ARTIFACT_NAME"
           echo "##[set-output name=name;]${TRIMMED_ARTIFACT_NAME}"
 
+      - name: Install Packages
+        continue-on-error: true
+        id: packages
+        run: |
+          if [ ${{ matrix.platform }} = x86 ]; then
+            PKGARCH=i386
+          else
+            PKGARCH=amd64
+          fi
+          echo "PKGARCH $PKGARCH"
+          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          sudo apt-get update && sudo apt-get install -y build-essential:${PKGARCH} ccache:${PKGARCH} cmake:${PKGARCH} curl:${PKGARCH} \
+          dialog:${PKGARCH} dpkg:${PKGARCH} fuse:${PKGARCH} gettext:${PKGARCH} git:${PKGARCH} libaio-dev:${PKGARCH} libasound2-dev:${PKGARCH} \
+          libasound2-dev:${PKGARCH} libbz2-dev:${PKGARCH} libcggl:${PKGARCH} libegl1-mesa-dev:${PKGARCH} libgl1-mesa-dev:${PKGARCH} \
+          libgles2-mesa-dev:${PKGARCH} libglew-dev:${PKGARCH} libglvnd-dev:${PKGARCH} libgtk-3-dev:${PKGARCH} libgtk2.0-dev:${PKGARCH} \
+          libjack-jackd2-dev:${PKGARCH} libjpeg-dev:${PKGARCH} liblzma-dev:${PKGARCH} liblzma5:${PKGARCH} libpcap0.8-dev:${PKGARCH} libpng++-dev:${PKGARCH} \
+          libpng-dev:${PKGARCH} libportaudiocpp0:${PKGARCH} libsamplerate0-dev:${PKGARCH} libsdl1.2-dev:${PKGARCH} libsdl2-dev:${PKGARCH} \
+          libsoundtouch-dev:${PKGARCH} libwxgtk3.0-dev:${PKGARCH} libwxgtk3.0-gtk3-dev:${PKGARCH} libxext-dev:${PKGARCH} libxml2-dev:${PKGARCH} \
+          libxml2-dev:${PKGARCH} make:${PKGARCH} ninja-build:${PKGARCH} nvidia-cg-toolkit:${PKGARCH} portaudio19-dev:${PKGARCH} \
+          wget:${PKGARCH} x11-common:${PKGARCH} zenity:${PKGARCH} zlib1g-dev:${PKGARCH}
+          update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 10
+          update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 10
+          cd /tmp
+          curl -sSfLO https://github.com/NixOS/patchelf/releases/download/0.12/patchelf-0.12.tar.bz2        tar xvf patchelf-0.12.tar.bz2
+          cd patchelf-0.12*/ 
+          ./configure
+          make && make install
+
       - name: Build AppImage
         env:
           PLATFORM: ${{ matrix.platform }}
           COMPILER: ${{ matrix.compiler }}
           name: ${{ steps.artifact-metadata.outputs.name }}
         run: |
-          if [ ${{ matrix.platform }} = x86 ]; then
-              docker pull quriouspixel/pcsx2:18.04-386
-              docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$GITHUB_WORKSPACE/.ccache":/root/.ccache quriouspixel/pcsx2:18.04-386 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
-          else
-              docker pull quriouspixel/pcsx2:18.04
-              docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$GITHUB_WORKSPACE/.ccache":/root/.ccache quriouspixel/pcsx2:18.04 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
-          fi
+          cd /pcsx2
+          mkdir build && cd build
+          cmake ..                                        \
+          -DCMAKE_C_COMPILER=/usr/lib/ccache/gcc      \
+          -DCMAKE_CXX_COMPILER=/usr/lib/ccache/g++    \
+          -DCMAKE_BUILD_TYPE=Release                  \
+          -DPACKAGE_MODE=TRUE                         \
+          -DXDG_STD=TRUE                              \
+          -DDISABLE_ADVANCE_SIMD=TRUE                 \
+          -DCMAKE_INSTALL_LIBDIR="/tmp/"              \
+          -DCMAKE_INSTALL_DATADIR="/tmp/"             \
+          -DCMAKE_INSTALL_DOCDIR="/tmp/PCSX2"         \
+          -DOpenGL_GL_PREFERENCE="LEGACY"             \
+          -DOPENGL_opengl_LIBRARY=""                  \
+          -G Ninja
+          ninja
+          ls -al .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
