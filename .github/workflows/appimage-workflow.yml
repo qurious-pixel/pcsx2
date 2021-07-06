@@ -135,15 +135,15 @@ jobs:
           libsoundtouch-dev:${PKGARCH} libwxgtk3.0-dev:${PKGARCH} libwxgtk3.0-gtk3-dev:${PKGARCH} libxext-dev:${PKGARCH} libxml2-dev:${PKGARCH} \
           libxml2-dev:${PKGARCH} make:${PKGARCH} ninja-build nvidia-cg-toolkit:${PKGARCH} portaudio19-dev:${PKGARCH} \
           wget:${PKGARCH} zenity:${PKGARCH} zlib1g-dev:${PKGARCH} \
-          dpkg-dev:${PKGARCH} cmake-data:${PKGARCH} cpp:${PKGARCH} perl:${PKGARCH} \
-          liberror-perl:${PKGARCH} libgdk-pixbuf2.0-dev:${PKGARCH} \
+          dpkg-dev:${PKGARCH} cpp:${PKGARCH} perl:${PKGARCH} libgdk-pixbuf2.0-dev:${PKGARCH} \
           libpango1.0-dev:${PKGARCH} libatk1.0-dev:${PKGARCH} libatk-bridge2.0-dev:${PKGARCH} \
           libcairo2-dev:${PKGARCH} libfontconfig1-dev:${PKGARCH} libpango1.0-dev:${PKGARCH} python:${PKGARCH} \
           libdbus-1-dev:${PKGARCH} libibus-1.0-dev:${PKGARCH}
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 10
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 10
           cd /tmp
-          curl -sSfLO https://github.com/NixOS/patchelf/releases/download/0.12/patchelf-0.12.tar.bz2        tar xvf patchelf-0.12.tar.bz2
+          curl -sSfLO https://github.com/NixOS/patchelf/releases/download/0.12/patchelf-0.12.tar.bz2        
+          tar xvf patchelf-0.12.tar.bz2
           cd patchelf-0.12*/ 
           ./configure
           make && sudo make install
@@ -170,7 +170,7 @@ jobs:
           -DOPENGL_opengl_LIBRARY=""                  \
           -GNinja
           ninja
-          ls -al .
+          ls -al bin/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
