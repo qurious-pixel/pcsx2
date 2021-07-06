@@ -133,7 +133,7 @@ jobs:
           libjack-jackd2-dev:${PKGARCH} libjpeg-dev:${PKGARCH} liblzma-dev:${PKGARCH} liblzma5:${PKGARCH} libpcap0.8-dev:${PKGARCH} libpng++-dev:${PKGARCH} \
           libpng-dev:${PKGARCH} libportaudiocpp0:${PKGARCH} libsamplerate0-dev:${PKGARCH} libsdl1.2-dev:${PKGARCH} libsdl2-dev:${PKGARCH} \
           libsoundtouch-dev:${PKGARCH} libwxgtk3.0-dev:${PKGARCH} libwxgtk3.0-gtk3-dev:${PKGARCH} libxext-dev:${PKGARCH} libxml2-dev:${PKGARCH} \
-          libxml2-dev:${PKGARCH} make ninja-build nvidia-cg-toolkit:${PKGARCH} portaudio19-dev:${PKGARCH} \
+          libxml2-dev:${PKGARCH} ninja-build nvidia-cg-toolkit:${PKGARCH} portaudio19-dev:${PKGARCH} \
           wget:${PKGARCH} zenity:${PKGARCH} zlib1g-dev:${PKGARCH} \
           libgdk-pixbuf2.0-dev:${PKGARCH} \
           libpango1.0-dev:${PKGARCH} libatk1.0-dev:${PKGARCH} libatk-bridge2.0-dev:${PKGARCH} \
@@ -154,7 +154,9 @@ jobs:
           COMPILER: ${{ matrix.compiler }}
           name: ${{ steps.artifact-metadata.outputs.name }}
         run: |
-          #cd pcsx2
+          if [ ${{ matrix.platform }} = x86 ]; then
+            toolfile=cmake/linux-compiler-i386-multilib.cmake
+          fi
           mkdir build && cd build
           cmake ..                                    \
           -DCMAKE_C_COMPILER=/usr/lib/ccache/gcc      \
@@ -168,6 +170,7 @@ jobs:
           -DCMAKE_INSTALL_DOCDIR="/tmp/PCSX2"         \
           -DOpenGL_GL_PREFERENCE="LEGACY"             \
           -DOPENGL_opengl_LIBRARY=""                  \
+          -DCMAKE_TOOLCHAIN_FILE=$toolfile            \
           -GNinja
           ninja
           ls -al bin/
