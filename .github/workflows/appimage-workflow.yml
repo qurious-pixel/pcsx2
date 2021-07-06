@@ -120,6 +120,7 @@ jobs:
           if [ ${{ matrix.platform }} = x86 ]; then
             PKGARCH=i386
             sudo dpkg --add-architecture i386
+            sudo dpkg --remove-architecture amd64
           else
             PKGARCH=amd64
           fi
