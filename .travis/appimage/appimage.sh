@@ -44,18 +44,12 @@ unset LD_LIBRARY_PATH
 # /tmp/squashfs-root/AppRun $HOME/squashfs-root/usr/bin/pcsx2 -appimage -unsupported-allow-new-glibc -no-copy-copyright-files -no-translations -bundle-non-qt-libs
 /tmp/squashfs-root/AppRun $HOME/squashfs-root/usr/bin/PCSX2 -unsupported-allow-new-glibc -no-copy-copyright-files -no-translations -bundle-non-qt-libs
 export PATH=$(readlink -f /tmp/squashfs-root/usr/bin/):$PATH
-	#cp /usr/lib/x86_64-linux-gnu/libSoundTouch.so.1 $HOME/squashfs-root/usr/lib/
-	#cp /usr/lib/x86_64-linux-gnu/libportaudio.so.2 $HOME/squashfs-root/usr/lib/
-	#cp /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0 $HOME/squashfs-root/usr/lib/
-	#cp /usr/lib/x86_64-linux-gnu/libsndio.so.6.1 $HOME/squashfs-root/usr/lib/
 mv /tmp/update/AppImageUpdate $HOME/squashfs-root/usr/bin/
 mv /tmp/update/* $HOME/squashfs-root/usr/lib/
 mkdir -p $HOME/squashfs-root/usr/lib/plugins
-find $BUILDBIN/../plugins -iname '*.so' -exec cp {} $HOME/squashfs-root/usr/lib/plugins \;
-arr=( $(ls -d $HOME/squashfs-root/usr/lib/plugins/* ) )
-for i in "${arr[@]}"; do patchelf --set-rpath /tmp/PCSX2 "$i"; done
-#patchelf --set-rpath /tmp/PCSX2 $HOME/squashfs-root/usr/lib/libSDL2-2.0.so.0
-#patchelf --set-rpath ../lib $HOME/squashfs-root/usr/lib/libsndio.so.6.1
+if [[ -e "$BUILDPATH/plugins" ]]; then
+	find "$BUILDPATH/plugins" -iname '*.so' -exec cp {} /pcsx2/squashfs-root/usr/lib/plugins \;
+fi
 mkdir -p $HOME/squashfs-root/usr/lib/updater
 mv $HOME/squashfs-root/usr/lib/libcurl.so.4 $HOME/squashfs-root/usr/lib/updater
 curl -sL "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/GameIndex.yaml" -o $HOME/squashfs-root/usr/lib/plugins/GameIndex.yaml
