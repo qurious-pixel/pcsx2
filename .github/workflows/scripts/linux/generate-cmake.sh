@@ -13,7 +13,6 @@ fi
 if [ ${PLATFORM} = x86 ]; then
     ADDITIONAL_CMAKE_ARGS="$ADDITIONAL_CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=cmake/linux-compiler-i386-multilib.cmake"
 fi
-mkdir build && cd build
           cmake ..                                    \
           -DCMAKE_CXX_COMPILER_LAUNCHER=ccache        \
           -DCMAKE_BUILD_TYPE=Release                  \
