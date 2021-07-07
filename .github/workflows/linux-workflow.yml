@@ -34,12 +34,12 @@ jobs:
           - os: ubuntu-18.04
             platform: x86
             compiler: gcc
-            detail: appimage
+            detail: -appimage
             experimental: false
           - os: ubuntu-18.04
             platform: x64
             compiler: gcc
-            detail: appimage
+            detail: -appimage
             experimental: false
           - os: ubuntu-18.04
             platform: x86
@@ -55,7 +55,7 @@ jobs:
             cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
             detail: -nopch
             experimental: false
-          - os: ubuntu-20.04
+          - os: ubuntu-18.04
             platform: x86
             compiler: gcc
             cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON -DARCH_FLAG=-march=haswell
@@ -125,7 +125,7 @@ jobs:
         run: |
           chmod +x .github/workflows/scripts/linux/appimage.sh
           .github/workflows/scripts/linux/appimage.sh
-        if: ${{ matrix.detail }}  == "appimage"
+        if: ${{ matrix.detail }}  == "-appimage"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
