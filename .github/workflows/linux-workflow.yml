@@ -5,7 +5,7 @@ name: Linux Build
 on:
   push:
     branches:
-      - master
+      - z-app-test2
     paths-ignore:
       - .gitignore
       - "**/*.md"
@@ -31,15 +31,17 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-20.04
+          - os: ubuntu-18.04
             platform: x86
             compiler: gcc
+            detail: appimage
             experimental: false
-          - os: ubuntu-20.04
+          - os: ubuntu-18.04
             platform: x64
             compiler: gcc
+            detail: appimage
             experimental: false
-          - os: ubuntu-20.04
+          - os: ubuntu-18.04
             platform: x86
             compiler: clang
             # Need to disable PCH until cmake 3.17
@@ -47,7 +49,7 @@ jobs:
             cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
             detail: -nopch
             experimental: false
-          - os: ubuntu-20.04
+          - os: ubuntu-18.04
             platform: x86
             compiler: gcc
             cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
@@ -114,3 +116,19 @@ jobs:
       - name: Build PCSX2
         working-directory: ./build
         run: ../.github/workflows/scripts/linux/compile.sh
+        
+      - name: Package AppImage
+        env:
+          PLATFORM: ${{ matrix.platform }}
+          COMPILER: ${{ matrix.compiler }}
+          name: ${{ steps.artifact-metadata.outputs.name }}
+        run: |
+          chmod +x .github/workflows/scripts/linux/appimage.sh
+          .github/workflows/scripts/linux/appimage.sh
+        if: ${{ matrix.detail }}  == "appimage"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ steps.artifact-metadata.outputs.name }}
+          path: artifacts
