@@ -5,7 +5,7 @@ name: AppImage Build
 on:
   push:
     branches:
-      - master
+      - z-app-test
     paths-ignore:
       - .gitignore
       - "**/*.md"
@@ -113,20 +113,129 @@ jobs:
           echo "name=$TRIMMED_ARTIFACT_NAME"
           echo "##[set-output name=name;]${TRIMMED_ARTIFACT_NAME}"
 
-      - name: Build AppImage
+      - name: Install Packages
+        continue-on-error: true
+        id: packages
+        run: |
+          if [ ${{ matrix.platform }} = x86 ]; then
+            PKGARCH=i386
+            sudo dpkg --add-architecture i386
+          else
+            PKGARCH=amd64
+          fi
+          echo "PKGARCH $PKGARCH"
+          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          sudo apt-get update 
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends -y ccache:${PKGARCH} cmake curl:${PKGARCH} \
+          dialog:${PKGARCH} fuse:${PKGARCH} gcc-8-multilib g++-8-multilib gettext:${PKGARCH} \
+          libaio-dev:${PKGARCH} libasound2-dev:${PKGARCH} libbz2-dev:${PKGARCH} libcggl:${PKGARCH} libegl1-mesa-dev:${PKGARCH} \
+          libgl1-mesa-dev:${PKGARCH} libgles2-mesa-dev:${PKGARCH} libglew-dev:${PKGARCH} libglvnd-dev:${PKGARCH} libgtk-3-dev:${PKGARCH} libgtk2.0-dev:${PKGARCH} \
+          libjack-jackd2-dev:${PKGARCH} libjpeg-dev:${PKGARCH} liblzma-dev:${PKGARCH} liblzma5:${PKGARCH} libpcap0.8-dev:${PKGARCH} libpng++-dev:${PKGARCH} \
+          libpng-dev:${PKGARCH} libportaudiocpp0:${PKGARCH} libsamplerate0-dev:${PKGARCH} libsdl1.2-dev:${PKGARCH} libsdl2-dev:${PKGARCH} \
+          libsoundtouch-dev:${PKGARCH} libwxgtk3.0-dev:${PKGARCH} libwxgtk3.0-gtk3-dev:${PKGARCH} libxext-dev:${PKGARCH} libxml2-dev:${PKGARCH} \
+          libxml2-dev:${PKGARCH} ninja-build nvidia-cg-toolkit:${PKGARCH} portaudio19-dev:${PKGARCH} \
+          wget:${PKGARCH} zenity:${PKGARCH} zlib1g-dev:${PKGARCH} \
+          libgdk-pixbuf2.0-dev:${PKGARCH} \
+          libpango1.0-dev:${PKGARCH} libatk1.0-dev:${PKGARCH} libatk-bridge2.0-dev:${PKGARCH} \
+          libcairo2-dev:${PKGARCH} libfontconfig1-dev:${PKGARCH} libpango1.0-dev:${PKGARCH} python:${PKGARCH} \
+          libdbus-1-dev:${PKGARCH} libibus-1.0-dev:${PKGARCH}
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 10
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 10
+          cd /tmp
+          curl -sSfLO https://github.com/NixOS/patchelf/releases/download/0.12/patchelf-0.12.tar.bz2        
+          tar xvf patchelf-0.12.tar.bz2
+          cd patchelf-0.12*/ 
+          ./configure
+          make && sudo make install
+
+      - name: Build Binary
         env:
           PLATFORM: ${{ matrix.platform }}
           COMPILER: ${{ matrix.compiler }}
           name: ${{ steps.artifact-metadata.outputs.name }}
         run: |
           if [ ${{ matrix.platform }} = x86 ]; then
-              docker pull quriouspixel/pcsx2:18.04-386
-              docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$GITHUB_WORKSPACE/.ccache":/root/.ccache quriouspixel/pcsx2:18.04-386 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
-          else
-              docker pull quriouspixel/pcsx2:18.04
-              docker run -u root --env-file .github/workflows/scripts/linux/docker.env -v $(pwd):/pcsx2 -v "$GITHUB_WORKSPACE/.ccache":/root/.ccache quriouspixel/pcsx2:18.04 /bin/bash /pcsx2/.github/workflows/scripts/linux/docker.sh
+            toolfile=cmake/linux-compiler-i386-multilib.cmake
           fi
+          mkdir build && cd build
+          cmake ..                                    \
+          -DCMAKE_C_COMPILER=/usr/lib/ccache/gcc      \
+          -DCMAKE_CXX_COMPILER=/usr/lib/ccache/g++    \
+          -DCMAKE_BUILD_TYPE=Release                  \
+          -DPACKAGE_MODE=TRUE                         \
+          -DXDG_STD=TRUE                              \
+          -DDISABLE_ADVANCE_SIMD=TRUE                 \
+          -DCMAKE_INSTALL_LIBDIR="/tmp/"              \
+          -DCMAKE_INSTALL_DATADIR="/tmp/"             \
+          -DCMAKE_INSTALL_DOCDIR="/tmp/PCSX2"         \
+          -DOpenGL_GL_PREFERENCE="LEGACY"             \
+          -DOPENGL_opengl_LIBRARY=""                  \
+          -DCMAKE_TOOLCHAIN_FILE=$toolfile            \
+          -GNinja
+          ninja
+          ls -al bin/
 
+      - name: Package AppImage
+        env:
+          PLATFORM: ${{ matrix.platform }}
+          COMPILER: ${{ matrix.compiler }}
+          name: ${{ steps.artifact-metadata.outputs.name }}
+        run: |
+          echo "${PLATFORM}"
+          if [ "${PLATFORM}" == "x86" ]; then
+            APPARCH="i686"
+            ARCH="i386"
+          else
+            APPARCH="x86_64"
+            ARCH="x86_64"
+          fi
+          BUILDPATH=$GITHUB_WORKSPACE/build
+          BUILDBIN=$BUILDPATH/pcsx2
+          cd /tmp
+          curl -sSfLO "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-$ARCH.AppImage"
+          chmod a+x linuxdeploy*.AppImage
+          ./linuxdeploy-$ARCH.AppImage --appimage-extract
+          mv /tmp/squashfs-root/usr/bin/patchelf /tmp/squashfs-root/usr/bin/patchelf.orig
+          sudo cp /usr/local/bin/patchelf /tmp/squashfs-root/usr/bin/patchelf
+          cd $GITHUB_WORKSPACE
+          mkdir -p squashfs-root/usr/bin
+          ls -al $BUILDBIN
+          cp -P "$BUILDBIN"/PCSX2 $GITHUB_WORKSPACE/squashfs-root/usr/bin/
+          patchelf --set-rpath /tmp/PCSX2 $GITHUB_WORKSPACE/squashfs-root/usr/bin/PCSX2
+          cp ./pcsx2/gui/Resources/AppIcon64.png ./squashfs-root/PCSX2.png
+          cp ./linux_various/PCSX2.desktop.in ./squashfs-root/PCSX2.desktop 
+          sed -i -e 's|Categories=@PCSX2_MENU_CATEGORIES@|Categories=Game;Emulator;|g' ./squashfs-root/PCSX2.desktop
+          sed -i -e 's|__GL_THREADED_OPTIMIZATIONS=1|__GL_THREADED_OPTIMIZATIONS=0|g' ./squashfs-root/PCSX2.desktop
+          curl -sSfL https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-$APPARCH -o ./squashfs-root/runtime
+          mkdir -p squashfs-root/usr/share/applications && cp ./squashfs-root/PCSX2.desktop ./squashfs-root/usr/share/applications
+          mkdir -p squashfs-root/usr/share/icons && cp ./squashfs-root/PCSX2.png ./squashfs-root/usr/share/icons
+          mkdir -p squashfs-root/usr/share/icons/hicolor/scalable/apps && cp ./squashfs-root/PCSX2.png ./squashfs-root/usr/share/icons/hicolor/scalable/apps
+          mkdir -p squashfs-root/usr/share/pixmaps && cp ./squashfs-root/PCSX2.png ./squashfs-root/usr/share/pixmaps
+          mkdir -p squashfs-root/usr/lib/
+          cp ./.github/workflows/scripts/linux/AppRun $GITHUB_WORKSPACE/squashfs-root/AppRun
+          curl -sSfL "https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-$APPARCH" -o $GITHUB_WORKSPACE/squashfs-root/AppRun-patched
+          chmod a+x ./squashfs-root/AppRun
+          chmod a+x ./squashfs-root/runtime
+          chmod a+x ./squashfs-root/AppRun-patched
+          echo "$name" > $GITHUB_WORKSPACE/squashfs-root/version.txt
+          mkdir -p $GITHUB_WORKSPACE/squashfs-root/usr/bin/{plugins,vm}
+          cp -r $GITHUB_WORKSPACE/bin/Langs $GITHUB_WORKSPACE/squashfs-root/usr/bin/
+          cp $GITHUB_WORKSPACE/bin/docs/{Configuration_Guide.pdf,PCSX2_FAQ.pdf} $GITHUB_WORKSPACE/squashfs-root/usr/bin/plugins
+          cp $GITHUB_WORKSPACE/bin/cheats_ws.zip $GITHUB_WORKSPACE/squashfs-root/usr/bin/plugins
+          if [[ -e "$BUILDPATH/plugins" ]]; then
+            find "$BUILDPATH/plugins" -iname '*.so' -exec cp {} $GITHUB_WORKSPACE/squashfs-root/usr/bin/plugins \;
+          fi
+          cp ./bin/GameIndex.yaml $GITHUB_WORKSPACE/squashfs-root/usr/bin/plugins/GameIndex.yaml
+          export UPD_INFO="gh-releases-zsync|PCSX2|pcsx2|latest|$name.AppImage.zsync"
+          export OUTPUT=$name.AppImage
+          /tmp/squashfs-root/AppRun --appdir=$GITHUB_WORKSPACE/squashfs-root/ -d $GITHUB_WORKSPACE/squashfs-root/PCSX2.desktop -i $GITHUB_WORKSPACE/squashfs-root/PCSX2.png --output appimage
+          mkdir -p $GITHUB_WORKSPACE/artifacts/
+          ls -al .
+          mv "$name.AppImage" $GITHUB_WORKSPACE/artifacts # && mv "$name.AppImage.zsync" $GITHUB_WORKSPACE/artifacts
+          chmod -R 777 ./artifacts
+          cd ./artifacts
+          ls -al .
+          
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
