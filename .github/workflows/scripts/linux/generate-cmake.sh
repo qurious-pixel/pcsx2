@@ -25,4 +25,4 @@ mkdir build && cd build
           -DOpenGL_GL_PREFERENCE="LEGACY"             \
           -DOPENGL_opengl_LIBRARY=""                  \
           -DXDG_STD=TRUE ${ADDITIONAL_CMAKE_ARGS}     \
-          -G build
+          -B build
