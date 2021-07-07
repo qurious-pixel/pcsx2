@@ -12,6 +12,7 @@ export CCACHE_MAXSIZE="400M"
 ccache -p
 ccache -z
 # Build
-make -j4 install
+ninja
+#make -j4 install
 # Save the Cache
 ccache -s
