@@ -18,12 +18,11 @@ mkdir build && cd build
           -DCMAKE_CXX_COMPILER_LAUNCHER=ccache        \
           -DCMAKE_BUILD_TYPE=Release                  \
           -DPACKAGE_MODE=TRUE                         \
-          -DXDG_STD=TRUE                              \
           -DDISABLE_ADVANCE_SIMD=TRUE                 \
           -DCMAKE_INSTALL_LIBDIR="/tmp/"              \
           -DCMAKE_INSTALL_DATADIR="/tmp/"             \
           -DCMAKE_INSTALL_DOCDIR="/tmp/PCSX2"         \
           -DOpenGL_GL_PREFERENCE="LEGACY"             \
           -DOPENGL_opengl_LIBRARY=""                  \
-          -D ${ADDITIONAL_CMAKE_ARGS}                 \
+          -DXDG_STD=TRUE ${ADDITIONAL_CMAKE_ARGS}     \
           -G build
