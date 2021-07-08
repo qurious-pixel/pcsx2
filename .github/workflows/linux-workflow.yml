@@ -36,12 +36,12 @@ jobs:
             compiler: gcc
             detail: -appimage
             experimental: false
-          - os: ubuntu-18.04
+          #- os: ubuntu-18.04
             platform: x64
             compiler: gcc
             detail: -appimage
             experimental: false
-          - os: ubuntu-18.04
+          #- os: ubuntu-18.04
             platform: x86
             compiler: clang
             # Need to disable PCH until cmake 3.17
@@ -49,13 +49,13 @@ jobs:
             cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
             detail: -nopch
             experimental: false
-          - os: ubuntu-18.04
+          #- os: ubuntu-18.04
             platform: x86
             compiler: gcc
             cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
             detail: -nopch
             experimental: false
-          - os: ubuntu-18.04
+          #- os: ubuntu-18.04
             platform: x86
             compiler: gcc
             cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON -DARCH_FLAG=-march=haswell
