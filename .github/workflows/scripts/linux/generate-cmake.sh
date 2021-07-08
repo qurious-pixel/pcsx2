@@ -26,6 +26,6 @@ cmake                                       \
 -DCMAKE_INSTALL_DOCDIR="/tmp/PCSX2"         \
 -DOpenGL_GL_PREFERENCE="LEGACY"             \
 -DOPENGL_opengl_LIBRARY=""                  \
--DXDG_STD=TRUE "${ADDITIONAL_CMAKE_ARGS}"   \
+-DXDG_STD=TRUE ${ADDITIONAL_CMAKE_ARGS}     \
 -GNinja                                     \
 -B build
