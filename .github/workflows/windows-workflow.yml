@@ -56,6 +56,9 @@ jobs:
 
       - name: Checkout Repository
         uses: actions/checkout@v2
+        with:
+          repository: iMineLink/pcsx2
+          ref: 6b0f4e25f8866901edffe083ff8739dce399c4b4
 
       - name: Checkout Submodules
         if: steps.cache-submodules.outputs.cache-hit != 'true'
