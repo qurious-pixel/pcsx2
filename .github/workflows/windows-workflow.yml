@@ -58,7 +58,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: iMineLink/pcsx2
-          ref: 7dae633
+          ref: 7dae63379351752cd77ca64c21bbfd52fed6f524
 
       - name: Checkout Submodules
         #if: steps.cache-submodules.outputs.cache-hit != 'true'
