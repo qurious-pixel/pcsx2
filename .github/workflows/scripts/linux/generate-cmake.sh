@@ -11,7 +11,8 @@ else
 fi
 
 if [ "${PLATFORM}" = x86 ]; then
-    ADDITIONAL_CMAKE_ARGS="$ADDITIONAL_CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=cmake/linux-compiler-i386-multilib.cmake"
+    ADDITIONAL_CMAKE_ARGS="$ADDITIONAL_CMAKE_ARGS" 
+    TOOLCHAIN="cmake/linux-compiler-i386-multilib.cmake"
 fi
 echo "Additional CMake Args - ${ADDITIONAL_CMAKE_ARGS}"
 
@@ -27,5 +28,6 @@ cmake                                       \
 -DOpenGL_GL_PREFERENCE="LEGACY"             \
 -DOPENGL_opengl_LIBRARY=""                  \
 -DXDG_STD=TRUE ${ADDITIONAL_CMAKE_ARGS}     \
+-DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN"         \
 -GNinja                                     \
 -B build
