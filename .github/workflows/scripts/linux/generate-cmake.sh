@@ -27,6 +27,6 @@ cmake                                       \
 -DOpenGL_GL_PREFERENCE="LEGACY"             \
 -DOPENGL_opengl_LIBRARY=""                  \
 -DXDG_STD=TRUE                              \
-${ADDITIONAL_CMAKE_ARGS}                    \
+"${ADDITIONAL_CMAKE_ARGS}"                  \
 -GNinja                                     \
 -B build
