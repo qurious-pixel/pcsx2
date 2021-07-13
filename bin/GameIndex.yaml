@@ -1013,6 +1013,51 @@ SCAJ-30010:
 SCAJ-30011:
   name: "God of War II"
   region: "NTSC-E"
+SCCS-40002:
+  name: "Devil May Cry 2 - Disc 1"
+  region: "NTSC-C"
+SCCS-40003:
+  name: "Devil May Cry 2 - Disc 2"
+  region: "NTSC-C"
+SCCS-40005:
+  name: "ICO"
+  region: "NTSC-C"
+SCCS-40006:
+  name: "Shin Sangoku Musou 2"
+  region: "NTSC-C"
+SCCS-40007:
+  name: "Arc the Lad: Seirei no Tasogare"
+  region: "NTSC-C"
+SCCS-40009:
+  name: "Dragon Ball Z 2"
+  region: "NTSC-C"
+SCCS-40010:
+  name: "Super Puzzle Bobble 2"
+  region: "NTSC-C"
+SCCS-40011:
+  name: "Armored Core 2: Another Age"
+  region: "NTSC-C"
+SCCS-40014:
+  name: "World Soccer Winning Eleven 7: International"
+  region: "NTSC-C"
+SCCS-40015:
+  name: "Viorate no Atelier: Gramnad no Renkinjutsushi 2"
+  region: "NTSC-C"
+SCCS-40016:
+  name: "Ape Escape: Pumped & Primed"
+  region: "NTSC-C"
+SCCS-40017:
+  name: "EyeToy: Play"
+  region: "NTSC-C"
+SCCS-40018:
+  name: "Saru EyeToy: Oosawagi! Ukkiuki Game Tenkomori!!"
+  region: "NTSC-C"
+SCCS-40019:
+  name: "Formula One 04"
+  region: "NTSC-C"
+SCCS-40022:
+  name: "World Soccer Winning Eleven 8: Asia Championship"
+  region: "NTSC-C"
 SCED-50041:
   name: "Tekken Tag Tournament [Demo]"
   region: "PAL-E"
@@ -8123,6 +8168,8 @@ SLES-51056:
   name: "Fighting Fury"
   region: "PAL-E"
   compat: 5
+  gameFixes:
+    - EETimingHack # Fixes hang at menu.
 SLES-51057:
   name: "Hard Hitter 2"
   region: "PAL-M3"
@@ -12684,7 +12731,7 @@ SLES-53439:
   name: "Crash Tag Team Racing"
   region: "PAL-M6"
   gameFixes:
-    - CrashTagTeamRacingIbitHack # Fixes constant recompilation problems.
+    - IbitHack # Fixes constant recompilation problems.
 SLES-53441:
   name: "Heroes of the Pacific"
   region: "PAL-M5"
@@ -14329,17 +14376,17 @@ SLES-54182:
   name: "Scarface - The World is Yours"
   region: "PAL-M4"
   gameFixes:
-    - ScarfaceIbitHack
+    - IbitHack
 SLES-54183:
   name: "Scarface - The World is Yours"
   region: "PAL-G"
   gameFixes:
-    - ScarfaceIbitHack
+    - IbitHack
 SLES-54184:
   name: "Scarface - The World is Yours"
   region: "PAL-R"
   gameFixes:
-    - ScarfaceIbitHack
+    - IbitHack
 SLES-54185:
   name: "Dirge of Cerberus - Final Fantasy VII"
   region: "PAL-M5"
@@ -14509,7 +14556,7 @@ SLES-54271:
   name: "Scarface - The World is Yours"
   region: "PAL-E"
   gameFixes:
-    - ScarfaceIbitHack
+    - IbitHack
 SLES-54305:
   name: "Demon Chaos"
   region: "PAL-M5"
@@ -15040,7 +15087,7 @@ SLES-54534:
   name: "Scarface - The World is Yours [Collector's Edition]"
   region: "PAL-E"
   gameFixes:
-    - ScarfaceIbitHack
+    - IbitHack
 SLES-54536:
   name: "Big Idea's VeggieTales - LarryBoy and the Bad Apple"
   region: "PAL-I"
@@ -26891,6 +26938,8 @@ SLPS-20037:
 SLPS-20038:
   name: "Grappler Baki - Baki Saidai no Tournament"
   region: "NTSC-J"
+  gameFixes:
+    - EETimingHack # Fixes hang at menu.
 SLPS-20040:
   name: "MotoGP"
   region: "NTSC-J"
@@ -35827,7 +35876,7 @@ SLUS-21111:
   region: "NTSC-U"
   compat: 5
   gameFixes:
-    - ScarfaceIbitHack
+    - IbitHack
 SLUS-21112:
   name: "L.A. Rush"
   region: "NTSC-U"
@@ -36162,7 +36211,7 @@ SLUS-21191:
   region: "NTSC-U"
   compat: 5
   gameFixes:
-    - CrashTagTeamRacingIbitHack # Fixes constant recompilation problems.
+    - IbitHack # Fixes constant recompilation problems.
 SLUS-21192:
   name: "Cabela's Outdoor Adventures 2006"
   region: "NTSC-U"
@@ -37576,7 +37625,7 @@ SLUS-21492:
   region: "NTSC-U"
   compat: 5
   gameFixes:
-    - ScarfaceIbitHack
+    - IbitHack
 SLUS-21493:
   name: "Need for Speed - Carbon"
   region: "NTSC-U"

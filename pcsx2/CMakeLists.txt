@@ -394,7 +394,8 @@ set(pcsx2USBSources
 	USB/usb-mic/usb-mic-singstar.cpp
 	USB/usb-mic/usb-mic-logitech.cpp
 	USB/usb-mic/usb-headset.cpp
-	USB/usb-eyetoy/jpgd/jpgd.cpp
+	../3rdparty/jpgd/jpgd.cpp
+	../3rdparty/jpgd/jpge.cpp
 	USB/usb-eyetoy/jo_mpeg.cpp
 	USB/usb-eyetoy/usb-eyetoy-webcam.cpp
 	USB/usb-hid/usb-hid.cpp
@@ -403,8 +404,6 @@ set(pcsx2USBSources
 	USB/shared/ringbuffer.cpp
 	USB/icon_buzz_24.cpp
 	USB/usb-msd/usb-msd-gtk.cpp
-	USB/usb-pad/joydev/joydev.cpp
-	USB/usb-pad/joydev/joydev-gtk.cpp
 	USB/usb-pad/evdev/shared-gtk.cpp
 	USB/usb-pad/evdev/evdev-ff.cpp
 	USB/usb-pad/evdev/evdev.cpp
@@ -450,7 +449,8 @@ set(pcsx2USBHeaders
 	USB/usb-mic/usb-mic-singstar.h
 	USB/usb-mic/usb-headset.h
 	USB/usb-mic/audiodev-noop.h
-	USB/usb-eyetoy/jpgd/jpgd.h
+	../3rdparty/jpgd/jpgd.h
+	../3rdparty/jpgd/jpge.h
 	USB/usb-eyetoy/jo_mpeg.h
 	USB/usb-eyetoy/videodeviceproxy.h
 	USB/usb-eyetoy/videodev.h
@@ -468,7 +468,6 @@ set(pcsx2USBHeaders
 	USB/linux/util.h
 	USB/gtk.h
 	USB/icon_buzz_24.h
-	USB/usb-pad/joydev/joydev.h
 	USB/usb-pad/evdev/shared.h
 	USB/usb-pad/evdev/evdev.h
 	USB/usb-pad/evdev/evdev-ff.h
@@ -477,6 +476,7 @@ set(pcsx2USBHeaders
 	USB/usb-eyetoy/cam-linux.h
 	USB/qemu-usb/input-keymap-linux-to-qcode.h
     )
+include_directories ("../3rdparty/jpgd/")
 
 if(PULSEAUDIO_FOUND)
     set(pcsx2USBSources ${pcsx2USBSources} USB/usb-mic/audiodev-pulse.cpp)
@@ -516,8 +516,8 @@ add_custom_command(
 
 # PAD/Linux sources 
 set(pcsx2PADSources
-    PAD/Linux/controller.cpp
-    PAD/Linux/GamePad.cpp
+    PAD/Linux/Device.cpp
+    PAD/Linux/InputManager.cpp
     PAD/Linux/SDL/joystick.cpp
     PAD/Linux/keyboard.cpp
     PAD/Linux/KeyStatus.cpp
@@ -527,7 +527,7 @@ set(pcsx2PADSources
     PAD/Linux/wx_dialog/opPanel.cpp
     PAD/Linux/wx_dialog/GamepadConfiguration.cpp
     PAD/Linux/wx_dialog/JoystickConfiguration.cpp
-    PAD/Linux/ini.cpp
+    PAD/Linux/Config.cpp
     PAD/Linux/linux.cpp
     ${CMAKE_BINARY_DIR}/pcsx2/PAD/Linux/resources_pad.cpp
     )
@@ -535,8 +535,10 @@ set(pcsx2PADSources
 # PAD/Linux headers
 set(pcsx2PADHeaders
     PAD/Linux/bitwise.h
-    PAD/Linux/controller.h
-    PAD/Linux/GamePad.h
+    PAD/Linux/Config.h
+    PAD/Linux/Device.h
+    PAD/Linux/Global.h
+    PAD/Linux/InputManager.h
     PAD/Linux/SDL/joystick.h
     PAD/Linux/keyboard.h
     PAD/Linux/KeyStatus.h

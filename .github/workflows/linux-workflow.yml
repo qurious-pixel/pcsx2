@@ -34,12 +34,12 @@ jobs:
           - os: ubuntu-18.04
             platform: x86
             compiler: gcc
-            detail: -appimage
+            detail: appimage
             experimental: false
           - os: ubuntu-18.04
             platform: x64
             compiler: gcc
-            detail: -appimage
+            detail: appimage
             experimental: false
           - os: ubuntu-18.04
             platform: x86
@@ -47,19 +47,19 @@ jobs:
             # Need to disable PCH until cmake 3.17
             # (PCH conflicts with ccache, fixed by https://gitlab.kitware.com/cmake/cmake/-/merge_requests/4400)
             cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
-            detail: -nopch
+            detail: nopch
             experimental: false
           - os: ubuntu-18.04
             platform: x86
             compiler: gcc
             cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
-            detail: -nopch
+            detail: nopch
             experimental: false
           - os: ubuntu-18.04
             platform: x86
             compiler: gcc
             cmakeflags: -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON -DARCH_FLAG=-march=haswell
-            detail: -avx2-nopch
+            detail: avx2 nopch
             experimental: false
 
     name: "${{ matrix.platform }} | ${{ matrix.compiler }} ${{ matrix.detail }}"
@@ -148,10 +148,11 @@ jobs:
           COMPILER: ${{ matrix.compiler }}
           name: ${{ steps.artifact-metadata.outputs.name }}
         run: .github/workflows/scripts/linux/appimage.sh
-        if: ${{ matrix.detail  == '-appimage' }}
+        if: ${{ matrix.detail  == 'appimage' }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ steps.artifact-metadata.outputs.name }}
           path: artifacts
+        if: ${{ matrix.detail  == 'appimage' }}

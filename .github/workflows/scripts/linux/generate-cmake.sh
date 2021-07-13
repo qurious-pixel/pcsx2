@@ -11,8 +11,8 @@ else
 fi
 
 if [ "${PLATFORM}" = x86 ]; then
-    ADDITIONAL_CMAKE_ARGS="$ADDITIONAL_CMAKE_ARGS" 
-    TOOLCHAIN="cmake/linux-compiler-i386-multilib.cmake"
+  ADDITIONAL_CMAKE_ARGS="$ADDITIONAL_CMAKE_ARGS" 
+  TOOLCHAIN="cmake/linux-compiler-i386-multilib.cmake"
 fi
 echo "Additional CMake Args - ${ADDITIONAL_CMAKE_ARGS}"
 
