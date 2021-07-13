@@ -5,7 +5,7 @@ name: 🐧 Linux Builds
 on:
   push:
     branches:
-      - master
+      - z-app-test3
     paths-ignore:
       - .gitignore
       - "**/*.md"
