@@ -93,6 +93,7 @@ declare -a PCSX2_PACKAGES=(
   "libxft-dev"
   "libxml2-dev"
   "nvidia-cg-toolkit"
+  "pkg-config"
   "portaudio19-dev"
   "python"
   "zlib1g-dev"
