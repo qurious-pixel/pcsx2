@@ -81,6 +81,7 @@ declare -a PCSX2_PACKAGES=(
   "libpng-dev"
   "libportaudiocpp0"
   "libpulse-dev"
+  "librsvg2-dev"
   "libsdl1.2-dev"
   "libsdl2-dev"
   "libsamplerate0-dev"
