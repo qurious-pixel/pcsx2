@@ -14,10 +14,10 @@ BUILDPATH="$GITHUB_WORKSPACE"/build
 BUILDBIN="$BUILDPATH"/pcsx2
 cd /tmp
 curl -sSfLO "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-$ARCH.AppImage"
-curl -sSfLO "https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-gtk/master/linuxdeploy-plugin-gtk.sh"
 chmod a+x linuxdeploy*.AppImage
-chmod a+x linuxdeploy-plugin-gtk.sh
 ./linuxdeploy-"$ARCH".AppImage --appimage-extract
+curl -sSfL "https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-gtk/master/linuxdeploy-plugin-gtk.sh" -o /tmp/squashfs-root/usr/bin/linuxdeploy-plugin-gtk.sh
+chmod a+x /tmp/squashfs-root/usr/bin/linuxdeploy-plugin-gtk.sh
 mv /tmp/squashfs-root/usr/bin/patchelf /tmp/squashfs-root/usr/bin/patchelf.orig
 sudo cp /usr/local/bin/patchelf /tmp/squashfs-root/usr/bin/patchelf
 cd "$GITHUB_WORKSPACE"
