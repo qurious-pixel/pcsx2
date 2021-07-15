@@ -45,8 +45,18 @@ mkdir -p "$GITHUB_WORKSPACE"/squashfs-root/usr/bin/app
 cp -r "$GITHUB_WORKSPACE"/bin/Langs "$GITHUB_WORKSPACE"/squashfs-root/usr/bin/
 cp "$GITHUB_WORKSPACE"/bin/docs/{Configuration_Guide.pdf,PCSX2_FAQ.pdf} "$GITHUB_WORKSPACE"/squashfs-root/usr/bin/app
 cp "$GITHUB_WORKSPACE"/bin/cheats_ws.zip "$GITHUB_WORKSPACE"/squashfs-root/usr/bin/app
-
 cp ./bin/GameIndex.yaml "$GITHUB_WORKSPACE"/squashfs-root/usr/bin/app/GameIndex.yaml
+### NIX libs
+if [[ ! -e "$GITHUB_WORKSPACE"/squashfs-root/usr/lib/nix ]];then
+	mkdir "$GITHUB_WORKSPACE"/squashfs-root/usr/lib/nix
+fi
+for lib in $(cat .github/workflows/scripts/linux/nixlibs.txt)
+do
+	find /usr -name "$lib" -print -exec cp --verbose {} "$GITHUB_WORKSPACE"/squashfs-root/usr/lib/nix \;
+	find /lib -name "$lib" -print -exec cp --verbose {} "$GITHUB_WORKSPACE"/squashfs-root/usr/lib/nix \;
+	ls "$GITHUB_WORKSPACE"/squashfs-root/usr/lib/nix
+done
+###
 export UPD_INFO="gh-releases-zsync|PCSX2|pcsx2|latest|$name.AppImage.zsync"
 export OUTPUT="$name.AppImage"
 /tmp/squashfs-root/AppRun --appdir="$GITHUB_WORKSPACE"/squashfs-root/ --plugin gtk -d "$GITHUB_WORKSPACE"/squashfs-root/PCSX2.desktop -i "$GITHUB_WORKSPACE"/squashfs-root/PCSX2.png --output appimage
