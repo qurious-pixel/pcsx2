@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [[ $(uname -n) == 'nixos' ]]; then
+	export LD_LIBRARY_PATH="$APPDIR/usr/lib/nix:$APPDIR/usr/lib:$LD_LIBRARY_PATH"
+else
+	export LD_LIBRARY_PATH="$APPDIR/usr/lib:$LD_LIBRARY_PATH"
+fi
+
 export LD_LIBRARY_PATH="$APPDIR/usr/lib:$LD_LIBRARY_PATH"
 BINARY_NAME=$(basename "$ARGV0")
 if [[ ! -e "$PWD/$BINARY_NAME.config" ]]; then
