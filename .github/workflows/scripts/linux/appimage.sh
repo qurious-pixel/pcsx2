@@ -6,9 +6,11 @@ echo "${PLATFORM}"
 if [ "${PLATFORM}" == "x86" ]; then
   APPARCH="i686"
   ARCH="i386"
+  LIBARCH="i386-linux-gnu"
 else
   APPARCH="x86_64"
   ARCH="x86_64"
+  LIBARCH="x86_64-linux-gnu"
 fi
 BUILDPATH="$GITHUB_WORKSPACE"/build
 BUILDBIN="$BUILDPATH"/pcsx2
@@ -47,15 +49,16 @@ cp "$GITHUB_WORKSPACE"/bin/docs/{Configuration_Guide.pdf,PCSX2_FAQ.pdf} "$GITHUB
 cp "$GITHUB_WORKSPACE"/bin/cheats_ws.zip "$GITHUB_WORKSPACE"/squashfs-root/usr/bin/app
 cp ./bin/GameIndex.yaml "$GITHUB_WORKSPACE"/squashfs-root/usr/bin/app/GameIndex.yaml
 ### NIX libs
-if [[ ! -e "$GITHUB_WORKSPACE"/squashfs-root/usr/lib/nix ]];then
-	mkdir "$GITHUB_WORKSPACE"/squashfs-root/usr/lib/nix
-fi
+mkdir "$GITHUB_WORKSPACE"/squashfs-root/usr/lib/nix
 for lib in $(cat .github/workflows/scripts/linux/nixlibs.txt)
 do
-	find /usr -name "$lib" -print -exec cp --verbose {} "$GITHUB_WORKSPACE"/squashfs-root/usr/lib/nix \;
-	find /lib -name "$lib" -print -exec cp --verbose {} "$GITHUB_WORKSPACE"/squashfs-root/usr/lib/nix \;
-	ls "$GITHUB_WORKSPACE"/squashfs-root/usr/lib/nix
+	if [[ -e "/lib/$LIBARCH/$lib" ]];then
+		cp "/lib/$LIBARCH/$lib" "$GITHUB_WORKSPACE"/squashfs-root/usr/lib/nix
+	else
+		cp "/usr/lib/$LIBARCH/$lib"  "$GITHUB_WORKSPACE"/squashfs-root/usr/lib/nix
+	fi
 done
+ls "$GITHUB_WORKSPACE"/squashfs-root/usr/lib/nix
 ###
 export UPD_INFO="gh-releases-zsync|PCSX2|pcsx2|latest|$name.AppImage.zsync"
 export OUTPUT="$name.AppImage"
